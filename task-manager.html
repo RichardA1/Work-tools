@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #60a5fa;
+            --accent: #fb923c;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #4ade80;
+            --completed-bg: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.4;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 1rem 0.5rem 0 0.5rem;
+        }
+
+        .top-section {
+            flex-shrink: 0;
+        }
+
+        header {
+            margin-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.02em;
+            margin-bottom: 0.25rem;
+        }
+
+        .subtitle {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .add-task-form {
+            background: var(--surface);
+            padding: 1rem;
+            border-radius: 6px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .form-group:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .form-group-inline {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .form-group-inline label {
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+
+        .form-group-inline select {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            background: var(--bg);
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--surface);
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.625rem 1.5rem;
+            font-family: 'Work Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: #ea580c;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(251, 146, 60, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .tasks-section {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem 0 0.5rem 0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .footer {
+            flex-shrink: 0;
+            background: var(--surface);
+            border-top: 2px solid var(--border);
+            padding: 0.75rem;
+        }
+
+        .footer-top {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .footer .add-task-form {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .footer-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .footer .task-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--text);
+            background: transparent;
+            padding: 0;
+            white-space: nowrap;
+        }
+
+        .footer .btn {
+            width: 100%;
+            padding: 0.625rem 1.5rem;
+        }
+
+        .footer .btn-add {
+            flex-shrink: 0;
+        }
+
+        .btn-export {
+            background: var(--primary);
+        }
+
+        .btn-export:hover {
+            background: #3b82f6;
+            box-shadow: 0 4px 12px rgba(96, 165, 250, 0.4);
+        }
+
+        .task-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            background: var(--bg);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            background: var(--surface);
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .task-item.completed {
+            background: var(--completed-bg);
+            border-left-color: var(--success);
+            opacity: 0.7;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.375rem;
+            margin-bottom: 0.375rem;
+        }
+
+        .checkbox-wrapper {
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--success);
+        }
+
+        .task-content {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .task-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .part-number-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.375rem;
+            margin-bottom: 0.25rem;
+            min-width: 0;
+        }
+
+        .part-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #fdba74;
+            background: rgba(251, 146, 60, 0.15);
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-item.completed .part-number {
+            color: #86efac;
+            background: rgba(74, 222, 128, 0.15);
+        }
+
+        .task-type {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .time-tracking {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+            text-align: right;
+            min-width: 80px;
+        }
+
+        .time-field {
+            background: transparent;
+            padding: 0;
+            border: none;
+        }
+
+        .time-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.5625rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.125rem;
+        }
+
+        .time-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6875rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .time-value.empty {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .task-description {
+            font-size: 1rem;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .task-item.completed .task-description {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .task-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.25rem;
+            margin-top: 0.375rem;
+        }
+
+        .btn-small {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.25rem 0.5rem;
+            font-size: 0.6875rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 500;
+        }
+
+        .btn-small:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn-delete {
+            font-size: 0.4rem;
+            padding: 0.25rem 0.375rem;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+        }
+
+        .btn-copy {
+            font-size: 0.6rem;
+            padding: 0.25rem 0.375rem;
+        }
+
+        .btn-copy:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .part-number-row .btn-copy {
+            padding: 0.125rem 0.25rem;
+            min-width: auto;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .btn-time {
+            background: var(--primary);
+            color: #0f172a;
+            border-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .btn-time:hover {
+            background: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 0.75rem 0.5rem 0 0.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .add-task-form {
+                padding: 0.75rem;
+            }
+
+            .task-item {
+                padding: 0.5rem;
+            }
+
+            .footer-actions {
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-section">
+            <header>
+                <h1>Task Manager</h1>
+            </header>
+        </div>
+
+        <div class="tasks-section">
+            <div class="section-header">
+                <h2>Active Tasks</h2>
+            </div>
+            <ul class="task-list" id="taskList"></ul>
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">📋</div>
+                <p>No tasks yet. Add your first task above!</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-top">
+                <span class="task-count" id="taskCount">0 tasks</span>
+            </div>
+            <div class="add-task-form">
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label for="partNumber">Part Number</label>
+                        <input 
+                            type="text" 
+                            id="partNumber" 
+                            maxlength="50" 
+                            placeholder="Enter part number..."
+                            required
+                        >
+                    </div>
+                    <div class="form-group form-group-inline">
+                        <label for="taskType">Type</label>
+                        <select id="taskType" required>
+                            <option value="">Select type...</option>
+                            <option value="S1">S1</option>
+                            <option value="OPAMP">OPAMP</option>
+                            <option value="LUFA">LUFA</option>
+                            <option value="S2">S2</option>
+                            <option value="PHOCA">PHOCA</option>
+                            <option value="5S">5S</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="footer-actions">
+                <button type="submit" form="taskForm" class="btn btn-add">Add Task</button>
+                <button class="btn btn-export" onclick="exportToCSV()">Save CSV</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Task management
+        let tasks = [];
+
+        // Load tasks from localStorage on page load
+        function loadTasks() {
+            const savedTasks = localStorage.getItem('tasks');
+            if (savedTasks) {
+                tasks = JSON.parse(savedTasks);
+            } else {
+                // Initialize with example tasks if no saved tasks exist
+                tasks = [
+                    {
+                        id: Date.now() - 3000,
+                        partNumber: "PCB-2024-001",
+                        type: "S1",
+                        startTime: null,
+                        stopTime: null,
+                        completed: false,
+                        createdAt: new Date(Date.now() - 3000).toISOString()
+                    },
+                    {
+                        id: Date.now() - 2000,
+                        partNumber: "AMP-789-XL",
+                        type: "OPAMP",
+                        startTime: null,
+                        stopTime: null,
+                        completed: false,
+                        createdAt: new Date(Date.now() - 2000).toISOString()
+                    },
+                    {
+                        id: Date.now() - 1000,
+                        partNumber: "CTRL-456-M3",
+                        type: "LUFA",
+                        startTime: null,
+                        stopTime: null,
+                        completed: false,
+                        createdAt: new Date(Date.now() - 1000).toISOString()
+                    }
+                ];
+                saveTasks();
+            }
+            renderTasks();
+        }
+
+        // Save tasks to localStorage
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Form submission
+        const taskForm = document.getElementById('taskForm');
+        taskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const partNumber = document.getElementById('partNumber').value.trim();
+            const taskType = document.getElementById('taskType').value;
+
+            if (partNumber && taskType) {
+                const task = {
+                    id: Date.now(),
+                    partNumber: partNumber,
+                    type: taskType,
+                    startTime: null,
+                    stopTime: null,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+
+                tasks.push(task);
+                saveTasks();
+                renderTasks();
+                
+                // Reset form
+                taskForm.reset();
+            }
+        });
+
+        // Render tasks
+        function renderTasks() {
+            const taskList = document.getElementById('taskList');
+            const emptyState = document.getElementById('emptyState');
+            const taskCount = document.getElementById('taskCount');
+
+            taskList.innerHTML = '';
+
+            if (tasks.length === 0) {
+                emptyState.style.display = 'block';
+                taskCount.textContent = '0 tasks';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            
+            const activeTasks = tasks.filter(t => !t.completed).length;
+            const completedTasks = tasks.filter(t => t.completed).length;
+            taskCount.textContent = `${activeTasks} active${completedTasks > 0 ? `, ${completedTasks} completed` : ''}`;
+
+            // Sort tasks: incomplete first, then completed
+            const sortedTasks = [...tasks].sort((a, b) => {
+                if (a.completed === b.completed) return b.id - a.id;
+                return a.completed ? 1 : -1;
+            });
+
+            sortedTasks.forEach(task => {
+                const li = document.createElement('li');
+                li.className = `task-item${task.completed ? ' completed' : ''}`;
+                
+                const startTimeDisplay = task.startTime 
+                    ? `<div class="time-value">${task.startTime}</div>`
+                    : `<div class="time-value empty">--</div>`;
+                
+                const stopTimeDisplay = task.stopTime 
+                    ? `<div class="time-value">${task.stopTime}</div>`
+                    : `<div class="time-value empty">--</div>`;
+                
+                const timeButtonText = !task.startTime ? 'Start' : (!task.stopTime ? 'Stop' : 'Reset');
+                
+                li.innerHTML = `
+                    <div class="task-header">
+                        <div class="checkbox-wrapper">
+                            <input 
+                                type="checkbox" 
+                                ${task.completed ? 'checked' : ''} 
+                                onchange="toggleTask(${task.id})"
+                            >
+                        </div>
+                        <div class="task-content">
+                            <div class="task-info">
+                                <div class="part-number-row">
+                                    <div class="part-number">${escapeHtml(task.partNumber)}</div>
+                                    <button class="btn-small btn-copy" onclick="copyPartNumber(${task.id})" title="Copy">📄</button>
+                                </div>
+                                <div class="task-type">Type: ${escapeHtml(task.type)}</div>
+                            </div>
+                            <div class="time-tracking">
+                                <div class="time-field">
+                                    <div class="time-label">Start</div>
+                                    ${startTimeDisplay}
+                                </div>
+                                <div class="time-field">
+                                    <div class="time-label">Stop</div>
+                                    ${stopTimeDisplay}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn-small btn-time" onclick="recordTime(${task.id})">${timeButtonText}</button>
+                        <button class="btn-small btn-delete" onclick="deleteTask(${task.id})" title="Delete">🗑️</button>
+                    </div>
+                `;
+                taskList.appendChild(li);
+            });
+        }
+
+        // Toggle task completion
+        function toggleTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                renderTasks();
+            }
+        }
+
+        // Record time (start, stop, or reset)
+        function recordTime(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const hours12 = hours % 12 || 12;
+                const timeString = `${hours12}:${minutes} ${ampm}`;
+                
+                if (!task.startTime) {
+                    // Record start time
+                    task.startTime = timeString;
+                } else if (!task.stopTime) {
+                    // Record stop time and mark as completed
+                    task.stopTime = timeString;
+                    task.completed = true;
+                } else {
+                    // Reset both times and completion status
+                    task.startTime = null;
+                    task.stopTime = null;
+                    task.completed = false;
+                }
+                
+                saveTasks();
+                renderTasks();
+            }
+        }
+
+        // Export tasks to CSV
+        function exportToCSV() {
+            if (tasks.length === 0) {
+                alert('No tasks to export!');
+                return;
+            }
+
+            // CSV header
+            let csv = 'Part Number,Type,Start Time,Stop Time,Completed,Created At\n';
+
+            // Add each task as a row
+            tasks.forEach(task => {
+                const row = [
+                    `"${task.partNumber}"`,
+                    `"${task.type}"`,
+                    `"${task.startTime || ''}"`,
+                    `"${task.stopTime || ''}"`,
+                    task.completed ? 'Yes' : 'No',
+                    `"${new Date(task.createdAt).toLocaleString()}"`
+                ].join(',');
+                csv += row + '\n';
+            });
+
+            // Create blob and download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            const timestamp = new Date().toISOString().split('T')[0];
+            link.setAttribute('href', url);
+            link.setAttribute('download', `tasks_${timestamp}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Delete task
+        function deleteTask(id) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                tasks = tasks.filter(t => t.id !== id);
+                saveTasks();
+                renderTasks();
+            }
+        }
+
+        // Copy part number to clipboard
+        function copyPartNumber(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                navigator.clipboard.writeText(task.partNumber).then(() => {
+                    // Visual feedback - you could add a temporary message here
+                    console.log('Part number copied:', task.partNumber);
+                }).catch(err => {
+                    console.error('Failed to copy:', err);
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = task.partNumber;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        console.log('Part number copied (fallback):', task.partNumber);
+                    } catch (err) {
+                        console.error('Fallback copy failed:', err);
+                    }
+                    document.body.removeChild(textArea);
+                });
+            }
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        loadTasks();
+    </script>
+</body>
+</html>
