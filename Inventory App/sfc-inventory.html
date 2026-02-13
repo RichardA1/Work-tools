@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SFC Inventory</title>
+    <style>
+        :root {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #fafafa;
+            --accent-primary: #0066cc;
+            --accent-secondary: #5c6770;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --border: #dee2e6;
+            --highlight: #28a745;
+            --danger: #dc3545;
+        }
+
+        body.dark-mode {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-tertiary: #242424;
+            --accent-primary: #4da6ff;
+            --accent-secondary: #8a9199;
+            --text-primary: #e8e8e8;
+            --text-secondary: #b8b8b8;
+            --text-muted: #888888;
+            --border: #404040;
+            --highlight: #5cb85c;
+            --danger: #dc3545;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 15px;
+            font-size: 14px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .menu-icon {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+            position: relative;
+        }
+
+        .menu-icon:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .menu-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--text-primary);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 5px);
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .dropdown-item svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--text-secondary);
+        }
+
+        .dark-mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .dark-mode-toggle label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            flex: 1;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch:hover {
+            background: var(--accent-secondary);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        body.dark-mode .toggle-switch {
+            background: var(--accent-primary);
+        }
+
+        body.dark-mode .toggle-slider {
+            transform: translateX(24px);
+        }
+
+        .top-controls {
+            background: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .search-section {
+            margin-bottom: 12px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 6px 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .btn {
+            padding: 6px 14px;
+            background: var(--accent-primary);
+            border: none;
+            border-radius: 3px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: var(--accent-secondary);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .search-result {
+            margin-top: 8px;
+            padding: 8px 10px;
+            background: var(--bg-tertiary);
+            border-left: 3px solid var(--highlight);
+            border-radius: 3px;
+            font-size: 12px;
+            color: var(--text-primary);
+            display: none;
+        }
+
+        .search-result.show {
+            display: block;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 0;
+            flex-wrap: wrap;
+            background: var(--bg-tertiary);
+            padding: 8px;
+            border-radius: 3px;
+            border: 1px solid var(--border);
+        }
+
+        .tab {
+            padding: 6px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .tab.active {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        .tab.highlight {
+            background: var(--highlight);
+            color: white;
+            border-color: var(--highlight);
+        }
+
+        .tab.highlight-partial {
+            background: #ff9800;
+            color: white;
+            border-color: #ff9800;
+        }
+
+        .tab-name {
+            flex: 1;
+        }
+
+        .tab-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-size: 12px;
+        }
+
+        .tab.active .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab:not(.active) .tab-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark-mode .tab:not(.active) .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--bg-secondary);
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .list-input-container {
+            margin-bottom: 12px;
+        }
+
+        .list-input {
+            width: 100%;
+            padding: 8px 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        .list-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .list-items {
+            list-style: none;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            background: var(--bg-tertiary);
+            margin-bottom: 4px;
+            border-radius: 3px;
+            border-left: 2px solid var(--accent-primary);
+        }
+
+        .list-item:hover {
+            background: var(--bg-primary);
+        }
+
+        .list-item.highlight {
+            background: var(--bg-tertiary);
+            border-left-color: var(--highlight);
+            outline: 2px solid var(--highlight);
+        }
+
+        .list-item.highlight-partial {
+            background: var(--bg-tertiary);
+            border-left-color: #ff9800;
+            outline: 2px solid #ff9800;
+        }
+
+        .list-number {
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 35px;
+            font-size: 12px;
+        }
+
+        .list-text {
+            flex: 1;
+            color: var(--text-primary);
+            word-break: break-word;
+            font-size: 13px;
+        }
+
+        .list-text.highlight {
+            background: var(--highlight);
+            color: white;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+
+        .list-text.highlight-partial {
+            background: #ff9800;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+
+        .remove-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-btn:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .empty-state-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            opacity: 0.3;
+        }
+
+        @media (max-width: 600px) {
+            .dropdown-menu {
+                right: -15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <h1>SFC Inventory</h1>
+            </div>
+            <div class="menu-icon" onclick="toggleMenu()">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+                <div id="dropdownMenu" class="dropdown-menu">
+                    <div class="dropdown-item" onclick="event.stopPropagation(); showAddTabModal();">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Tab
+                    </div>
+                    <div class="dropdown-item" onclick="event.stopPropagation(); exportData();">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Export XML
+                    </div>
+                    <div class="dropdown-item" onclick="event.stopPropagation(); document.getElementById('importFile').click();">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        Import XML
+                    </div>
+                    <div class="dropdown-item" onclick="event.stopPropagation();">
+                        <div class="dark-mode-toggle">
+                            <label>Dark Mode</label>
+                            <div class="toggle-switch" onclick="toggleDarkMode()">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <input type="file" id="importFile" accept=".xml" onchange="importData(event)" style="display: none;">
+        </header>
+
+        <div class="top-controls">
+            <div class="search-section">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search all lists...">
+                    <button class="btn" onclick="searchAllLists()">Find</button>
+                </div>
+                <div id="searchResult" class="search-result"></div>
+            </div>
+        </div>
+
+        <div class="tabs" id="tabsContainer"></div>
+        <div id="tabContents"></div>
+    </div>
+
+    <!-- Modal for adding/renaming tabs -->
+    <div id="tabModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Create New Tab</h2>
+            <input type="text" id="tabNameInput" placeholder="Tab name...">
+            <div class="modal-actions">
+                <button class="btn" onclick="confirmTabAction()">Confirm</button>
+                <button class="btn btn-danger" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tabs = [];
+        let currentTab = null;
+        let modalAction = null;
+        let modalTabId = null;
+
+        function toggleMenu() {
+            const menu = document.getElementById('dropdownMenu');
+            menu.classList.toggle('show');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('dropdownMenu');
+            const menuIcon = document.querySelector('.menu-icon');
+            if (menu && !menuIcon.contains(event.target)) {
+                menu.classList.remove('show');
+            }
+        });
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        }
+
+        function initializeDarkMode() {
+            const darkMode = localStorage.getItem('darkMode');
+            if (darkMode === 'enabled') {
+                document.body.classList.add('dark-mode');
+            }
+        }
+
+        function initializeApp() {
+            initializeDarkMode();
+            if (tabs.length === 0) {
+                addTab('General');
+            }
+        }
+
+        function generateId() {
+            return 'tab_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function showAddTabModal() {
+            const menu = document.getElementById('dropdownMenu');
+            menu.classList.remove('show');
+            modalAction = 'add';
+            document.getElementById('modalTitle').textContent = 'Create New Tab';
+            document.getElementById('tabNameInput').value = '';
+            document.getElementById('tabModal').classList.add('show');
+            document.getElementById('tabNameInput').focus();
+        }
+
+        function showRenameTabModal(tabId) {
+            modalAction = 'rename';
+            modalTabId = tabId;
+            const tab = tabs.find(t => t.id === tabId);
+            document.getElementById('modalTitle').textContent = 'Rename Tab';
+            document.getElementById('tabNameInput').value = tab.name;
+            document.getElementById('tabModal').classList.add('show');
+            document.getElementById('tabNameInput').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('tabModal').classList.remove('show');
+            modalAction = null;
+            modalTabId = null;
+        }
+
+        function confirmTabAction() {
+            const name = document.getElementById('tabNameInput').value.trim();
+            if (!name) return;
+
+            if (modalAction === 'add') {
+                addTab(name);
+            } else if (modalAction === 'rename') {
+                renameTab(modalTabId, name);
+            }
+            closeModal();
+        }
+
+        function addTab(name) {
+            const id = generateId();
+            tabs.push({
+                id: id,
+                name: name,
+                items: []
+            });
+            renderTabs();
+            switchTab(id);
+        }
+
+        function renameTab(tabId, newName) {
+            const tab = tabs.find(t => t.id === tabId);
+            if (tab) {
+                tab.name = newName;
+                renderTabs();
+            }
+        }
+
+        function deleteTab(tabId) {
+            if (tabs.length === 1) {
+                alert('Cannot delete the last tab!');
+                return;
+            }
+            if (confirm('Are you sure you want to delete this tab and all its items?')) {
+                tabs = tabs.filter(t => t.id !== tabId);
+                if (currentTab === tabId) {
+                    currentTab = tabs[0].id;
+                }
+                renderTabs();
+            }
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            renderTabs();
+        }
+
+        function renderTabs() {
+            const tabsContainer = document.getElementById('tabsContainer');
+            const tabContents = document.getElementById('tabContents');
+            
+            tabsContainer.innerHTML = '';
+            tabContents.innerHTML = '';
+
+            tabs.forEach(tab => {
+                // Create tab button
+                const tabElement = document.createElement('div');
+                tabElement.className = 'tab' + (currentTab === tab.id ? ' active' : '');
+                tabElement.innerHTML = `
+                    <span class="tab-name">${escapeHtml(tab.name)}</span>
+                    <div class="tab-actions">
+                        <button class="tab-btn" onclick="showRenameTabModal('${tab.id}')" title="Rename">✎</button>
+                        <button class="tab-btn" onclick="deleteTab('${tab.id}')" title="Delete">✕</button>
+                    </div>
+                `;
+                tabElement.querySelector('.tab-name').onclick = () => switchTab(tab.id);
+                tabsContainer.appendChild(tabElement);
+
+                // Create tab content
+                const contentElement = document.createElement('div');
+                contentElement.className = 'tab-content' + (currentTab === tab.id ? ' active' : '');
+                contentElement.id = `content_${tab.id}`;
+                
+                let itemsHtml = '';
+                if (tab.items.length === 0) {
+                    itemsHtml = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <div>No items. Type above to add.</div>
+                        </div>
+                    `;
+                } else {
+                    itemsHtml = '<ul class="list-items">';
+                    tab.items.forEach((item, index) => {
+                        itemsHtml += `
+                            <li class="list-item">
+                                <span class="list-number">#${index + 1}</span>
+                                <span class="list-text">${escapeHtml(item)}</span>
+                                <button class="remove-btn" onclick="removeItem('${tab.id}', ${index})" title="Remove item">×</button>
+                            </li>
+                        `;
+                    });
+                    itemsHtml += '</ul>';
+                }
+
+                contentElement.innerHTML = `
+                    <div class="list-input-container">
+                        <input type="text" 
+                               class="list-input" 
+                               id="input_${tab.id}" 
+                               placeholder="Type item and press Enter..."
+                               onkeypress="handleListInput(event, '${tab.id}')">
+                    </div>
+                    ${itemsHtml}
+                `;
+                
+                tabContents.appendChild(contentElement);
+            });
+        }
+
+        function handleListInput(event, tabId) {
+            if (event.key === 'Enter') {
+                const input = event.target;
+                const value = input.value.trim();
+                if (value) {
+                    const tab = tabs.find(t => t.id === tabId);
+                    if (tab) {
+                        tab.items.push(value);
+                        input.value = '';
+                        renderTabs();
+                        // Refocus the input
+                        setTimeout(() => {
+                            document.getElementById(`input_${tabId}`).focus();
+                        }, 50);
+                    }
+                }
+            }
+        }
+
+        function removeItem(tabId, index) {
+            const tab = tabs.find(t => t.id === tabId);
+            if (tab) {
+                tab.items.splice(index, 1);
+                renderTabs();
+            }
+        }
+
+        function searchAllLists() {
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            const searchResult = document.getElementById('searchResult');
+            
+            // Clear previous highlights
+            document.querySelectorAll('.highlight, .highlight-partial').forEach(el => {
+                el.classList.remove('highlight', 'highlight-partial');
+            });
+
+            if (!searchTerm) {
+                searchResult.classList.remove('show');
+                return;
+            }
+
+            let exactMatches = [];
+            let partialMatches = [];
+
+            // Search through all tabs for both exact and partial matches
+            for (const tab of tabs) {
+                for (let i = 0; i < tab.items.length; i++) {
+                    if (tab.items[i].toLowerCase() === searchTerm) {
+                        exactMatches.push({ tab: tab, index: i });
+                    } else if (tab.items[i].toLowerCase().includes(searchTerm)) {
+                        partialMatches.push({ tab: tab, index: i });
+                    }
+                }
+            }
+
+            // Determine which matches to use (exact takes priority)
+            const matchesToUse = exactMatches.length > 0 ? exactMatches : partialMatches;
+            const isPartialMatch = exactMatches.length === 0 && partialMatches.length > 0;
+            const highlightClass = isPartialMatch ? 'highlight-partial' : 'highlight';
+
+            if (matchesToUse.length > 0) {
+                // Switch to the first tab with a match
+                switchTab(matchesToUse[0].tab.id);
+                
+                // Wait for render, then highlight all matches
+                setTimeout(() => {
+                    const tabsWithMatches = new Set();
+                    
+                    matchesToUse.forEach(match => {
+                        tabsWithMatches.add(match.tab.id);
+                        
+                        // Highlight list items
+                        const listItems = document.querySelectorAll(`#content_${match.tab.id} .list-item`);
+                        if (listItems[match.index]) {
+                            listItems[match.index].classList.add(highlightClass);
+                            const textSpan = listItems[match.index].querySelector('.list-text');
+                            textSpan.classList.add(highlightClass);
+                        }
+                    });
+
+                    // Highlight all tabs that have matches
+                    const tabElements = document.querySelectorAll('.tab');
+                    tabElements.forEach(tabEl => {
+                        const tabName = tabEl.querySelector('.tab-name').textContent;
+                        const tabWithMatch = matchesToUse.find(m => m.tab.name === tabName);
+                        if (tabWithMatch) {
+                            tabEl.classList.add(highlightClass);
+                        }
+                    });
+
+                    // Scroll to first match
+                    const firstListItems = document.querySelectorAll(`#content_${matchesToUse[0].tab.id} .list-item`);
+                    if (firstListItems[matchesToUse[0].index]) {
+                        firstListItems[matchesToUse[0].index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+
+                    // Build result message
+                    let resultText = '';
+                    if (isPartialMatch) {
+                        resultText = `${matchesToUse.length} partial match${matchesToUse.length > 1 ? 'es' : ''} found: `;
+                    } else {
+                        resultText = `${matchesToUse.length} match${matchesToUse.length > 1 ? 'es' : ''} found: `;
+                    }
+
+                    // Group matches by tab
+                    const matchesByTab = {};
+                    matchesToUse.forEach(match => {
+                        if (!matchesByTab[match.tab.name]) {
+                            matchesByTab[match.tab.name] = [];
+                        }
+                        matchesByTab[match.tab.name].push(match.index + 1);
+                    });
+
+                    // Create summary
+                    const summaries = [];
+                    for (const tabName in matchesByTab) {
+                        const items = matchesByTab[tabName].sort((a, b) => a - b);
+                        summaries.push(`"${tabName}" (${items.map(i => `#${i}`).join(', ')})`);
+                    }
+
+                    resultText += summaries.join(' | ');
+                    searchResult.textContent = resultText;
+                    searchResult.classList.add('show');
+                }, 100);
+            } else {
+                searchResult.textContent = 'No results found.';
+                searchResult.classList.add('show');
+            }
+        }
+
+        function exportData() {
+            const menu = document.getElementById('dropdownMenu');
+            menu.classList.remove('show');
+            
+            let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+            xml += '<SFCInventory>\n';
+            
+            tabs.forEach(tab => {
+                xml += `  <Tab name="${escapeXml(tab.name)}">\n`;
+                tab.items.forEach(item => {
+                    xml += `    <Item>${escapeXml(item)}</Item>\n`;
+                });
+                xml += '  </Tab>\n';
+            });
+            
+            xml += '</SFCInventory>';
+
+            const blob = new Blob([xml], { type: 'text/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sfc-inventory.xml';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const menu = document.getElementById('dropdownMenu');
+            menu.classList.remove('show');
+            
+            const file = event.target.files[0];
+            if (!file) {
+                console.log('No file selected');
+                return;
+            }
+
+            console.log('Importing file:', file.name);
+
+            const reader = new FileReader();
+            reader.onerror = function() {
+                alert('Error reading file!');
+                event.target.value = '';
+            };
+            
+            reader.onload = function(e) {
+                try {
+                    console.log('File loaded, parsing XML...');
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(e.target.result, 'text/xml');
+                    
+                    if (xmlDoc.querySelector('parsererror')) {
+                        alert('Invalid XML file!');
+                        event.target.value = '';
+                        return;
+                    }
+
+                    const tabElements = xmlDoc.querySelectorAll('Tab');
+                    console.log('Found tabs:', tabElements.length);
+                    
+                    if (tabElements.length === 0) {
+                        alert('No tabs found in XML file!');
+                        event.target.value = '';
+                        return;
+                    }
+
+                    if (confirm('This will replace all current data. Continue?')) {
+                        const newTabs = [];
+                        
+                        tabElements.forEach(tabEl => {
+                            const tabName = tabEl.getAttribute('name') || 'Untitled';
+                            const items = [];
+                            
+                            const itemElements = tabEl.querySelectorAll('Item');
+                            itemElements.forEach(itemEl => {
+                                const itemText = itemEl.textContent.trim();
+                                if (itemText) {
+                                    items.push(itemText);
+                                }
+                            });
+
+                            newTabs.push({
+                                id: generateId(),
+                                name: tabName,
+                                items: items
+                            });
+                        });
+
+                        if (newTabs.length > 0) {
+                            tabs = newTabs;
+                            currentTab = tabs[0].id;
+                            renderTabs();
+                            alert('Data imported successfully! Loaded ' + tabs.length + ' tab(s).');
+                        } else {
+                            alert('No valid tabs found in file!');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Import error:', error);
+                    alert('Error importing file: ' + error.message);
+                }
+                
+                // Reset file input
+                event.target.value = '';
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function escapeXml(text) {
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&apos;');
+        }
+
+        // Handle Enter key in modal
+        document.getElementById('tabNameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                confirmTabAction();
+            }
+        });
+
+        // Initialize the app
+        initializeApp();
+    </script>
+</body>
+</html>
