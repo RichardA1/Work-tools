@@ -19,6 +19,7 @@ A streamlined, single-file task management application with dark/light mode supp
 - **Delete Tasks** — Individual task deletion with confirmation
 - **Copy Actions** — Click part numbers or times to copy instantly
 - **Rework Indicator** — Checkbox to flag tasks requiring rework
+- **URL Links** — Click link button (🔗) to open part number in configured URL
 
 ### Time Tracking
 - **Start/Stop/Reset** — Three-state time tracking
@@ -75,6 +76,14 @@ Click directly on any of these to copy to clipboard:
 - Part numbers (via the 📄 button)
 - Start times
 - Stop times
+
+### Opening Part Number Links
+If a URL template is configured:
+1. Click the 🔗 button next to any part number
+2. Opens the configured URL with the part number in a new window
+3. Window is named after the part number (clicking again reuses the same window)
+
+**Note:** Whether links open in tabs or windows depends on your browser settings.
 
 ### Managing Tasks
 - **Mark Complete** — Check the checkbox (or use Stop button)
@@ -145,6 +154,9 @@ All configuration is embedded in `task-manager.html` as XML. Find the `CONFIG_XM
         <block label="Sample 2">Sample 2</block>
         <block label="Sample 3">Sample 3</block>
     </textblocks>
+
+    <!-- URL template for part number links. Use {partNumber} as placeholder -->
+    <url_template>https://example.com/search?q={partNumber}</url_template>
 </config>
 ```
 
@@ -172,6 +184,32 @@ Edit the `<textblocks>` section to add quick-copy snippets:
 ```
 
 The `label` attribute appears as the card header. The text content is what gets copied.
+
+### Customizing URL Template
+Edit the `<url_template>` section to configure part number links:
+
+```xml
+<!-- Internal system lookup -->
+<url_template>http://internal-system.company.com/part/{partNumber}</url_template>
+
+<!-- Google search -->
+<url_template>https://www.google.com/search?q={partNumber}</url_template>
+
+<!-- Inventory database -->
+<url_template>https://inventory.company.com/lookup?id={partNumber}</url_template>
+```
+
+**How it works:**
+- The `{partNumber}` placeholder is replaced with the actual part number
+- Part numbers are automatically URL-encoded (spaces become %20, etc.)
+- If this element is empty or missing, the 🔗 link button won't appear
+- Links open in a new window named after the part number
+
+**Browser behavior:**
+Whether links open in tabs or windows depends on browser settings. To force windows:
+- **Chrome/Edge:** Settings → Appearance → Turn off "Open new pages in tabs"
+- **Firefox:** Settings → General → Tabs → Uncheck "Open links in tabs"
+- **Safari:** Preferences → Tabs → Set to "Never"
 
 ### Saving Changes
 1. Open `task-manager.html` in a text editor
@@ -262,6 +300,7 @@ Part Number,Type,Start Time,Stop Time,Completed,Rework,Created At
 - Long part numbers truncate with ellipsis but copy in full
 - Mark tasks as rework to highlight them with a red border
 - Rework status is independent of completion status
+- Configure URL template to enable quick lookup links for part numbers
 - Use Clear All for a fresh start (requires confirmation)
 
 ### Time Tracking
