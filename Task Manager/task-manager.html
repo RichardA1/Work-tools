@@ -473,7 +473,7 @@
         .rework-indicator {
             display: flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: 0.75rem;
             margin-top: 0.375rem;
             font-size: 0.6875rem;
             color: var(--text-muted);
@@ -492,6 +492,12 @@
             cursor: pointer;
         }
 
+        .rework-check-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
         .task-item.is-rework {
             border-left-color: #ef4444;
         }
@@ -499,6 +505,41 @@
         .task-item.is-rework .part-number {
             color: #fca5a5;
             background: rgba(239, 68, 68, 0.15);
+        }
+
+        .note-preview {
+            padding: 0.25rem 0.5rem;
+            background: rgba(139, 92, 246, 0.1);
+            border-left: 2px solid #8b5cf6;
+            border-radius: 3px;
+            font-size: 0.6875rem;
+            color: var(--text-muted);
+            font-style: italic;
+            line-height: 1.3;
+            max-width: 60%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .note-preview:empty {
+            display: none;
+        }
+
+        .task-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.375rem;
+        }
+
+        .task-actions-buttons {
+            display: flex;
+            gap: 0.25rem;
+            flex-shrink: 0;
         }
 
         .task-content {
@@ -552,6 +593,36 @@
             font-weight: 600;
             color: var(--primary);
             margin-bottom: 0.5rem;
+        }
+
+        .task-status {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .task-status-label {
+            font-size: 0.6875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .task-status-select {
+            padding: 0.25rem 0.5rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            color: var(--text);
+            font-size: 0.6875rem;
+            cursor: pointer;
+            font-family: 'Work Sans', sans-serif;
+            min-width: 120px;
+        }
+
+        .task-status-select:focus {
+            outline: none;
+            border-color: var(--accent);
         }
 
         .time-tracking {
@@ -610,13 +681,6 @@
         .task-item.completed .task-description {
             text-decoration: line-through;
             color: var(--text-muted);
-        }
-
-        .task-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.25rem;
-            margin-top: 0.375rem;
         }
 
         .btn-small {
@@ -868,6 +932,113 @@
                 gap: 0.5rem;
             }
         }
+
+        /* ─── MODAL ─── */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-header {
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .modal-body {
+            margin-bottom: 1rem;
+        }
+
+        .modal-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 0.75rem;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+            font-family: 'Work Sans', sans-serif;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            resize: vertical;
+        }
+
+        .modal-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .btn-modal {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-modal-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-modal-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-modal-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .btn-modal-secondary:hover {
+            background: var(--accent-secondary);
+        }
+
+        .btn-note {
+            font-size: 0.6rem;
+            padding: 0.25rem 0.375rem;
+        }
+
+        .btn-note:hover {
+            background: #8b5cf6;
+            border-color: #8b5cf6;
+        }
     </style>
 </head>
 <body>
@@ -962,12 +1133,29 @@
         </div>
     </div>
 
+    <!-- Note Modal -->
+    <div id="noteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="noteModalTitle">Task Note</div>
+            </div>
+            <div class="modal-body">
+                <textarea id="noteTextarea" class="modal-textarea" placeholder="Add a note for this task..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal btn-modal-primary" onclick="saveNote()">Save</button>
+                <button class="btn-modal btn-modal-secondary" onclick="closeNoteModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ─── STATE ───
         let tasks = [];
         let taskTypes = [];
         let textBlocks = [];
         let urlTemplate = '';
+        let statusOptions = [];
 
         // ─── TABS ───
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1000,8 +1188,17 @@
         <block label="Sample 3">Sample 3</block>
     </textblocks>
 
+    <!-- Status dropdown options. Each option has a label (shown to user) and value (stored in data) -->
+    <status_options>
+        <option label="Option 1" value="option1" />
+        <option label="Option 2" value="option2" />
+        <option label="Option 3" value="option3" />
+    </status_options>
+
     <!-- URL template for part number links. Use {partNumber} as placeholder -->
-    <url_template>https://www.amazon.com/dp/{partNumber}?th=1</url_template>
+    <!-- IMPORTANT: Use &amp; instead of & in URLs (XML requires this) -->
+    <!-- Example: https://example.com/search?q={partNumber}&amp;filter=active -->
+    <url_template>https://example.com/search?q={partNumber}</url_template>
 </config>`;
 
         function parseConfig(xmlText) {
@@ -1019,6 +1216,13 @@
                     text:  n.textContent.trim()
                 }));
             renderTextBlocks();
+
+            // Parse status options
+            statusOptions = Array.from(xmlDoc.querySelectorAll('status_options > option'))
+                .map(n => ({
+                    label: n.getAttribute('label') || 'Untitled',
+                    value: n.getAttribute('value') || ''
+                }));
 
             // Parse URL template
             const urlNode = xmlDoc.querySelector('url_template');
@@ -1055,9 +1259,9 @@
                 tasks = JSON.parse(saved);
             } else {
                 tasks = [
-                    { id: Date.now()-3000, partNumber:"PCB-2024-001", type:"Option 1", startTime:null, stopTime:null, completed:false, isRework:false, createdAt: new Date(Date.now()-3000).toISOString() },
-                    { id: Date.now()-2000, partNumber:"AMP-789-XL",   type:"Option 2", startTime:null, stopTime:null, completed:false, isRework:false, createdAt: new Date(Date.now()-2000).toISOString() },
-                    { id: Date.now()-1000, partNumber:"CTRL-456-M3",  type:"Option 3", startTime:null, stopTime:null, completed:false, isRework:false, createdAt: new Date(Date.now()-1000).toISOString() }
+                    { id: Date.now()-3000, partNumber:"PCB-2024-001", type:"Option 1", startTime:null, stopTime:null, completed:false, isRework:false, status:'option1', note:'', createdAt: new Date(Date.now()-3000).toISOString() },
+                    { id: Date.now()-2000, partNumber:"AMP-789-XL",   type:"Option 2", startTime:null, stopTime:null, completed:false, isRework:false, status:'option1', note:'', createdAt: new Date(Date.now()-2000).toISOString() },
+                    { id: Date.now()-1000, partNumber:"CTRL-456-M3",  type:"Option 3", startTime:null, stopTime:null, completed:false, isRework:false, status:'option1', note:'', createdAt: new Date(Date.now()-1000).toISOString() }
                 ];
                 saveTasks();
             }
@@ -1076,6 +1280,8 @@
                 tasks.push({
                     id: Date.now(), partNumber, type: taskType,
                     startTime: null, stopTime: null, completed: false, isRework: false,
+                    status: statusOptions.length > 0 ? statusOptions[0].value : '',
+                    note: '',
                     createdAt: new Date().toISOString()
                 });
                 saveTasks();
@@ -1147,8 +1353,18 @@
                                 </div>
                                 <div class="task-type">Type: ${escapeHtml(task.type)}</div>
                                 <div class="rework-indicator">
-                                    <input type="checkbox" class="rework-checkbox" ${task.isRework ? 'checked' : ''} onchange="toggleRework(${task.id})" id="rework-${task.id}">
-                                    <label class="rework-label" for="rework-${task.id}">Rework</label>
+                                    <div class="task-status">
+                                        <div class="task-status-label">Status:</div>
+                                        <select class="task-status-select" onchange="updateTaskStatus(${task.id}, this.value)">
+                                            ${statusOptions.map(opt => 
+                                                `<option value="${opt.value}" ${task.status === opt.value ? 'selected' : ''}>${escapeHtml(opt.label)}</option>`
+                                            ).join('')}
+                                        </select>
+                                    </div>
+                                    <div class="rework-check-wrapper">
+                                        <input type="checkbox" class="rework-checkbox" ${task.isRework ? 'checked' : ''} onchange="toggleRework(${task.id})" id="rework-${task.id}">
+                                        <label class="rework-label" for="rework-${task.id}">Rework</label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="time-tracking">
@@ -1158,8 +1374,12 @@
                         </div>
                     </div>
                     <div class="task-actions">
-                        <button class="btn-small btn-time" onclick="recordTime(${task.id})">${timeBtnText}</button>
-                        <button class="btn-small btn-delete" onclick="deleteTask(${task.id})" title="Delete">🗑️</button>
+                        ${task.note ? `<div class="note-preview">${escapeHtml(task.note)}</div>` : ''}
+                        <div class="task-actions-buttons">
+                            <button class="btn-small btn-time" onclick="recordTime(${task.id})">${timeBtnText}</button>
+                            <button class="btn-small btn-note" onclick="openNoteModal(${task.id})" title="Add/Edit Note">📝</button>
+                            <button class="btn-small btn-delete" onclick="deleteTask(${task.id})" title="Delete">🗑️</button>
+                        </div>
                     </div>`;
                 taskList.appendChild(li);
             });
@@ -1173,6 +1393,11 @@
         function toggleRework(id) {
             const task = tasks.find(t => t.id === id);
             if (task) { task.isRework = !task.isRework; saveTasks(); renderTasks(); }
+        }
+
+        function updateTaskStatus(id, newStatus) {
+            const task = tasks.find(t => t.id === id);
+            if (task) { task.status = newStatus; saveTasks(); }
         }
 
         function recordTime(id) {
@@ -1202,6 +1427,52 @@
             }
         }
 
+        // ─── NOTES MODAL ───
+        let currentNoteTaskId = null;
+
+        function openNoteModal(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                currentNoteTaskId = id;
+                document.getElementById('noteModalTitle').textContent = `Note: ${task.partNumber}`;
+                document.getElementById('noteTextarea').value = task.note || '';
+                document.getElementById('noteModal').classList.add('show');
+                document.getElementById('noteTextarea').focus();
+            }
+        }
+
+        function closeNoteModal() {
+            document.getElementById('noteModal').classList.remove('show');
+            currentNoteTaskId = null;
+        }
+
+        function saveNote() {
+            if (currentNoteTaskId !== null) {
+                const task = tasks.find(t => t.id === currentNoteTaskId);
+                if (task) {
+                    task.note = document.getElementById('noteTextarea').value.trim();
+                    saveTasks();
+                    renderTasks();
+                }
+            }
+            closeNoteModal();
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('noteModal').classList.contains('show')) {
+                closeNoteModal();
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('noteModal').addEventListener('click', (e) => {
+            if (e.target.id === 'noteModal') {
+                closeNoteModal();
+            }
+        });
+
+
         function copyPartNumber(id) {
             const task = tasks.find(t => t.id === id);
             if (task) copyText(task.partNumber);
@@ -1221,14 +1492,18 @@
 
         function exportToCSV() {
             if (tasks.length === 0) { alert('No tasks to export!'); return; }
-            let csv = 'Part Number,Type,Start Time,Stop Time,Completed,Rework,Created At\n';
+            let csv = 'Part Number,Type,Status,Start Time,Stop Time,Completed,Rework,Note,Created Date\n';
             tasks.forEach(task => {
+                const createdDate = new Date(task.createdAt).toLocaleDateString();
+                const noteText = (task.note || '').replace(/"/g, '""'); // Escape quotes in notes
+                const statusLabel = statusOptions.find(opt => opt.value === task.status)?.label || task.status || '';
                 csv += [
-                    `"${task.partNumber}"`, `"${task.type}"`,
+                    `"${task.partNumber}"`, `"${task.type}"`, `"${statusLabel}"`,
                     `"${task.startTime || ''}"`, `"${task.stopTime || ''}"`,
                     task.completed ? 'Yes' : 'No',
                     task.isRework ? 'Yes' : 'No',
-                    `"${new Date(task.createdAt).toLocaleString()}"`
+                    `"${noteText}"`,
+                    `"${createdDate}"`
                 ].join(',') + '\n';
             });
             const link = document.createElement('a');

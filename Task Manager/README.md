@@ -18,6 +18,9 @@ A streamlined, single-file task management application with dark/light mode supp
 - **Add Tasks** — Part number (50 char max) + type selection
 - **Delete Tasks** — Individual task deletion with confirmation
 - **Copy Actions** — Click part numbers or times to copy instantly
+- **Status Dropdown** — Configurable status field for each task (e.g., Pending, In Progress, Complete)
+- **Task Notes** — Add notes to any task via popup modal (📝 button)
+- **Note Preview** — See note snippets inline with action buttons
 - **Rework Indicator** — Checkbox to flag tasks requiring rework
 - **URL Links** — Click link button (🔗) to open part number in configured URL
 
@@ -87,14 +90,28 @@ If a URL template is configured:
 
 ### Managing Tasks
 - **Mark Complete** — Check the checkbox (or use Stop button)
-- **Mark as Rework** — Check the "Rework" checkbox below the Type field
+- **Change Status** — Use the status dropdown to set task status (e.g., Pending, In Progress)
+- **Mark as Rework** — Check the "Rework" checkbox (inline with status dropdown)
   - Task border turns red
   - Part number badge turns light red
   - Rework status saved and exported in CSV
 - **Delete** — Click the 🗑️ icon with confirmation
 - **Clear All** — Use the menu (☰) → Clear All option
 
-### Using Notes
+### Adding Task Notes
+Each task can have an optional note:
+1. Click the 📝 button on any task
+2. Modal popup appears with a text area
+3. Type your note (supports multiple lines)
+4. Click **Save** to save the note, or **Cancel** to discard
+5. Note preview appears inline with action buttons
+6. Notes are included in CSV export
+
+**Shortcuts:**
+- Press **Escape** to close the modal
+- Click outside the modal to close it
+
+### Using the Notes Tab
 1. Click the **Notes** tab
 2. Type freely in the text area
 3. Notes save automatically after a brief pause
@@ -155,7 +172,16 @@ All configuration is embedded in `task-manager.html` as XML. Find the `CONFIG_XM
         <block label="Sample 3">Sample 3</block>
     </textblocks>
 
+    <!-- Status dropdown options. Each option has a label (shown to user) and value (stored in data) -->
+    <status_options>
+        <option label="Option 1" value="option1" />
+        <option label="Option 2" value="option2" />
+        <option label="Option 3" value="option3" />
+    </status_options>
+
     <!-- URL template for part number links. Use {partNumber} as placeholder -->
+    <!-- IMPORTANT: Use &amp; instead of & in URLs (XML requires this) -->
+    <!-- Example: https://example.com/search?q={partNumber}&amp;filter=active -->
     <url_template>https://example.com/search?q={partNumber}</url_template>
 </config>
 ```
@@ -171,6 +197,29 @@ Edit the `<types>` section to change dropdown options:
     <type>Research</type>
 </types>
 ```
+
+### Customizing Status Options
+Edit the `<status_options>` section to change the status dropdown:
+
+```xml
+<!-- Example: Workflow statuses -->
+<status_options>
+    <option label="Pending" value="pending" />
+    <option label="In Progress" value="in_progress" />
+    <option label="Complete" value="complete" />
+</status_options>
+
+<!-- Example: Priority levels -->
+<status_options>
+    <option label="Low" value="low" />
+    <option label="Medium" value="medium" />
+    <option label="High" value="high" />
+</status_options>
+```
+
+Each option has:
+- **label** — What the user sees in the dropdown
+- **value** — What gets stored in the data and exported to CSV
 
 ### Customizing Text Blocks
 Edit the `<textblocks>` section to add quick-copy snippets:
@@ -195,9 +244,19 @@ Edit the `<url_template>` section to configure part number links:
 <!-- Google search -->
 <url_template>https://www.google.com/search?q={partNumber}</url_template>
 
+<!-- Amazon product page with multiple parameters -->
+<url_template>https://www.amazon.com/dp/{partNumber}?pd_rd_w=kqCoJ&amp;th=1</url_template>
+
 <!-- Inventory database -->
 <url_template>https://inventory.company.com/lookup?id={partNumber}</url_template>
 ```
+
+**IMPORTANT - XML Escaping:**
+When your URL contains multiple query parameters, you must escape the `&` character as `&amp;` in the XML:
+- ❌ **Wrong:** `?param1=value&param2=value`
+- ✅ **Correct:** `?param1=value&amp;param2=value`
+
+This is required because `&` is a special character in XML. The parser will automatically convert `&amp;` back to `&` when the URL is used.
 
 **How it works:**
 - The `{partNumber}` placeholder is replaced with the actual part number
@@ -235,10 +294,12 @@ Everything (HTML, CSS, JavaScript, and configuration) is in one file for maximum
   "id": 1704412800000,
   "partNumber": "PCB-2024-001",
   "type": "Option 1",
+  "status": "option1",
   "startTime": "2:45 PM",
   "stopTime": "3:30 PM",
   "completed": true,
   "isRework": false,
+  "note": "Needs inspection",
   "createdAt": "2025-01-05T12:00:00.000Z"
 }
 ```
@@ -249,9 +310,20 @@ Everything (HTML, CSS, JavaScript, and configuration) is in one file for maximum
 
 ### CSV Export Format
 ```
-Part Number,Type,Start Time,Stop Time,Completed,Rework,Created At
-"PCB-2024-001","Option 1","2:45 PM","3:30 PM","Yes","No","1/5/2025, 12:00:00 PM"
+Part Number,Type,Status,Start Time,Stop Time,Completed,Rework,Note,Created Date
+"PCB-2024-001","Option 1","Option 1","2:45 PM","3:30 PM","Yes","No","Needs inspection","2/25/2026"
 ```
+
+**Columns:**
+- **Part Number** — Task part number
+- **Type** — Task type
+- **Status** — Status dropdown label (e.g., "Pending", "In Progress")
+- **Start Time** — 12-hour format (e.g., "2:45 PM")
+- **Stop Time** — 12-hour format
+- **Completed** — Yes/No
+- **Rework** — Yes/No
+- **Note** — Task note text (quotes escaped as "")
+- **Created Date** — Short date format (e.g., "2/25/2026")
 
 ### Browser Compatibility
 - Chrome, Firefox, Safari, Edge (modern versions)
@@ -367,8 +439,8 @@ Part Number,Type,Start Time,Stop Time,Completed,Rework,Created At
 - Works entirely offline after first load
 
 ## Version Information
-**Version:** 2.0  
-**Last Updated:** February 2025  
+**Version:** 2.1  
+**Last Updated:** February 2026  
 **File Type:** Single-file HTML application  
 **Dependencies:** None
 
