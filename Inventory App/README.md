@@ -1,14 +1,16 @@
 # SFC Inventory - User Guide
 
 ## Overview
-SFC Inventory is a simple, browser-based list management tool that helps you organize items into different categories (tabs). Perfect for inventory tracking, task lists, project management, or any scenario where you need to organize information into multiple groups.
+SFC Inventory is a simple, browser-based list management tool that helps you organize items into different categories (tabs). Each tab can also contain **subcategories** — named groups within a tab — allowing for more complex, nested organization. Perfect for inventory tracking, task lists, project management, or any scenario where you need to organize information into multiple groups.
 
 ## Getting Started
 
 ### Opening the Application
 1. Open the `sfc-inventory.html` file in any modern web browser (Chrome, Firefox, Safari, Edge)
-2. No installation or internet connection required - it runs entirely in your browser
+2. No installation or internet connection required — it runs entirely in your browser
 3. Your data is automatically saved in your browser's storage
+
+---
 
 ## Main Features
 
@@ -27,123 +29,170 @@ SFC Inventory is a simple, browser-based list management tool that helps you org
 
 **Deleting a Tab:**
 1. Click the × icon on any tab
-2. Confirm the deletion (this will permanently remove all items in that tab)
+2. Confirm the deletion (this will permanently remove all items and subcategories in that tab)
 3. Note: You cannot delete the last remaining tab
 
 **Switching Between Tabs:**
 - Simply click on any tab name to view its contents
 
+---
+
 ### 2. Adding and Managing List Items
 
-**Adding Items:**
+Each tab has a **root-level** list at the top for general items, as well as any number of subcategory groups below it.
+
+**Adding Root Items:**
 1. Click on a tab to select it
-2. Type your item in the text field
+2. Type your item in the text field at the top of the tab
 3. Press **Enter** to add the item to the list
-4. The item will appear with a line number (#1, #2, etc.)
+4. The item will appear numbered (#1, #2, etc.)
 
 **Removing Items:**
 1. Click the × button next to any item to remove it
-2. Line numbers will automatically update
+2. Numbers update automatically
 
-### 3. Search Function
+---
+
+### 3. Subcategories
+
+Subcategories allow you to group items within a tab into named sections. For example, a "Warehouse" tab could have subcategories for "Aisle A", "Aisle B", and "Aisle C" — each with their own item lists.
+
+**Adding a Subcategory:**
+1. Switch to the tab where you want the subcategory
+2. Click the **+ Add Subcategory** button (bottom-right of the tab content area)
+3. Enter a name for the subcategory
+4. Click "Confirm"
+
+**Adding Items to a Subcategory:**
+1. Expand the subcategory (click the header if it's collapsed)
+2. Type in the subcategory's input field
+3. Press **Enter** to add
+
+**Renaming a Subcategory:**
+1. Click the pencil icon (✎) on the subcategory header
+2. Enter the new name and click "Confirm"
+
+**Deleting a Subcategory:**
+1. Click the × icon on the subcategory header
+2. Confirm the deletion (this will remove all items in that subcategory)
+
+**Collapsing / Expanding a Subcategory:**
+- Click anywhere on the subcategory header bar to toggle it open or closed
+- The item count is always visible in the header, even when collapsed
+
+---
+
+### 4. Search Function
+
+The search scans all root-level lists **and** all subcategory lists across every tab.
 
 **Basic Search:**
 1. Enter text in the "Search all lists..." field at the top
 2. Click the "Find" button
 
 **How Search Works:**
-- **Exact Match (Green)**: If the search finds items that exactly match your text, they'll be highlighted in green
-- **Partial Match (Orange)**: If no exact match is found, the search will find items containing your text and highlight them in orange
-- **Multiple Results**: All matching items across all tabs will be highlighted
-- **Result Summary**: Shows you how many matches were found and where (e.g., "3 matches found: 'General' (#1, #5) | 'Work' (#3)")
+- **Exact Match (Green):** Items that exactly match your query are highlighted green
+- **Partial Match (Orange):** If no exact match exists, items containing your text are highlighted orange
+- **Auto-expand:** Subcategories that contain a match are automatically expanded
+- **Result Summary:** Shows counts and locations, including subcategory names (e.g., `"Warehouse" (Aisle A:#2, Aisle B:#1)`)
 
-**Search Results:**
-- Matching tabs are highlighted in the same color as the match type
-- The app automatically switches to the first tab with a match
-- You can click through tabs to see all highlighted matches
+---
 
-### 4. Import and Export
+### 5. Import and Export
+
+The XML format now includes subcategories. Files from v1.0 (without subcategories) are still fully compatible.
 
 **Exporting Your Data:**
-1. Click the menu icon (≡) in the top right
-2. Select "Export XML"
-3. A file named `sfc-inventory.xml` will download to your computer
-4. Use this to back up your data or transfer it to another device
+1. Click the menu icon (≡) → "Export XML"
+2. A file named `sfc-inventory.xml` will download
 
 **Importing Data:**
-1. Click the menu icon (≡) in the top right
-2. Select "Import XML"
-3. Choose an XML file that was previously exported
-4. **Warning**: This will replace all current data - make sure to export first if you want to keep it!
-5. The imported tabs and items will appear immediately
+1. Click the menu icon (≡) → "Import XML"
+2. Choose a previously exported XML file
+3. **Warning:** This replaces all current data — export first if you need a backup
 
-### 5. Dark Mode
+---
 
-**Enabling Dark Mode:**
-1. Click the menu icon (≡) in the top right
+### 6. Dark Mode
+
+1. Click the menu icon (≡)
 2. Toggle the "Dark Mode" switch
-3. Your preference is automatically saved
+3. Your preference is saved automatically
 
-**Benefits:**
-- Reduces eye strain in low-light environments
-- Saves battery on devices with OLED screens
-- Your preference persists between sessions
-
-## Tips and Best Practices
-
-1. **Regular Backups**: Export your data regularly to avoid losing information
-2. **Descriptive Tab Names**: Use clear names like "Office Supplies" instead of "Tab 1"
-3. **Item Details**: Add as much detail as needed in each item - there's no character limit
-4. **Search Shortcuts**: Use partial searches to find groups of related items (e.g., search "apple" to find "apple juice", "apple pie", etc.)
-5. **Organization**: Create separate tabs for different categories to keep things organized
-
-## Data Storage
-
-- All data is stored locally in your browser's local storage
-- Data persists between sessions (when you close and reopen the browser)
-- Data is specific to the browser and device you're using
-- Clearing your browser's cache/data will delete your lists (export first!)
-- To transfer data between devices or browsers, use the Export/Import feature
-
-## Keyboard Shortcuts
-
-- **Enter**: Add a new item to the current list
-- **Escape**: Close modals (when renaming tabs)
-
-## Troubleshooting
-
-**My data disappeared:**
-- Check if you're using the same browser
-- Make sure you didn't clear browser data
-- Import your last export file
-
-**Import isn't working:**
-- Make sure you're selecting a valid XML file exported from this app
-- Check that the file isn't corrupted
-- Try exporting first, then import that file as a test
-
-**Search not finding items:**
-- Remember: search is case-insensitive
-- Check for typos in your search term
-- Try a partial search (fewer characters) if exact match isn't working
+---
 
 ## File Format
 
-The XML export format looks like this:
+The XML export format (v2.0) supports both root items and subcategories:
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <SFCInventory>
-  <Tab name="General">
-    <Item>First item</Item>
-    <Item>Second item</Item>
+  <Tab name="Warehouse">
+    <Item>Forklift</Item>
+    <Subcategory name="Aisle A">
+      <Item>Widget box (qty: 50)</Item>
+      <Item>Bolt pack 10mm</Item>
+    </Subcategory>
+    <Subcategory name="Aisle B">
+      <Item>Shelf bracket set</Item>
+    </Subcategory>
   </Tab>
-  <Tab name="Work">
-    <Item>Project A</Item>
+  <Tab name="General">
+    <Item>Miscellaneous item</Item>
   </Tab>
 </SFCInventory>
 ```
 
-You can manually edit this file with a text editor if needed, then import it back.
+> Files exported from v1.0 (no `<Subcategory>` tags) import correctly — root items are preserved and no subcategories are added.
+
+---
+
+## Tips and Best Practices
+
+1. **Hierarchy design:** Use tabs for broad categories (departments, locations) and subcategories for divisions within them
+2. **Collapse for focus:** Collapse subcategories you aren't actively editing to reduce visual clutter
+3. **Regular backups:** Export your data regularly to avoid losing information
+4. **Search shortcuts:** Subcategory matches show the subcategory name in results so you know exactly where to look
+5. **Manual editing:** You can open the exported XML in any text editor to bulk-add items, then import it back
+
+---
+
+## Data Storage
+
+- All data is stored in your browser's local storage
+- Data persists between sessions
+- Data is tied to your specific browser and device
+- Clearing browser cache will delete your data — export first!
+- Use Export/Import to transfer between browsers or devices
+
+---
+
+## Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| **Enter** | Add item to the currently focused list |
+| **Enter** (in modal) | Confirm tab / subcategory name |
+
+---
+
+## Troubleshooting
+
+**My data disappeared:**
+- Check you're using the same browser
+- Make sure browser data wasn't cleared
+- Import your last export file
+
+**Import isn't working:**
+- Confirm the file is a valid `.xml` file exported from this app
+- Try exporting a fresh file and re-importing it as a test
+
+**Search not finding items inside subcategories:**
+- Search scans all subcategories automatically — check that the term is spelled correctly
+- Collapsed subcategories are auto-expanded when a match is found inside them
+
+---
 
 ## Browser Compatibility
 
@@ -153,16 +202,9 @@ Works best in modern browsers:
 - Safari
 - Microsoft Edge
 
-Requires JavaScript to be enabled.
-
-## Questions or Issues?
-
-This application runs entirely in your browser with no server connection, so there's no support team. However:
-- Export your data regularly as a backup
-- Test new features with sample data first
-- Keep a copy of the HTML file in case you need to reinstall
+JavaScript must be enabled.
 
 ---
 
-**Version**: 1.0  
-**Last Updated**: February 2025
+**Version:** 2.0  
+**Last Updated:** March 2025
