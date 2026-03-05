@@ -1,13 +1,25 @@
 # Task Manager
 
-A streamlined, single-file task management application with dark/light mode support, time tracking, notes, and quick-copy text blocks.
+A streamlined task management application with dark/light mode, time tracking, notes, quick-copy text blocks, priority ranking, and collapsible task cards.
+
+## File Structure
+
+```
+task-manager.html    # Application (HTML, CSS, JavaScript)
+config.js            # Configuration — edit this to customize the app
+README.md            # This documentation
+```
+
+Both files must be in the same folder. Just open `task-manager.html` in a browser — no server required.
+
+---
 
 ## Features Overview
 
 ### Three-Tab Interface
 - **Tasks** — Manage tasks with part numbers, types, time tracking, and status
 - **Notes** — Freeform note-taking with auto-save
-- **Text Blocks** — Quick-copy text snippets for common phrases
+- **Text Blocks** — Quick-copy text snippets, including multiline content
 
 ### Task Management
 - **Color-Coded Status**
@@ -18,40 +30,55 @@ A streamlined, single-file task management application with dark/light mode supp
 - **Add Tasks** — Part number (50 char max) + type selection
 - **Delete Tasks** — Individual task deletion with confirmation
 - **Copy Actions** — Click part numbers or times to copy instantly
-- **Status Dropdown** — Configurable status field for each task (e.g., Pending, In Progress, Complete)
+- **Status Dropdown** — Configurable status field for each task
 - **Task Notes** — Add notes to any task via popup modal (📝 button)
 - **Note Preview** — See note snippets inline with action buttons
 - **Rework Indicator** — Checkbox to flag tasks requiring rework
 - **URL Links** — Click link button (🔗) to open part number in configured URL
 
+### Priority Ranking
+Each incomplete task can be assigned a priority using the **1 / 2 / 3** circle buttons on the Type line:
+- **1** — High priority (red)
+- **2** — Medium priority (orange)
+- **3** — Low priority (yellow)
+
+Clicking an active priority button a second time deselects it. The task list sorts incomplete tasks by priority first (1 → 2 → 3 → unprioritized), then by creation date. Priority is automatically cleared when a task is marked complete.
+
+### Collapsible Tasks
+Each task card has a **▼ / ▶ collapse button** at the top-right. Click it to minimize the task to just the part number row, saving vertical space when managing long lists. State is saved in localStorage and persists across reloads.
+
 ### Time Tracking
-- **Start/Stop/Reset** — Three-state time tracking
+- **Start/Stop/Reset** — Three-state time tracking per task
 - **12-Hour Format** — Displays as HH:MM AM/PM
-- **Auto-Complete** — Clicking Stop automatically marks task complete
+- **Auto-Complete** — Clicking Stop marks the task complete and clears its priority
 - **Clickable Times** — Click any start or stop time to copy it
 
 ### Menu System
 Access the hamburger menu (☰) in the top-right corner for:
-- **Save CSV** — Export all tasks to CSV file
+- **Save CSV** — Export all tasks to a CSV file
 - **Clear All** — Remove all tasks at once
 - **Dark Mode Toggle** — Switch between dark and light themes
-- **View README** — Open documentation in new tab
+- **View README** — Open documentation in a new tab
 
 ### Data Persistence
-- Tasks stored in browser localStorage
+- Tasks stored in browser localStorage (including minimize state and priority)
 - Notes auto-save as you type
 - Theme preference remembered
 - Survives page reloads and browser restarts
 
+---
+
 ## Getting Started
 
 ### Installation
-1. Download `task-manager.html`
-2. Open it in any modern web browser
-3. Start using immediately — no setup required
+1. Download `task-manager.html` and `config.js` into the same folder
+2. Open `task-manager.html` in any modern browser
+3. Start using immediately — no setup or server required
 
 ### First Launch
-The app loads with three example tasks to demonstrate the interface. Delete these and add your own tasks using the form in the footer.
+The app loads with three example tasks to demonstrate the interface. Delete these and add your own using the form in the footer.
+
+---
 
 ## Using the Application
 
@@ -64,15 +91,18 @@ The app loads with three example tasks to demonstrate the interface. Delete thes
 
 The new task appears at the top with a yellow left border.
 
-### Time Tracking Workflow
-Each task has a time tracking button that cycles through three states:
+### Setting Priority
+On any incomplete task, click the **1**, **2**, or **3** circle buttons on the Type line. The list re-sorts automatically. Click the active button again to remove the priority.
 
-1. **Start** — Records the current time as start time
-   - Task turns orange
-2. **Stop** — Records the current time as stop time
-   - Task automatically marks as complete and turns green
-3. **Reset** — Clears both times and completion status
-   - Task returns to yellow
+### Collapsing Tasks
+Click **▼** at the top-right of any task card to collapse it to a single line. Click **▶** to expand it again.
+
+### Time Tracking Workflow
+Each task's time button cycles through three states:
+
+1. **Start** — Records the current time as start time; task turns orange
+2. **Stop** — Records stop time; task auto-completes, turns green, priority is cleared
+3. **Reset** — Clears both times and completion status; task returns to yellow
 
 ### Copying Information
 Click directly on any of these to copy to clipboard:
@@ -81,56 +111,39 @@ Click directly on any of these to copy to clipboard:
 - Stop times
 
 ### Opening Part Number Links
-If a URL template is configured:
+If a URL template is configured in `config.js`:
 1. Click the 🔗 button next to any part number
-2. Opens the configured URL with the part number in a new window
-3. Window is named after the part number (clicking again reuses the same window)
-
-**Note:** Whether links open in tabs or windows depends on your browser settings.
+2. Opens the configured URL with the part number substituted in
+3. The window is named after the part number, so clicking again reuses it
 
 ### Managing Tasks
-- **Mark Complete** — Check the checkbox (or use Stop button)
-- **Change Status** — Use the status dropdown to set task status (e.g., Pending, In Progress)
-- **Mark as Rework** — Check the "Rework" checkbox (inline with status dropdown)
-  - Task border turns red
-  - Part number badge turns light red
-  - Rework status saved and exported in CSV
-- **Delete** — Click the 🗑️ icon with confirmation
-- **Clear All** — Use the menu (☰) → Clear All option
+- **Mark Complete** — Check the checkbox (or use Stop); priority is cleared automatically
+- **Change Status** — Use the status dropdown on the task card
+- **Mark as Rework** — Check the "Rework" checkbox; border turns red
+- **Delete** — Click 🗑️ with confirmation
+- **Clear All** — Menu (☰) → Clear All
 
 ### Adding Task Notes
-Each task can have an optional note:
-1. Click the 📝 button on any task
-2. Modal popup appears with a text area
-3. Type your note (supports multiple lines)
-4. Click **Save** to save the note, or **Cancel** to discard
-5. Note preview appears inline with action buttons
-6. Notes are included in CSV export
-
-**Shortcuts:**
-- Press **Escape** to close the modal
-- Click outside the modal to close it
+1. Click the 📝 button on any task (bottom-left of the card)
+2. Type your note in the popup (supports multiple lines)
+3. Click **Save**, press **Escape**, or click outside to close
+4. A note preview appears inline next to the 📝 button
 
 ### Using the Notes Tab
-1. Click the **Notes** tab
-2. Type freely in the text area
-3. Notes save automatically after a brief pause
-4. Watch for the green "Saved" indicator
+Click the **Notes** tab and type freely. Notes save automatically after a brief pause — watch for the green "Saved" indicator in the bottom-right.
 
 ### Using Text Blocks
 1. Click the **Text Blocks** tab
-2. See all configured text snippets
-3. Click the 📄 button next to any block to copy its text
+2. Browse your configured snippets — multiline blocks display with full formatting
+3. Click 📄 to copy any block's full text to the clipboard
 
 ### Switching Themes
-1. Click the menu icon (☰) in the top-right
-2. Toggle the **Dark Mode** switch
-3. Theme preference is saved automatically
+Menu (☰) → toggle **Dark Mode**. Preference is saved automatically.
 
 ### Exporting Data
-1. Open the menu (☰)
-2. Click **Save CSV**
-3. File downloads as `tasks_YYYY-MM-DD.csv`
+Menu (☰) → **Save CSV** — downloads as `tasks_YYYY-MM-DD.csv`.
+
+---
 
 ## Interface Layout
 
@@ -141,151 +154,115 @@ Each task can have an optional note:
 │ [Tasks] [Notes] [Text Blocks]           │ ← Tabs
 ├─────────────────────────────────────────┤
 │                                         │
-│  Task List / Notes Area / Text Blocks  │ ← Active tab content
-│  (scrollable)                           │
+│  ☐ PART-NUMBER  📄 🔗              ▼   │ ← Part number row + minimize
+│    Type: Option 1        [1] [2] [3]    │ ← Type + priority buttons
+│    Status: [dropdown]  □ Rework         │ ← Status + rework
+│    📝  note preview...   [Start] [🗑️]   │ ← Notes left, actions right
 │                                         │
 ├─────────────────────────────────────────┤
 │ Task Counter                            │
-│ [Part Number Input]                     │ ← Footer (Tasks tab only)
-│ [Type Dropdown]                         │
+│ [Part Number Input]  [Type Dropdown]    │ ← Footer (Tasks tab only)
 │ [Add Task Button]                       │
 └─────────────────────────────────────────┘
 ```
 
+---
+
 ## Configuration
 
-All configuration is embedded in `task-manager.html` as XML. Find the `CONFIG_XML` constant near the top of the `<script>` section.
+All configuration lives in **`config.js`** — a plain JavaScript file in the same folder as `task-manager.html`. Open it in any text editor (Notepad, VS Code, etc.), make your changes, save, and refresh the app.
 
-### Current Default Structure
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<config>
-    <types>
-        <type>Option 1</type>
-        <type>Option 2</type>
-        <type>Option 3</type>
-    </types>
+If `config.js` cannot be found or contains a syntax error, a red error banner appears at the top of the app.
 
-    <textblocks>
-        <block label="Sample 1">Sample 1</block>
-        <block label="Sample 2">Sample 2</block>
-        <block label="Sample 3">Sample 3</block>
-    </textblocks>
+### config.js Structure
 
-    <!-- Status dropdown options. Each option has a label (shown to user) and value (stored in data) -->
-    <status_options>
-        <option label="Option 1" value="option1" />
-        <option label="Option 2" value="option2" />
-        <option label="Option 3" value="option3" />
-    </status_options>
+```js
+var TASK_MANAGER_CONFIG = {
 
-    <!-- URL template for part number links. Use {partNumber} as placeholder -->
-    <!-- IMPORTANT: Use &amp; instead of & in URLs (XML requires this) -->
-    <!-- Example: https://example.com/search?q={partNumber}&amp;filter=active -->
-    <url_template>https://example.com/search?q={partNumber}</url_template>
-</config>
+    types: [
+        "Option 1",
+        "Option 2",
+        "Option 3"
+    ],
+
+    statusOptions: [
+        { label: "Option 1", value: "option1" },
+        { label: "Option 2", value: "option2" },
+        { label: "Option 3", value: "option3" }
+    ],
+
+    textBlocks: [
+        { label: "Sample 1",  text: "Sample 1" },
+        { label: "Sample 2",  text: "Sample 2" },
+        { label: "Multiline", text: "Line one\nLine two\nLine three" }
+    ],
+
+    urlTemplate: "https://example.com/search?q={partNumber}"
+
+};
 ```
 
 ### Customizing Task Types
-Edit the `<types>` section to change dropdown options:
-
-```xml
-<types>
-    <type>Urgent</type>
-    <type>Normal</type>
-    <type>Low Priority</type>
-    <type>Research</type>
-</types>
+```js
+types: [
+    "Urgent",
+    "Normal",
+    "Low Priority",
+    "Research"
+],
 ```
 
 ### Customizing Status Options
-Edit the `<status_options>` section to change the status dropdown:
-
-```xml
-<!-- Example: Workflow statuses -->
-<status_options>
-    <option label="Pending" value="pending" />
-    <option label="In Progress" value="in_progress" />
-    <option label="Complete" value="complete" />
-</status_options>
-
-<!-- Example: Priority levels -->
-<status_options>
-    <option label="Low" value="low" />
-    <option label="Medium" value="medium" />
-    <option label="High" value="high" />
-</status_options>
+```js
+statusOptions: [
+    { label: "Pending",     value: "pending"     },
+    { label: "In Progress", value: "in_progress" },
+    { label: "Complete",    value: "complete"    }
+],
 ```
 
 Each option has:
 - **label** — What the user sees in the dropdown
-- **value** — What gets stored in the data and exported to CSV
+- **value** — What gets stored internally and exported to CSV
 
 ### Customizing Text Blocks
-Edit the `<textblocks>` section to add quick-copy snippets:
-
-```xml
-<textblocks>
-    <block label="Status - Pending">Awaiting review from supervisor</block>
-    <block label="Status - Complete">Task completed and verified</block>
-    <block label="Email Sign-off">Best regards,\nYour Name</block>
-</textblocks>
+```js
+textBlocks: [
+    { label: "Status Update",   text: "Awaiting review from supervisor" },
+    { label: "Email Sign-off",  text: "Thanks,\nJohn Smith\njohn@example.com" },
+    { label: "Instructions",    text: "Step 1: Do this\nStep 2: Do that\nStep 3: Done" }
+],
 ```
 
-The `label` attribute appears as the card header. The text content is what gets copied.
+Use `\n` anywhere in the `text` value to insert a line break. The full formatted text (with real newlines) is what gets copied to the clipboard when you click 📄.
 
-### Customizing URL Template
-Edit the `<url_template>` section to configure part number links:
+### Customizing the URL Template
+```js
+// Internal system
+urlTemplate: "http://internal.company.com/part/{partNumber}"
 
-```xml
-<!-- Internal system lookup -->
-<url_template>http://internal-system.company.com/part/{partNumber}</url_template>
+// Google search
+urlTemplate: "https://www.google.com/search?q={partNumber}"
 
-<!-- Google search -->
-<url_template>https://www.google.com/search?q={partNumber}</url_template>
+// Multiple query parameters — & works normally, no escaping needed
+urlTemplate: "https://example.com/search?q={partNumber}&filter=active"
 
-<!-- Amazon product page with multiple parameters -->
-<url_template>https://www.amazon.com/dp/{partNumber}?pd_rd_w=kqCoJ&amp;th=1</url_template>
-
-<!-- Inventory database -->
-<url_template>https://inventory.company.com/lookup?id={partNumber}</url_template>
+// Disable the link button entirely
+urlTemplate: ""
 ```
 
-**IMPORTANT - XML Escaping:**
-When your URL contains multiple query parameters, you must escape the `&` character as `&amp;` in the XML:
-- ❌ **Wrong:** `?param1=value&param2=value`
-- ✅ **Correct:** `?param1=value&amp;param2=value`
+`{partNumber}` is replaced with the actual part number (URL-encoded automatically).
 
-This is required because `&` is a special character in XML. The parser will automatically convert `&amp;` back to `&` when the URL is used.
-
-**How it works:**
-- The `{partNumber}` placeholder is replaced with the actual part number
-- Part numbers are automatically URL-encoded (spaces become %20, etc.)
-- If this element is empty or missing, the 🔗 link button won't appear
-- Links open in a new window named after the part number
-
-**Browser behavior:**
-Whether links open in tabs or windows depends on browser settings. To force windows:
-- **Chrome/Edge:** Settings → Appearance → Turn off "Open new pages in tabs"
-- **Firefox:** Settings → General → Tabs → Uncheck "Open links in tabs"
-- **Safari:** Preferences → Tabs → Set to "Never"
-
-### Saving Changes
-1. Open `task-manager.html` in a text editor
-2. Find the `CONFIG_XML` constant (around line 940)
-3. Edit the XML content
-4. Save the file
-5. Refresh your browser
+---
 
 ## Technical Details
 
 ### File Structure
 ```
-task-manager.html    # Single-file application
-README.md            # This documentation
+task-manager.html    # Application (HTML + CSS + JavaScript)
+config.js            # External configuration file
+README.md            # Documentation
 ```
-
-Everything (HTML, CSS, JavaScript, and configuration) is in one file for maximum portability.
 
 ### Data Storage
 **Tasks** — localStorage key: `tasks`
@@ -295,6 +272,8 @@ Everything (HTML, CSS, JavaScript, and configuration) is in one file for maximum
   "partNumber": "PCB-2024-001",
   "type": "Option 1",
   "status": "option1",
+  "priority": 1,
+  "minimized": false,
   "startTime": "2:45 PM",
   "stopTime": "3:30 PM",
   "completed": true,
@@ -308,152 +287,102 @@ Everything (HTML, CSS, JavaScript, and configuration) is in one file for maximum
 
 **Theme** — localStorage key: `theme` (`"dark"` or `"light"`)
 
+### Task Sort Order
+Incomplete tasks sort by priority first (1 → 2 → 3 → unprioritized), then by creation date (newest first). Completed tasks always appear at the bottom.
+
 ### CSV Export Format
 ```
 Part Number,Type,Status,Start Time,Stop Time,Completed,Rework,Note,Created Date
-"PCB-2024-001","Option 1","Option 1","2:45 PM","3:30 PM","Yes","No","Needs inspection","2/25/2026"
+"PCB-2024-001","Option 1","Pending","2:45 PM","3:30 PM","Yes","No","Needs inspection","2/25/2026"
 ```
-
-**Columns:**
-- **Part Number** — Task part number
-- **Type** — Task type
-- **Status** — Status dropdown label (e.g., "Pending", "In Progress")
-- **Start Time** — 12-hour format (e.g., "2:45 PM")
-- **Stop Time** — 12-hour format
-- **Completed** — Yes/No
-- **Rework** — Yes/No
-- **Note** — Task note text (quotes escaped as "")
-- **Created Date** — Short date format (e.g., "2/25/2026")
 
 ### Browser Compatibility
 - Chrome, Firefox, Safari, Edge (modern versions)
 - JavaScript required
 - localStorage API required
 - Clipboard API with fallback
-- No external dependencies
-- Works offline
+- No external dependencies (except Google Fonts)
+- Works when opened directly via `file://` — no server required
+
+---
 
 ## Design Features
 
 ### Dark Mode (Default)
-- Background: Dark slate (#0f172a)
-- Surface: Lighter slate (#1e293b)
-- Primary: Blue (#60a5fa)
-- Accent: Orange (#fb923c)
-- Text: Light gray (#f1f5f9)
+- Background: `#0f172a` · Surface: `#1e293b` · Primary: `#60a5fa` · Accent: `#fb923c`
 
 ### Light Mode
-- Background: Off-white (#f8fafc)
-- Surface: White (#ffffff)
-- Primary: Blue (#2563eb)
-- Accent: Orange (#ea580c)
-- Text: Dark slate (#0f172a)
+- Background: `#f8fafc` · Surface: `#ffffff` · Primary: `#2563eb` · Accent: `#ea580c`
 
-### Typography
-- **UI Text** — Work Sans
-- **Part Numbers & Times** — JetBrains Mono (monospace)
+### Priority Colors
+- **1 — High:** Red `#ef4444` · **2 — Medium:** Orange `#f97316` · **3 — Low:** Yellow `#eab308`
 
 ### Status Colors
-- 🟡 **New Tasks** — Yellow (#facc15)
-- 🟠 **Started Tasks** — Orange (#fb923c)
-- 🟢 **Completed Tasks** — Green (#4ade80)
-- 🔴 **Rework Tasks** — Red (#ef4444)
+- 🟡 New — `#facc15` · 🟠 Started — `#fb923c` · 🟢 Complete — `#4ade80` · 🔴 Rework — `#ef4444`
 
-### Responsive Design
-- Optimized for desktop and mobile
-- Compact spacing for information density
-- Touch-friendly buttons and controls
+### Typography
+- **UI Text** — Work Sans · **Part Numbers & Times** — JetBrains Mono
+
+---
 
 ## Tips & Best Practices
 
-### Task Management
-- Tasks sort automatically: incomplete first, then by creation date
-- Part numbers can include letters, numbers, and special characters
-- Long part numbers truncate with ellipsis but copy in full
-- Mark tasks as rework to highlight them with a red border
-- Rework status is independent of completion status
-- Configure URL template to enable quick lookup links for part numbers
-- Use Clear All for a fresh start (requires confirmation)
+- Use **priority 1** sparingly to keep rankings meaningful
+- Collapse completed tasks (or let them sink to the bottom) to stay focused on active work
+- Tasks re-sort instantly when priority changes — no manual reordering needed
+- Use `\n` in text block values for email templates, multi-step instructions, or any snippet that needs line breaks
+- Export to CSV regularly — localStorage can be cleared by the browser
+- Keep `config.js` in version control so your customizations are preserved
 
-### Time Tracking
-- Click Start when beginning work
-- Click Stop when done (automatically marks complete)
-- Click Reset to reuse a task entry
-- Times are clickable — no need to select/copy manually
-
-### Notes
-- Auto-save triggers after ~600ms of no typing
-- Watch for "Saved" confirmation in bottom-right
-- Notes persist indefinitely in localStorage
-- Plain text only (no formatting)
-
-### Text Blocks
-- Great for email templates, status updates, or common phrases
-- Keep snippets short for the preview to show more
-- Use newlines in the XML for multi-line text
-- Can include any text — no length limit
-
-### Data Safety
-- Export to CSV regularly as backup
-- Browser data persists until manually cleared
-- Clearing browser data will delete tasks and notes
-- No undo for Clear All or individual deletions
-
-### Customization
-- Edit `CONFIG_XML` directly in the HTML file
-- Add as many types or text blocks as needed
-- XML structure allows future expansion
-- No external files required
+---
 
 ## Keyboard Shortcuts
-- **Enter** — Submit Add Task form (when focused on inputs)
-- **Escape** — Close menu dropdown (when open)
+- **Enter** — Submit Add Task form (when inputs are focused)
+- **Escape** — Close note modal or menu dropdown
 
-## Storage Limits
-- Browser localStorage: typically 5-10MB
-- Each task: ~200-300 bytes
-- Capacity: thousands of tasks before hitting limits
+---
 
 ## Troubleshooting
 
-**Types aren't loading**
-→ Check that `CONFIG_XML` constant is valid XML syntax
+**Config error banner appears on load**
+→ Make sure `config.js` is in the same folder as `task-manager.html` and that the filename is exactly `config.js`.
+
+**Types / statuses not updating after editing config.js**
+→ Hard-refresh the browser (Ctrl+Shift+R / Cmd+Shift+R) to bypass the script cache.
+
+**Syntax error after editing config.js**
+→ Check for missing commas between entries, unmatched `{` / `}` brackets, or unescaped quotes inside strings. VS Code will highlight syntax errors as you type.
 
 **Tasks disappeared**
-→ Check if browser data was cleared. Export to CSV regularly.
-
-**Theme won't change**
-→ Try clearing localStorage key `theme` and reload
+→ Browser localStorage was cleared. Export to CSV regularly as a backup.
 
 **Copy not working**
-→ Check browser permissions for clipboard access
+→ Check browser clipboard permissions. The app falls back to `execCommand` if the Clipboard API is unavailable.
 
 **Notes not saving**
-→ Check browser console for localStorage errors
+→ Check the browser console for localStorage errors. Some browsers restrict localStorage in private/incognito mode.
+
+---
 
 ## Privacy & Security
 - All data stored locally in your browser
-- No network requests (except opening README)
-- No tracking or analytics
-- No user accounts or authentication
-- Works entirely offline after first load
+- No network requests except loading Google Fonts
+- No tracking, analytics, or user accounts
+- Works fully offline after first load
+
+---
 
 ## Version Information
-**Version:** 2.1  
-**Last Updated:** February 2026  
-**File Type:** Single-file HTML application  
-**Dependencies:** None
+**Version:** 3.1
+**Last Updated:** March 2026
+**File Type:** Two-file application (HTML + JS config)
+**Dependencies:** None (Google Fonts loaded remotely)
 
-## Support
-For questions or issues:
-1. Check this README thoroughly
-2. Inspect browser console for errors
-3. Verify localStorage is enabled
-4. Try in a different browser
+---
 
 ## License
 Free to use and modify for personal or commercial purposes.
 
 ---
 
-**Made with ❤️ for efficient task tracking**
+*Made with ❤️ for efficient task tracking*
