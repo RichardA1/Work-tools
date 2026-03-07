@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SFCInventory>
+  <Tab name="General">
+    <Item>SFC-001</Item>
+    <Item>SFC-002</Item>
+    <Item>SFC-003</Item>
+    <Item>SFC-004</Item>
+    <Item>SFC-005</Item>
+    <Subcategory name="Archived">
+      <Item>SFC-006</Item>
+      <Item>SFC-007</Item>
+      <Item>SFC-008</Item>
+    </Subcategory>
+  </Tab>
+  <Tab name="Work">
+    <Item>SFC-042</Item>
+    <Item>SFC-043</Item>
+    <Item>SFC-044</Item>
+    <Subcategory name="Pending">
+      <Item>SFC-101</Item>
+      <Item>SFC-102</Item>
+      <Item>SFC-103</Item>
+      <Item>SFC-104</Item>
+    </Subcategory>
+    <Subcategory name="In Progress">
+      <Item>SFC-105</Item>
+      <Item>SFC-106</Item>
+      <Item>SFC-107</Item>
+    </Subcategory>
+  </Tab>
+  <Tab name="Maintenance">
+    <Item>SFC-200</Item>
+    <Item>SFC-201</Item>
+    <Item>SFC-202</Item>
+    <Subcategory name="Scheduled">
+      <Item>SFC-210</Item>
+      <Item>SFC-211</Item>
+      <Item>SFC-212</Item>
+      <Item>SFC-213</Item>
+    </Subcategory>
+    <Subcategory name="Overdue">
+      <Item>SFC-220</Item>
+      <Item>SFC-221</Item>
+      <Item>SFC-222</Item>
+    </Subcategory>
+  </Tab>
+  <Tab name="Logistics">
+    <Item>SFC-300</Item>
+    <Item>SFC-301</Item>
+    <Item>SFC-302</Item>
+    <Subcategory name="Inbound">
+      <Item>SFC-310</Item>
+      <Item>SFC-311</Item>
+      <Item>SFC-312</Item>
+    </Subcategory>
+    <Subcategory name="Outbound">
+      <Item>SFC-320</Item>
+    </Subcategory>
+  </Tab>
+</SFCInventory>

@@ -20,6 +20,9 @@
             --subcat-bg: #f0f4fa;
             --subcat-border: #b8c9e8;
             --subcat-header: #e6eef8;
+            --sfc-accent: #6f42c1;
+            --sfc-bg: #f3f0ff;
+            --sfc-border: #c9b8f0;
         }
 
         body.dark-mode {
@@ -37,66 +40,49 @@
             --subcat-bg: #252d3a;
             --subcat-border: #3a5070;
             --subcat-header: #1e2a3a;
+            --sfc-accent: #a07de0;
+            --sfc-bg: #1e1830;
+            --sfc-border: #5a4080;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            padding: 15px;
-            font-size: 14px;
+            background: var(--bg-primary); color: var(--text-primary);
+            min-height: 100vh; padding: 15px; font-size: 14px;
             transition: background 0.3s ease, color 0.3s ease;
         }
 
         .container { max-width: 1200px; margin: 0 auto; }
 
         header {
-            margin-bottom: 15px;
-            padding-bottom: 10px;
+            margin-bottom: 15px; padding-bottom: 10px;
             border-bottom: 2px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
         }
 
         .header-left h1 { font-size: 1.5rem; font-weight: 600; color: var(--text-primary); }
 
         .menu-icon {
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 4px;
-            transition: background 0.2s ease;
-            position: relative;
+            cursor: pointer; padding: 8px; border-radius: 4px;
+            transition: background 0.2s ease; position: relative;
         }
         .menu-icon:hover { background: var(--bg-tertiary); }
         .menu-icon svg { width: 24px; height: 24px; stroke: var(--text-primary); }
 
         .dropdown-menu {
-            position: absolute;
-            top: calc(100% + 5px);
-            right: 0;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            min-width: 200px;
-            display: none;
-            z-index: 1000;
+            position: absolute; top: calc(100% + 5px); right: 0;
+            background: var(--bg-secondary); border: 1px solid var(--border);
+            border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 200px; display: none; z-index: 1000;
         }
         .dropdown-menu.show { display: block; }
 
         .dropdown-item {
-            padding: 10px 15px;
-            cursor: pointer;
-            transition: background 0.2s ease;
+            padding: 10px 15px; cursor: pointer; transition: background 0.2s ease;
             border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
+            display: flex; align-items: center; gap: 10px; font-size: 13px;
         }
         .dropdown-item:last-child { border-bottom: none; }
         .dropdown-item:hover { background: var(--bg-tertiary); }
@@ -112,282 +98,387 @@
         }
         .toggle-switch:hover { background: var(--accent-secondary); }
         .toggle-slider {
-            position: absolute; top: 2px; left: 2px;
-            width: 20px; height: 20px;
-            background: white; border-radius: 50%;
-            transition: transform 0.3s ease;
+            position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+            background: white; border-radius: 50%; transition: transform 0.3s ease;
         }
         body.dark-mode .toggle-switch { background: var(--accent-primary); }
         body.dark-mode .toggle-slider { transform: translateX(24px); }
 
         .top-controls {
-            background: var(--bg-secondary);
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border);
+            background: var(--bg-secondary); padding: 12px; border-radius: 4px;
+            margin-bottom: 15px; border: 1px solid var(--border);
+            position: sticky;
+            top: 15px;
+            z-index: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
-        .search-container { display: flex; gap: 8px; align-items: center; }
-
-        input[type="text"] {
-            flex: 1;
-            padding: 6px 10px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 3px;
-            color: var(--text-primary);
-            font-size: 13px;
+        
+            flex: 1; padding: 6px 10px; background: var(--bg-tertiary);
+            border: 1px solid var(--border); border-radius: 3px;
+            color: var(--text-primary); font-size: 13px;
         }
         input[type="text"]:focus { outline: none; border-color: var(--accent-primary); }
 
         .btn {
-            padding: 6px 14px;
-            background: var(--accent-primary);
-            border: none; border-radius: 3px;
-            color: white; font-size: 13px;
-            cursor: pointer; font-weight: 500;
-            white-space: nowrap;
+            padding: 6px 14px; background: var(--accent-primary); border: none;
+            border-radius: 3px; color: white; font-size: 13px;
+            cursor: pointer; font-weight: 500; white-space: nowrap;
         }
         .btn:hover { opacity: 0.9; }
         .btn-secondary { background: var(--accent-secondary); }
         .btn-danger { background: var(--danger); }
-        .btn-sm {
-            padding: 4px 10px;
-            font-size: 12px;
+        .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+        
+        .sfc-finder-section {
+            margin-top: 0;
+            padding-top: 0;
         }
 
-        .search-result {
-            margin-top: 8px;
-            padding: 8px 10px;
-            background: var(--bg-tertiary);
-            border-left: 3px solid var(--highlight);
-            border-radius: 3px;
-            font-size: 12px;
-            color: var(--text-primary);
+        .sfc-finder-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 8px; gap: 8px; flex-wrap: wrap;
+            cursor: pointer;
+            user-select: none;
+        }
+        .sfc-finder-header:hover .sfc-finder-title { opacity: 0.8; }
+
+        .sfc-collapse-icon {
+            font-size: 10px;
+            color: var(--sfc-accent);
+            transition: transform 0.2s ease;
+            min-width: 12px;
+        }
+        .sfc-collapse-icon.collapsed { transform: rotate(-90deg); }
+
+        .sfc-finder-body { }
+        .sfc-finder-body.collapsed { display: none; }
+
+        /* Compact summary shown when collapsed and results exist */
+        .sfc-collapsed-summary {
             display: none;
-        }
-        .search-result.show { display: block; }
-
-        .tabs {
-            display: flex; gap: 4px; margin-bottom: 0;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            margin-bottom: 4px;
+            gap: 10px;
             flex-wrap: wrap;
-            background: var(--bg-tertiary);
-            padding: 8px;
-            border-radius: 3px;
-            border: 1px solid var(--border);
+            align-items: center;
+        }
+        .sfc-collapsed-summary.show { display: flex; }
+        .sfc-summary-pill {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 2px 8px; border-radius: 10px;
+            font-size: 11px; font-weight: 600;
+        }
+        .sfc-summary-pill.exact  { background: #eafbee; color: #1a7a35; border: 1px solid var(--highlight); }
+        .sfc-summary-pill.partial { background: #fff4e5; color: #a05000; border: 1px solid #e07b00; }
+        .sfc-summary-pill.missing { background: #fdecea; color: #a01010; border: 1px solid var(--danger); }
+        body.dark-mode .sfc-summary-pill.exact   { background: #0e2e18; color: #5cb85c; }
+        body.dark-mode .sfc-summary-pill.partial { background: #2a1a00; color: #e09040; }
+        body.dark-mode .sfc-summary-pill.missing { background: #2e0e0e; color: #e05050; }
+
+        .sfc-finder-title {
+            font-size: 12px; font-weight: 600; color: var(--sfc-accent);
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .sfc-finder-actions { display: flex; gap: 6px; align-items: center; }
+
+        .btn-sfc {
+            background: var(--sfc-accent); color: white; border: none;
+            border-radius: 3px; padding: 6px 14px; font-size: 13px;
+            cursor: pointer; font-weight: 500; white-space: nowrap;
+        }
+        .btn-sfc:hover { opacity: 0.9; }
+
+        .btn-sfc-outline {
+            background: transparent; color: var(--sfc-accent);
+            border: 1px solid var(--sfc-accent); border-radius: 3px;
+            padding: 5px 12px; font-size: 13px; cursor: pointer; white-space: nowrap;
+        }
+        .btn-sfc-outline:hover { background: var(--sfc-bg); }
+
+        textarea.sfc-input {
+            width: 100%; min-height: 80px; max-height: 160px;
+            padding: 8px 10px; background: var(--bg-tertiary);
+            border: 1px solid var(--sfc-border); border-radius: 3px;
+            color: var(--text-primary); font-size: 13px;
+            font-family: monospace; resize: vertical; line-height: 1.6;
+        }
+        textarea.sfc-input:focus { outline: none; border-color: var(--sfc-accent); }
+        textarea.sfc-input::placeholder {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-muted); font-size: 12px;
+        }
+
+        .sfc-input-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Results panel */
+        .sfc-results-panel {
+            display: none; margin-top: 10px;
+            border: 1px solid var(--sfc-border); border-radius: 4px; overflow: hidden;
+        }
+        .sfc-results-panel.show { display: block; }
+
+        .sfc-results-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 12px; background: var(--sfc-accent); color: white;
+            font-size: 13px; font-weight: 600; gap: 10px; flex-wrap: wrap;
+        }
+
+        .sfc-results-title { flex: 1; }
+
+        .sfc-nav-controls { display: flex; align-items: center; gap: 8px; }
+        .sfc-nav-btn {
+            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+            color: white; border-radius: 3px; padding: 3px 10px;
+            cursor: pointer; font-size: 13px; font-weight: 600; line-height: 1.4;
+        }
+        .sfc-nav-btn:hover { background: rgba(255,255,255,0.35); }
+        .sfc-nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .sfc-nav-counter { font-size: 12px; opacity: 0.9; min-width: 52px; text-align: center; }
+
+        .sfc-results-body { background: var(--bg-secondary); }
+
+        .sfc-results-group {
+            padding: 10px 14px; border-bottom: 1px solid var(--border);
+        }
+        .sfc-results-group:last-child { border-bottom: none; }
+
+        .sfc-group-label {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .sfc-group-label.found { color: var(--highlight); }
+        .sfc-group-label.partial { color: #e07b00; }
+        .sfc-group-label.not-found { color: var(--danger); }
+
+        .sfc-group-label .sfc-group-count {
+            font-size: 11px; font-weight: 600; padding: 1px 7px;
+            border-radius: 10px; color: white;
+        }
+        .found .sfc-group-count { background: var(--highlight); }
+        .partial .sfc-group-count { background: #e07b00; }
+        .not-found .sfc-group-count { background: var(--danger); }
+
+        .sfc-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+        .sfc-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            border-radius: 20px; padding: 4px 11px; font-size: 12px;
+            cursor: pointer; transition: all 0.15s ease; border: 1px solid transparent;
+        }
+
+        .sfc-chip.found-chip {
+            background: var(--bg-tertiary); border-color: var(--highlight); color: var(--text-primary);
+        }
+        .sfc-chip.found-chip:hover { border-color: var(--sfc-accent); }
+        .sfc-chip.found-chip.active-chip {
+            background: var(--sfc-accent); border-color: var(--sfc-accent); color: white;
+        }
+
+        .sfc-chip.partial-chip {
+            background: var(--bg-tertiary); border-color: #e07b00; color: var(--text-primary);
+            cursor: pointer;
+        }
+        .sfc-chip.partial-chip:hover { border-color: #c46a00; }
+        .sfc-chip.partial-chip.active-chip {
+            background: #e07b00; border-color: #e07b00; color: white;
+        }
+
+        .sfc-chip.notfound-chip {
+            background: var(--bg-tertiary); border-color: var(--danger);
+            color: var(--text-muted); cursor: default; opacity: 0.85;
+        }
+
+        .sfc-chip-code { font-weight: 700; font-family: monospace; font-size: 12px; }
+        .sfc-chip-loc { font-size: 11px; opacity: 0.7; }
+        .sfc-chip-item { font-size: 11px; font-style: italic; opacity: 0.75; border-left: 1px solid currentColor; padding-left: 6px; }
+        .sfc-chip.active-chip .sfc-chip-loc { opacity: 0.9; }
+        .sfc-chip.active-chip .sfc-chip-item { opacity: 0.9; }
+
+        .sfc-empty-result { font-size: 12px; color: var(--text-muted); padding: 2px 0; }
+
+        /* SFC item highlights — found (soft) */
+        .list-item.sfc-highlight {
+            border-left-color: var(--sfc-accent);
+            outline: 2px solid var(--sfc-accent);
+            background: var(--sfc-bg);
+        }
+        .list-text.sfc-highlight {
+            color: var(--sfc-accent); font-weight: 600;
+        }
+        /* SFC item highlights — partial found (orange) */
+        .list-item.sfc-partial {
+            border-left-color: #e07b00;
+            outline: 2px solid #e07b00;
+            background: #fff8f0;
+        }
+        body.dark-mode .list-item.sfc-partial { background: #2a1f0a; }
+        .list-text.sfc-partial {
+            color: #c46a00; font-weight: 600;
+        }
+        body.dark-mode .list-text.sfc-partial { color: #f0a040; }
+        /* SFC active item — solid fill, clearly distinct from all other highlights */
+        .list-item.sfc-active {
+            border-left-color: var(--sfc-accent) !important;
+            outline: 3px solid var(--sfc-accent) !important;
+            background: var(--sfc-accent) !important;
+        }
+        .list-item.sfc-active .list-number { color: rgba(255,255,255,0.8) !important; }
+        .list-item.sfc-active .list-text { color: white !important; font-weight: 600; }
+        .list-item.sfc-active .remove-btn {
+            border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.8);
+        }
+        .list-item.sfc-active .remove-btn:hover { background: rgba(0,0,0,0.2); border-color: white; color: white; }
+
+        .subcategory-block.sfc-highlight {
+            outline: 2px solid var(--sfc-accent); border-color: var(--sfc-accent);
+        }
+        .subcategory-block.sfc-partial {
+            outline: 2px solid #e07b00; border-color: #e07b00;
+        }
+        .tab.sfc-highlight { background: var(--sfc-accent); color: white; border-color: var(--sfc-accent); }
+        .tab.sfc-partial { background: #e07b00; color: white; border-color: #e07b00; }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex; gap: 4px; margin-bottom: 0; flex-wrap: wrap;
+            background: var(--bg-tertiary); padding: 8px;
+            border-radius: 3px 3px 0 0; border: 1px solid var(--border);
+            position: sticky;
+            top: 15px;
+            z-index: 400;
         }
 
         .tab {
-            padding: 6px 12px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 3px;
-            cursor: pointer; font-size: 13px;
-            display: flex; align-items: center; gap: 8px;
+            padding: 6px 12px; background: var(--bg-secondary);
+            border: 1px solid var(--border); border-radius: 3px;
+            cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 8px;
         }
         .tab:hover { background: var(--bg-tertiary); }
         .tab.active { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
-        .tab.highlight { background: var(--highlight); color: white; border-color: var(--highlight); }
-        .tab.highlight-partial { background: #ff9800; color: white; border-color: #ff9800; }
+        
 
         .tab-name { flex: 1; }
         .tab-actions { display: flex; gap: 4px; }
-
         .tab-btn {
-            background: transparent; border: none;
-            color: inherit; cursor: pointer;
-            padding: 2px 6px; border-radius: 2px; font-size: 12px;
+            background: transparent; border: none; color: inherit;
+            cursor: pointer; padding: 2px 6px; border-radius: 2px; font-size: 12px;
         }
         .tab.active .tab-btn:hover { background: rgba(255,255,255,0.2); }
         .tab:not(.active) .tab-btn:hover { background: rgba(0,0,0,0.05); }
         body.dark-mode .tab:not(.active) .tab-btn:hover { background: rgba(255,255,255,0.1); }
 
         .tab-content {
-            display: none;
-            background: var(--bg-secondary);
-            padding: 15px;
-            border-radius: 4px;
-            border: 1px solid var(--border);
+            display: none; background: var(--bg-secondary); padding: 15px;
+            border-radius: 4px; border: 1px solid var(--border);
         }
         .tab-content.active { display: block; }
 
-        /* Root items section */
         .root-items-section { margin-bottom: 16px; }
-
         .list-input-container { margin-bottom: 10px; }
         .list-input {
-            width: 100%;
-            padding: 8px 10px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 3px;
-            color: var(--text-primary);
-            font-size: 13px;
+            width: 100%; padding: 8px 10px; background: var(--bg-tertiary);
+            border: 1px solid var(--border); border-radius: 3px;
+            color: var(--text-primary); font-size: 13px;
         }
         .list-input:focus { outline: none; border-color: var(--accent-primary); }
 
         .list-items { list-style: none; }
         .list-item {
             display: flex; align-items: center; gap: 10px;
-            padding: 6px 10px;
-            background: var(--bg-tertiary);
-            margin-bottom: 4px;
-            border-radius: 3px;
+            padding: 6px 10px; background: var(--bg-tertiary);
+            margin-bottom: 4px; border-radius: 3px;
             border-left: 2px solid var(--accent-primary);
         }
         .list-item:hover { background: var(--bg-primary); }
-        .list-item.highlight { border-left-color: var(--highlight); outline: 2px solid var(--highlight); }
-        .list-item.highlight-partial { border-left-color: #ff9800; outline: 2px solid #ff9800; }
+        
 
         .list-number { font-weight: 600; color: var(--text-secondary); min-width: 35px; font-size: 12px; }
         .list-text { flex: 1; color: var(--text-primary); word-break: break-word; font-size: 13px; }
-        .list-text.highlight { background: var(--highlight); color: white; padding: 2px 4px; border-radius: 2px; }
-        .list-text.highlight-partial { background: #ff9800; color: white; padding: 2px 4px; border-radius: 2px; }
+        
 
         .remove-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: 4px 8px; border-radius: 3px;
+            background: transparent; border: 1px solid var(--border);
+            color: var(--text-secondary); padding: 4px 8px; border-radius: 3px;
             cursor: pointer; font-size: 16px; line-height: 1;
-            width: 28px; height: 28px;
-            display: flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
         }
         .remove-btn:hover { background: var(--danger); color: white; border-color: var(--danger); }
 
-        /* ── Subcategory styles ── */
         .subcategories-section { margin-top: 4px; }
-
         .subcategory-header-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
         }
-
         .subcategory-label {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
+            font-size: 11px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.5px; color: var(--text-muted);
         }
 
         .subcategory-block {
-            border: 1px solid var(--subcat-border);
-            border-radius: 5px;
-            margin-bottom: 10px;
-            background: var(--subcat-bg);
-            overflow: hidden;
+            border: 1px solid var(--subcat-border); border-radius: 5px;
+            margin-bottom: 10px; background: var(--subcat-bg); overflow: hidden;
         }
-
-        .subcategory-block.highlight { outline: 2px solid var(--highlight); border-color: var(--highlight); }
-        .subcategory-block.highlight-partial { outline: 2px solid #ff9800; border-color: #ff9800; }
+        
 
         .subcat-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            background: var(--subcat-header);
-            border-bottom: 1px solid var(--subcat-border);
-            cursor: pointer;
-            user-select: none;
+            display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+            background: var(--subcat-header); border-bottom: 1px solid var(--subcat-border);
+            cursor: pointer; user-select: none;
         }
-
         .subcat-collapse-icon {
-            font-size: 10px;
-            color: var(--text-muted);
-            transition: transform 0.2s ease;
-            min-width: 12px;
+            font-size: 10px; color: var(--text-muted);
+            transition: transform 0.2s ease; min-width: 12px;
         }
         .subcat-collapse-icon.collapsed { transform: rotate(-90deg); }
-
-        .subcat-name {
-            flex: 1;
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--text-primary);
-        }
-
+        .subcat-name { flex: 1; font-weight: 600; font-size: 13px; color: var(--text-primary); }
         .subcat-count {
-            font-size: 11px;
-            color: var(--text-muted);
-            background: var(--bg-secondary);
-            border: 1px solid var(--subcat-border);
-            border-radius: 10px;
-            padding: 1px 7px;
+            font-size: 11px; color: var(--text-muted); background: var(--bg-secondary);
+            border: 1px solid var(--subcat-border); border-radius: 10px; padding: 1px 7px;
         }
-
         .subcat-actions { display: flex; gap: 4px; }
         .subcat-btn {
-            background: transparent;
-            border: 1px solid transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: 3px 7px;
-            border-radius: 3px;
-            font-size: 13px;
-            line-height: 1;
+            background: transparent; border: 1px solid transparent;
+            color: var(--text-secondary); cursor: pointer;
+            padding: 3px 7px; border-radius: 3px; font-size: 13px; line-height: 1;
         }
         .subcat-btn:hover { border-color: var(--border); background: var(--bg-secondary); }
         .subcat-btn.danger:hover { background: var(--danger); color: white; border-color: var(--danger); }
-
-        .subcat-body {
-            padding: 10px 12px;
-        }
+        .subcat-body { padding: 10px 12px; }
         .subcat-body.collapsed { display: none; }
-
         .subcat-input {
-            width: 100%;
-            padding: 6px 10px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--subcat-border);
-            border-radius: 3px;
-            color: var(--text-primary);
-            font-size: 13px;
-            margin-bottom: 8px;
+            width: 100%; padding: 6px 10px; background: var(--bg-secondary);
+            border: 1px solid var(--subcat-border); border-radius: 3px;
+            color: var(--text-primary); font-size: 13px; margin-bottom: 8px;
         }
         .subcat-input:focus { outline: none; border-color: var(--accent-primary); }
 
-        .empty-state {
-            text-align: center; padding: 30px 20px;
-            color: var(--text-muted); font-size: 13px;
-        }
-        .empty-state-icon { font-size: 2rem; margin-bottom: 8px; opacity: 0.3; }
-
         /* Modal */
         .modal {
-            display: none; position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 1000;
-            align-items: center; justify-content: center;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;
         }
         .modal.show { display: flex; }
-
         .modal-content {
-            background: var(--bg-secondary);
-            padding: 20px; border-radius: 4px;
-            border: 1px solid var(--border);
-            max-width: 400px; width: 90%;
+            background: var(--bg-secondary); padding: 20px; border-radius: 4px;
+            border: 1px solid var(--border); max-width: 400px; width: 90%;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         .modal-content h2 { margin-bottom: 15px; color: var(--text-primary); font-size: 1.25rem; font-weight: 600; }
         .modal-content input { width: 100%; padding: 8px 10px; margin-bottom: 15px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 3px; color: var(--text-primary); font-size: 13px; }
         .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
 
-        @media (max-width: 600px) {
-            .dropdown-menu { right: -15px; }
-        }
+        @media (max-width: 600px) { .dropdown-menu { right: -15px; } }
     </style>
 </head>
 <body>
 <div class="container">
     <header>
-        <div class="header-left">
-            <h1>SFC Inventory</h1>
-        </div>
+        <div class="header-left"><h1>SFC Inventory</h1></div>
         <div class="menu-icon" onclick="toggleMenu()">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -396,34 +487,21 @@
             </svg>
             <div id="dropdownMenu" class="dropdown-menu">
                 <div class="dropdown-item" onclick="event.stopPropagation(); showAddTabModal();">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     Add Tab
                 </div>
                 <div class="dropdown-item" onclick="event.stopPropagation(); exportData();">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                     Export XML
                 </div>
                 <div class="dropdown-item" onclick="event.stopPropagation(); document.getElementById('importFile').click();">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                     Import XML
                 </div>
                 <div class="dropdown-item" onclick="event.stopPropagation();">
                     <div class="dark-mode-toggle">
                         <label>Dark Mode</label>
-                        <div class="toggle-switch" onclick="toggleDarkMode()">
-                            <div class="toggle-slider"></div>
-                        </div>
+                        <div class="toggle-switch" onclick="toggleDarkMode()"><div class="toggle-slider"></div></div>
                     </div>
                 </div>
             </div>
@@ -432,18 +510,47 @@
     </header>
 
     <div class="top-controls">
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search all lists...">
-            <button class="btn" onclick="searchAllLists()">Find</button>
+
+        <!-- SFC Lookup -->
+        <div class="sfc-finder-section">
+            <div class="sfc-finder-header" onclick="toggleSFCFinder()">
+                <span style="display:flex;align-items:center;gap:6px;">
+                    <span class="sfc-collapse-icon" id="sfcCollapseIcon">▼</span>
+                    <span class="sfc-finder-title">SFC Lookup</span>
+                </span>
+                <div class="sfc-finder-actions" onclick="event.stopPropagation()">
+                    <button class="btn-sfc" onclick="runSFCLookup()">&#128269; Find SFCs</button>
+                    <button class="btn-sfc-outline" id="sfcClearBtn" onclick="clearSFCResults()" style="display:none;">✕ Clear</button>
+                </div>
+            </div>
+
+            <!-- Collapsed summary (shown only when collapsed + results exist) -->
+            <div class="sfc-collapsed-summary" id="sfcCollapsedSummary"></div>
+
+            <!-- Expandable body -->
+            <div class="sfc-finder-body" id="sfcFinderBody">
+                <textarea class="sfc-input" id="sfcInput" placeholder="Paste SFCs to look up, one per line:&#10;SFC-001&#10;SFC-042&#10;SFC-999"></textarea>
+                <div class="sfc-input-hint">One SFC per line &mdash; exact, case-insensitive match across all tabs and subcategories</div>
+
+                <div id="sfcResultsPanel" class="sfc-results-panel">
+                    <div class="sfc-results-header">
+                        <span class="sfc-results-title" id="sfcResultsTitle">Results</span>
+                        <div class="sfc-nav-controls">
+                            <button class="sfc-nav-btn" id="sfcPrevBtn" onclick="navigateSFC(-1)" disabled>&#9664; Prev</button>
+                            <span class="sfc-nav-counter" id="sfcNavCounter">— of —</span>
+                            <button class="sfc-nav-btn" id="sfcNextBtn" onclick="navigateSFC(1)" disabled>Next &#9654;</button>
+                        </div>
+                    </div>
+                    <div class="sfc-results-body" id="sfcResultsBody"></div>
+                </div>
+            </div>
         </div>
-        <div id="searchResult" class="search-result"></div>
     </div>
 
     <div class="tabs" id="tabsContainer"></div>
     <div id="tabContents"></div>
 </div>
 
-<!-- Unified modal for tabs, subcategories -->
 <div id="tabModal" class="modal">
     <div class="modal-content">
         <h2 id="modalTitle">Create New Tab</h2>
@@ -461,20 +568,21 @@
     let modalAction = null;
     let modalTabId = null;
     let modalSubcatId = null;
-    // Track collapsed state of subcategories: key = tabId + '::' + subcatId
     let collapsedSubcats = {};
 
-    // ─── Menu ────────────────────────────────────────────────────────────────
-    function toggleMenu() {
-        document.getElementById('dropdownMenu').classList.toggle('show');
-    }
+    // SFC lookup state
+    let sfcFoundMatches = [];
+    let sfcCurrentIndex = -1;
+
+    // ─── Menu ─────────────────────────────────────────────────────────────────
+    function toggleMenu() { document.getElementById('dropdownMenu').classList.toggle('show'); }
     document.addEventListener('click', function(e) {
         const menuIcon = document.querySelector('.menu-icon');
         if (menuIcon && !menuIcon.contains(e.target))
             document.getElementById('dropdownMenu').classList.remove('show');
     });
 
-    // ─── Dark Mode ───────────────────────────────────────────────────────────
+    // ─── Dark Mode ────────────────────────────────────────────────────────────
     function toggleDarkMode() {
         document.body.classList.toggle('dark-mode');
         localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
@@ -487,32 +595,39 @@
     function initializeApp() {
         initializeDarkMode();
         if (tabs.length === 0) addTab('General');
+
+        // Keep the tabs bar sitting just below the sticky controls panel
+        const controls = document.querySelector('.top-controls');
+        const tabsBar  = document.getElementById('tabsContainer');
+        const BODY_PAD = 15; // matches body padding
+        function syncTabsTop() {
+            const h = controls.getBoundingClientRect().height;
+            tabsBar.style.top = (BODY_PAD + h + 4) + 'px';
+        }
+        new ResizeObserver(syncTabsTop).observe(controls);
+        syncTabsTop();
     }
 
     function generateId() {
         return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
-    // ─── Modal helpers ────────────────────────────────────────────────────────
+    // ─── Modals ───────────────────────────────────────────────────────────────
     function showAddTabModal() {
         document.getElementById('dropdownMenu').classList.remove('show');
-        modalAction = 'addTab';
-        modalTabId = null; modalSubcatId = null;
+        modalAction = 'addTab'; modalTabId = null; modalSubcatId = null;
         document.getElementById('modalTitle').textContent = 'Create New Tab';
         document.getElementById('tabNameInput').value = '';
         document.getElementById('tabModal').classList.add('show');
         document.getElementById('tabNameInput').focus();
     }
-
     function showRenameTabModal(tabId) {
         modalAction = 'renameTab'; modalTabId = tabId; modalSubcatId = null;
-        const tab = tabs.find(t => t.id === tabId);
         document.getElementById('modalTitle').textContent = 'Rename Tab';
-        document.getElementById('tabNameInput').value = tab.name;
+        document.getElementById('tabNameInput').value = tabs.find(t => t.id === tabId).name;
         document.getElementById('tabModal').classList.add('show');
         document.getElementById('tabNameInput').focus();
     }
-
     function showAddSubcatModal(tabId) {
         modalAction = 'addSubcat'; modalTabId = tabId; modalSubcatId = null;
         document.getElementById('modalTitle').textContent = 'Add Subcategory';
@@ -520,22 +635,18 @@
         document.getElementById('tabModal').classList.add('show');
         document.getElementById('tabNameInput').focus();
     }
-
     function showRenameSubcatModal(tabId, subcatId) {
         modalAction = 'renameSubcat'; modalTabId = tabId; modalSubcatId = subcatId;
-        const tab = tabs.find(t => t.id === tabId);
-        const subcat = tab.subcategories.find(s => s.id === subcatId);
+        const sub = tabs.find(t => t.id === tabId).subcategories.find(s => s.id === subcatId);
         document.getElementById('modalTitle').textContent = 'Rename Subcategory';
-        document.getElementById('tabNameInput').value = subcat.name;
+        document.getElementById('tabNameInput').value = sub.name;
         document.getElementById('tabModal').classList.add('show');
         document.getElementById('tabNameInput').focus();
     }
-
     function closeModal() {
         document.getElementById('tabModal').classList.remove('show');
         modalAction = null; modalTabId = null; modalSubcatId = null;
     }
-
     function confirmTabAction() {
         const name = document.getElementById('tabNameInput').value.trim();
         if (!name) return;
@@ -550,15 +661,12 @@
     function addTab(name) {
         const id = generateId();
         tabs.push({ id, name, items: [], subcategories: [] });
-        renderTabs();
-        switchTab(id);
+        renderTabs(); switchTab(id);
     }
-
     function renameTab(tabId, newName) {
         const tab = tabs.find(t => t.id === tabId);
         if (tab) { tab.name = newName; renderTabs(); }
     }
-
     function deleteTab(tabId) {
         if (tabs.length === 1) { alert('Cannot delete the last tab!'); return; }
         if (confirm('Delete this tab and all its contents?')) {
@@ -567,43 +675,25 @@
             renderTabs();
         }
     }
-
-    function switchTab(tabId) {
-        currentTab = tabId;
-        renderTabs();
-    }
+    function switchTab(tabId) { currentTab = tabId; renderTabs(); }
 
     // ─── Subcategory CRUD ─────────────────────────────────────────────────────
     function addSubcategory(tabId, name) {
         const tab = tabs.find(t => t.id === tabId);
-        if (tab) {
-            tab.subcategories.push({ id: generateId(), name, items: [] });
-            renderTabs();
-            // refocus add-subcat button area
-        }
+        if (tab) { tab.subcategories.push({ id: generateId(), name, items: [] }); renderTabs(); }
     }
-
     function renameSubcategory(tabId, subcatId, newName) {
         const tab = tabs.find(t => t.id === tabId);
-        if (tab) {
-            const sub = tab.subcategories.find(s => s.id === subcatId);
-            if (sub) { sub.name = newName; renderTabs(); }
-        }
+        if (tab) { const sub = tab.subcategories.find(s => s.id === subcatId); if (sub) { sub.name = newName; renderTabs(); } }
     }
-
     function deleteSubcategory(tabId, subcatId) {
         if (!confirm('Delete this subcategory and all its items?')) return;
         const tab = tabs.find(t => t.id === tabId);
-        if (tab) {
-            tab.subcategories = tab.subcategories.filter(s => s.id !== subcatId);
-            renderTabs();
-        }
+        if (tab) { tab.subcategories = tab.subcategories.filter(s => s.id !== subcatId); renderTabs(); }
     }
-
     function toggleSubcat(tabId, subcatId) {
         const key = tabId + '::' + subcatId;
         collapsedSubcats[key] = !collapsedSubcats[key];
-        // Toggle visually without full re-render for performance
         const body = document.getElementById('subcatBody_' + subcatId);
         const icon = document.getElementById('subcatIcon_' + subcatId);
         if (body) body.classList.toggle('collapsed', !!collapsedSubcats[key]);
@@ -616,56 +706,40 @@
             const value = event.target.value.trim();
             if (value) {
                 const tab = tabs.find(t => t.id === tabId);
-                if (tab) {
-                    tab.items.push(value);
-                    event.target.value = '';
-                    renderTabs();
-                    setTimeout(() => { const el = document.getElementById('input_' + tabId); if(el) el.focus(); }, 50);
-                }
+                if (tab) { tab.items.push(value); event.target.value = ''; renderTabs();
+                    setTimeout(() => { const el = document.getElementById('input_' + tabId); if(el) el.focus(); }, 50); }
             }
         }
     }
-
     function removeItem(tabId, index) {
         const tab = tabs.find(t => t.id === tabId);
         if (tab) { tab.items.splice(index, 1); renderTabs(); }
     }
-
     function handleSubcatInput(event, tabId, subcatId) {
         if (event.key === 'Enter') {
             const value = event.target.value.trim();
             if (value) {
                 const tab = tabs.find(t => t.id === tabId);
-                if (tab) {
-                    const sub = tab.subcategories.find(s => s.id === subcatId);
-                    if (sub) {
-                        sub.items.push(value);
-                        event.target.value = '';
-                        renderTabs();
-                        setTimeout(() => { const el = document.getElementById('subInput_' + subcatId); if(el) el.focus(); }, 50);
-                    }
+                if (tab) { const sub = tab.subcategories.find(s => s.id === subcatId);
+                    if (sub) { sub.items.push(value); event.target.value = ''; renderTabs();
+                        setTimeout(() => { const el = document.getElementById('subInput_' + subcatId); if(el) el.focus(); }, 50); }
                 }
             }
         }
     }
-
     function removeSubcatItem(tabId, subcatId, index) {
         const tab = tabs.find(t => t.id === tabId);
-        if (tab) {
-            const sub = tab.subcategories.find(s => s.id === subcatId);
-            if (sub) { sub.items.splice(index, 1); renderTabs(); }
-        }
+        if (tab) { const sub = tab.subcategories.find(s => s.id === subcatId);
+            if (sub) { sub.items.splice(index, 1); renderTabs(); } }
     }
 
     // ─── Render ───────────────────────────────────────────────────────────────
     function renderTabs() {
         const tabsContainer = document.getElementById('tabsContainer');
         const tabContents = document.getElementById('tabContents');
-        tabsContainer.innerHTML = '';
-        tabContents.innerHTML = '';
+        tabsContainer.innerHTML = ''; tabContents.innerHTML = '';
 
         tabs.forEach(tab => {
-            // Tab button
             const tabEl = document.createElement('div');
             tabEl.className = 'tab' + (currentTab === tab.id ? ' active' : '');
             tabEl.innerHTML = `
@@ -677,51 +751,31 @@
             tabEl.querySelector('.tab-name').onclick = () => switchTab(tab.id);
             tabsContainer.appendChild(tabEl);
 
-            // Tab content
             const contentEl = document.createElement('div');
             contentEl.className = 'tab-content' + (currentTab === tab.id ? ' active' : '');
             contentEl.id = 'content_' + tab.id;
 
-            // Root items HTML
-            let rootItemsHtml = '';
-            if (tab.items.length === 0) {
-                rootItemsHtml = '<div style="color:var(--text-muted);font-size:12px;padding:4px 0 8px;">No items yet — type above and press Enter.</div>';
-            } else {
-                rootItemsHtml = '<ul class="list-items">';
-                tab.items.forEach((item, i) => {
-                    rootItemsHtml += `
+            let rootItemsHtml = tab.items.length === 0
+                ? '<div style="color:var(--text-muted);font-size:12px;padding:4px 0 8px;">No items yet — type above and press Enter.</div>'
+                : '<ul class="list-items">' + tab.items.map((item, i) => `
+                    <li class="list-item">
+                        <span class="list-number">#${i+1}</span>
+                        <span class="list-text">${escapeHtml(item)}</span>
+                        <button class="remove-btn" onclick="removeItem('${tab.id}', ${i})" title="Remove">×</button>
+                    </li>`).join('') + '</ul>';
+
+            let subcatsHtml = tab.subcategories.map(sub => {
+                const key = tab.id + '::' + sub.id;
+                const isCollapsed = !!collapsedSubcats[key];
+                let subItemsHtml = sub.items.length === 0
+                    ? '<div style="color:var(--text-muted);font-size:12px;padding:4px 0;">No items yet.</div>'
+                    : '<ul class="list-items">' + sub.items.map((item, i) => `
                         <li class="list-item">
                             <span class="list-number">#${i+1}</span>
                             <span class="list-text">${escapeHtml(item)}</span>
-                            <button class="remove-btn" onclick="removeItem('${tab.id}', ${i})" title="Remove">×</button>
-                        </li>`;
-                });
-                rootItemsHtml += '</ul>';
-            }
-
-            // Subcategories HTML
-            let subcatsHtml = '';
-            tab.subcategories.forEach(sub => {
-                const key = tab.id + '::' + sub.id;
-                const isCollapsed = !!collapsedSubcats[key];
-
-                let subItemsHtml = '';
-                if (sub.items.length === 0) {
-                    subItemsHtml = '<div style="color:var(--text-muted);font-size:12px;padding:4px 0;">No items yet.</div>';
-                } else {
-                    subItemsHtml = '<ul class="list-items">';
-                    sub.items.forEach((item, i) => {
-                        subItemsHtml += `
-                            <li class="list-item">
-                                <span class="list-number">#${i+1}</span>
-                                <span class="list-text">${escapeHtml(item)}</span>
-                                <button class="remove-btn" onclick="removeSubcatItem('${tab.id}','${sub.id}',${i})" title="Remove">×</button>
-                            </li>`;
-                    });
-                    subItemsHtml += '</ul>';
-                }
-
-                subcatsHtml += `
+                            <button class="remove-btn" onclick="removeSubcatItem('${tab.id}','${sub.id}',${i})" title="Remove">×</button>
+                        </li>`).join('') + '</ul>';
+                return `
                     <div class="subcategory-block" id="subcatBlock_${sub.id}">
                         <div class="subcat-header" onclick="toggleSubcat('${tab.id}','${sub.id}')">
                             <span class="subcat-collapse-icon ${isCollapsed ? 'collapsed' : ''}" id="subcatIcon_${sub.id}">▼</span>
@@ -733,22 +787,18 @@
                             </div>
                         </div>
                         <div class="subcat-body ${isCollapsed ? 'collapsed' : ''}" id="subcatBody_${sub.id}">
-                            <input type="text"
-                                   class="subcat-input"
-                                   id="subInput_${sub.id}"
+                            <input type="text" class="subcat-input" id="subInput_${sub.id}"
                                    placeholder="Type item and press Enter..."
                                    onkeypress="handleSubcatInput(event,'${tab.id}','${sub.id}')">
                             ${subItemsHtml}
                         </div>
                     </div>`;
-            });
+            }).join('');
 
             contentEl.innerHTML = `
                 <div class="root-items-section">
                     <div class="list-input-container">
-                        <input type="text"
-                               class="list-input"
-                               id="input_${tab.id}"
+                        <input type="text" class="list-input" id="input_${tab.id}"
                                placeholder="Type item and press Enter..."
                                onkeypress="handleListInput(event,'${tab.id}')">
                     </div>
@@ -761,232 +811,356 @@
                     </div>
                     ${subcatsHtml || '<div style="color:var(--text-muted);font-size:12px;padding:4px 0 4px;">No subcategories yet.</div>'}
                 </div>`;
-
             tabContents.appendChild(contentEl);
+        });
+
+        // Reapply SFC highlights after every render so tab switching doesn't wipe them
+        if (sfcFoundMatches.length > 0) applyAllSFCHighlights();
+    }
+
+    // ─── SFC Finder collapse ──────────────────────────────────────────────────
+    let sfcFinderCollapsed = false;
+
+    function toggleSFCFinder() {
+        sfcFinderCollapsed = !sfcFinderCollapsed;
+        document.getElementById('sfcFinderBody').classList.toggle('collapsed', sfcFinderCollapsed);
+        document.getElementById('sfcCollapseIcon').classList.toggle('collapsed', sfcFinderCollapsed);
+        updateCollapsedSummary();
+    }
+
+    function updateCollapsedSummary() {
+        const summaryEl = document.getElementById('sfcCollapsedSummary');
+        // Only show summary when collapsed and a search has been run
+        if (!sfcFinderCollapsed || sfcFoundMatches.length === 0 && !document.getElementById('sfcResultsPanel').classList.contains('show')) {
+            summaryEl.classList.remove('show');
+            summaryEl.innerHTML = '';
+            return;
+        }
+        // Count exact, partial, not-found from the last run (stored on window for summary access)
+        const { lastExact = 0, lastPartialHits = 0, lastNotFound = 0 } = window._sfcLastCounts || {};
+        let html = '';
+        if (lastExact > 0)        html += `<span class="sfc-summary-pill exact">✓ ${lastExact} exact</span>`;
+        if (lastPartialHits > 0)  html += `<span class="sfc-summary-pill partial">~ ${lastPartialHits} partial</span>`;
+        if (lastNotFound > 0)     html += `<span class="sfc-summary-pill missing">✕ ${lastNotFound} not found</span>`;
+        if (!html)                html = '<span style="font-size:12px;color:var(--text-muted)">No results yet</span>';
+        summaryEl.innerHTML = html;
+        summaryEl.classList.add('show');
+    }
+
+    // ─── SFC Lookup ───────────────────────────────────────────────────────────
+
+    // Returns the single exact match for a code, or null
+    function findExactSFC(code) {
+        const needle = code.toLowerCase();
+        for (const tab of tabs) {
+            for (let i = 0; i < tab.items.length; i++) {
+                if (tab.items[i].toLowerCase() === needle)
+                    return { tab, subcatId: null, subcatName: null, index: i, matchType: 'exact' };
+            }
+            for (const sub of tab.subcategories) {
+                for (let i = 0; i < sub.items.length; i++) {
+                    if (sub.items[i].toLowerCase() === needle)
+                        return { tab, subcatId: sub.id, subcatName: sub.name, index: i, matchType: 'exact' };
+                }
+            }
+        }
+        return null;
+    }
+
+    // Returns ALL partial/substring matches for a code
+    function findAllPartialSFCs(code) {
+        const needle = code.toLowerCase();
+        const results = [];
+        for (const tab of tabs) {
+            for (let i = 0; i < tab.items.length; i++) {
+                if (tab.items[i].toLowerCase().includes(needle))
+                    results.push({ tab, subcatId: null, subcatName: null, index: i, matchType: 'partial' });
+            }
+            for (const sub of tab.subcategories) {
+                for (let i = 0; i < sub.items.length; i++) {
+                    if (sub.items[i].toLowerCase().includes(needle))
+                        results.push({ tab, subcatId: sub.id, subcatName: sub.name, index: i, matchType: 'partial' });
+                }
+            }
+        }
+        return results;
+    }
+
+    function runSFCLookup() {
+        const inputCodes = document.getElementById('sfcInput').value
+            .split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+        if (inputCodes.length === 0) {
+            alert('Please enter at least one SFC code to look up.');
+            return;
+        }
+
+        clearSFCHighlights();
+        sfcFoundMatches = [];
+        sfcCurrentIndex = -1;
+
+        const exactFound = [], partialFound = [], notFound = [];
+        for (const code of inputCodes) {
+            const exact = findExactSFC(code);
+            if (exact) {
+                exactFound.push({ code, match: exact });
+            } else {
+                const partials = findAllPartialSFCs(code);
+                if (partials.length > 0) {
+                    partials.forEach(match => partialFound.push({ code, match }));
+                } else {
+                    notFound.push(code);
+                }
+            }
+        }
+
+        // Remove any partial hit that points to the same item as an exact match
+        // (i.e. an item that IS an SFC code shouldn't also appear as a partial hit for another code)
+        const exactLocations = new Set(
+            exactFound.map(f => `${f.match.tab.id}::${f.match.subcatId ?? ''}::${f.match.index}`)
+        );
+        const dedupedPartials = partialFound.filter(f =>
+            !exactLocations.has(`${f.match.tab.id}::${f.match.subcatId ?? ''}::${f.match.index}`)
+        );
+
+        // sfcFoundMatches must be in the same order chips are rendered (exact first, then partial)
+        // so that chip index N always maps to sfcFoundMatches[N]
+        sfcFoundMatches = [...exactFound, ...dedupedPartials];
+
+        const panel = document.getElementById('sfcResultsPanel');
+        const body = document.getElementById('sfcResultsBody');
+        panel.classList.add('show');
+        document.getElementById('sfcClearBtn').style.display = '';
+
+        const total = inputCodes.length;
+        const foundCount = exactFound.length + new Set(dedupedPartials.map(f => f.code)).size;
+        document.getElementById('sfcResultsTitle').textContent =
+            `${foundCount} of ${total} SFC${total !== 1 ? 's' : ''} found` +
+            (dedupedPartials.length > 0 ? ` (${dedupedPartials.length} partial hit${dedupedPartials.length !== 1 ? 's' : ''})` : '');
+
+        // chip index offset — exact chips first, then partial
+        let chipIdx = 0;
+
+        // Exact found group
+        let exactHtml = `<div class="sfc-results-group">
+            <div class="sfc-group-label found">Exact Match <span class="sfc-group-count">${exactFound.length}</span></div>
+            <div class="sfc-chips">`;
+        if (exactFound.length === 0) {
+            exactHtml += '<span class="sfc-empty-result">No exact matches.</span>';
+        } else {
+            exactFound.forEach((f) => {
+                const loc = f.match.subcatId ? `${f.match.tab.name} › ${f.match.subcatName}` : f.match.tab.name;
+                exactHtml += `<div class="sfc-chip found-chip" id="sfcChip_${chipIdx}" onclick="jumpToSFC(${chipIdx})">
+                    <span class="sfc-chip-code">${escapeHtml(f.code)}</span>
+                    <span class="sfc-chip-loc">${escapeHtml(loc)}</span>
+                </div>`;
+                chipIdx++;
+            });
+        }
+        exactHtml += '</div></div>';
+
+        // Partial found group
+        let partialHtml = `<div class="sfc-results-group">
+            <div class="sfc-group-label partial">Partial Match <span class="sfc-group-count">${dedupedPartials.length}</span></div>
+            <div class="sfc-chips">`;
+        if (dedupedPartials.length === 0) {
+            partialHtml += '<span class="sfc-empty-result">No partial matches.</span>';
+        } else {
+            dedupedPartials.forEach((f) => {
+                const loc = f.match.subcatId ? `${f.match.tab.name} › ${f.match.subcatName}` : f.match.tab.name;
+                const itemText = f.match.subcatId
+                    ? tabs.find(t => t.id === f.match.tab.id).subcategories.find(s => s.id === f.match.subcatId).items[f.match.index]
+                    : tabs.find(t => t.id === f.match.tab.id).items[f.match.index];
+                partialHtml += `<div class="sfc-chip partial-chip" id="sfcChip_${chipIdx}" onclick="jumpToSFC(${chipIdx})">
+                    <span class="sfc-chip-code">${escapeHtml(f.code)}</span>
+                    <span class="sfc-chip-loc">${escapeHtml(loc)}</span>
+                    <span class="sfc-chip-item">${escapeHtml(itemText)}</span>
+                </div>`;
+                chipIdx++;
+            });
+        }
+        partialHtml += '</div></div>';
+
+        // Not found group
+        let notFoundHtml = `<div class="sfc-results-group">
+            <div class="sfc-group-label not-found">Not Found <span class="sfc-group-count">${notFound.length}</span></div>
+            <div class="sfc-chips">`;
+        if (notFound.length === 0) {
+            notFoundHtml += '<span class="sfc-empty-result">All SFCs were located.</span>';
+        } else {
+            notFound.forEach(code => {
+                notFoundHtml += `<div class="sfc-chip notfound-chip"><span class="sfc-chip-code">${escapeHtml(code)}</span></div>`;
+            });
+        }
+        notFoundHtml += '</div></div>';
+
+        body.innerHTML = exactHtml + partialHtml + notFoundHtml;
+
+        const hasFound = sfcFoundMatches.length > 0;
+        document.getElementById('sfcPrevBtn').disabled = !hasFound;
+        document.getElementById('sfcNextBtn').disabled = !hasFound;
+        document.getElementById('sfcNavCounter').textContent = hasFound ? `0 of ${sfcFoundMatches.length}` : '0 of 0';
+
+        // Store counts for the collapsed summary
+        window._sfcLastCounts = {
+            lastExact:       exactFound.length,
+            lastPartialHits: dedupedPartials.length,
+            lastNotFound:    notFound.length
+        };
+        updateCollapsedSummary();
+
+        if (hasFound) { applyAllSFCHighlights(); jumpToSFC(0); }
+    }
+
+    function applyAllSFCHighlights() {
+        setTimeout(() => {
+            sfcFoundMatches.forEach(({ match }) => {
+                const hClass = match.matchType === 'partial' ? 'sfc-partial' : 'sfc-highlight';
+                if (match.subcatId) {
+                    const key = match.tab.id + '::' + match.subcatId;
+                    if (collapsedSubcats[key]) {
+                        collapsedSubcats[key] = false;
+                        const b = document.getElementById('subcatBody_' + match.subcatId);
+                        const ic = document.getElementById('subcatIcon_' + match.subcatId);
+                        if (b) b.classList.remove('collapsed'); if (ic) ic.classList.remove('collapsed');
+                    }
+                    const block = document.getElementById('subcatBlock_' + match.subcatId);
+                    if (block) block.classList.add(hClass);
+                    const items = document.querySelectorAll(`#subcatBody_${match.subcatId} .list-item`);
+                    if (items[match.index]) {
+                        items[match.index].classList.add(hClass);
+                        items[match.index].querySelector('.list-text').classList.add(hClass);
+                    }
+                } else {
+                    const items = document.querySelectorAll(`#content_${match.tab.id} .root-items-section .list-item`);
+                    if (items[match.index]) {
+                        items[match.index].classList.add(hClass);
+                        items[match.index].querySelector('.list-text').classList.add(hClass);
+                    }
+                }
+            });
+            document.querySelectorAll('.tab').forEach(tabEl => {
+                const name = tabEl.querySelector('.tab-name').textContent;
+                const match = sfcFoundMatches.find(f => f.match.tab.name === name);
+                if (match) tabEl.classList.add(match.match.matchType === 'partial' ? 'sfc-partial' : 'sfc-highlight');
+            });
+        }, 80);
+    }
+
+    function jumpToSFC(index) {
+        if (sfcFoundMatches.length === 0) return;
+        index = ((index % sfcFoundMatches.length) + sfcFoundMatches.length) % sfcFoundMatches.length;
+        sfcCurrentIndex = index;
+        const { match } = sfcFoundMatches[index];
+
+        document.getElementById('sfcNavCounter').textContent = `${index + 1} of ${sfcFoundMatches.length}`;
+        document.querySelectorAll('.sfc-chip').forEach(c => c.classList.remove('active-chip'));
+        const chip = document.getElementById('sfcChip_' + index);
+        if (chip) { chip.classList.add('active-chip'); chip.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+
+        // Switch tab if needed — renderTabs will reapply all highlights automatically
+        if (currentTab !== match.tab.id) { currentTab = match.tab.id; renderTabs(); }
+
+        setTimeout(() => {
+            document.querySelectorAll('.list-item.sfc-active').forEach(el => el.classList.remove('sfc-active'));
+            const sel = match.subcatId ? `#subcatBody_${match.subcatId} .list-item` : `#content_${match.tab.id} .root-items-section .list-item`;
+            const items = document.querySelectorAll(sel);
+            if (items[match.index]) { items[match.index].classList.add('sfc-active'); items[match.index].scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+        }, 120);
+    }
+
+    function navigateSFC(direction) {
+        if (sfcFoundMatches.length === 0) return;
+        jumpToSFC(sfcCurrentIndex + direction);
+    }
+
+    function clearSFCHighlights() {
+        document.querySelectorAll('.sfc-highlight, .sfc-partial, .sfc-active').forEach(el => {
+            el.classList.remove('sfc-highlight', 'sfc-partial', 'sfc-active');
         });
     }
 
-    // ─── Search ───────────────────────────────────────────────────────────────
-    function searchAllLists() {
-        const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
-        const searchResult = document.getElementById('searchResult');
-
-        // Clear previous highlights
-        document.querySelectorAll('.highlight, .highlight-partial').forEach(el => {
-            el.classList.remove('highlight', 'highlight-partial');
-        });
-
-        if (!searchTerm) { searchResult.classList.remove('show'); return; }
-
-        let exactMatches = [];
-        let partialMatches = [];
-
-        for (const tab of tabs) {
-            // Root items
-            for (let i = 0; i < tab.items.length; i++) {
-                if (tab.items[i].toLowerCase() === searchTerm)
-                    exactMatches.push({ tab, subcatId: null, subcatName: null, index: i });
-                else if (tab.items[i].toLowerCase().includes(searchTerm))
-                    partialMatches.push({ tab, subcatId: null, subcatName: null, index: i });
-            }
-            // Subcategory items
-            for (const sub of tab.subcategories) {
-                for (let i = 0; i < sub.items.length; i++) {
-                    if (sub.items[i].toLowerCase() === searchTerm)
-                        exactMatches.push({ tab, subcatId: sub.id, subcatName: sub.name, index: i });
-                    else if (sub.items[i].toLowerCase().includes(searchTerm))
-                        partialMatches.push({ tab, subcatId: sub.id, subcatName: sub.name, index: i });
-                }
-            }
-        }
-
-        const matchesToUse = exactMatches.length > 0 ? exactMatches : partialMatches;
-        const isPartial = exactMatches.length === 0 && partialMatches.length > 0;
-        const hClass = isPartial ? 'highlight-partial' : 'highlight';
-
-        if (matchesToUse.length > 0) {
-            switchTab(matchesToUse[0].tab.id);
-
-            setTimeout(() => {
-                const tabsWithMatches = new Set();
-
-                matchesToUse.forEach(match => {
-                    tabsWithMatches.add(match.tab.id);
-
-                    if (!match.subcatId) {
-                        // Root item
-                        const listItems = document.querySelectorAll(`#content_${match.tab.id} .root-items-section .list-item`);
-                        if (listItems[match.index]) {
-                            listItems[match.index].classList.add(hClass);
-                            listItems[match.index].querySelector('.list-text').classList.add(hClass);
-                        }
-                    } else {
-                        // Subcategory item — expand if collapsed
-                        const key = match.tab.id + '::' + match.subcatId;
-                        if (collapsedSubcats[key]) {
-                            collapsedSubcats[key] = false;
-                            const body = document.getElementById('subcatBody_' + match.subcatId);
-                            const icon = document.getElementById('subcatIcon_' + match.subcatId);
-                            if (body) body.classList.remove('collapsed');
-                            if (icon) icon.classList.remove('collapsed');
-                        }
-
-                        const block = document.getElementById('subcatBlock_' + match.subcatId);
-                        if (block) block.classList.add(hClass);
-
-                        const listItems = document.querySelectorAll(`#subcatBody_${match.subcatId} .list-item`);
-                        if (listItems[match.index]) {
-                            listItems[match.index].classList.add(hClass);
-                            listItems[match.index].querySelector('.list-text').classList.add(hClass);
-                        }
-                    }
-                });
-
-                // Highlight matching tabs
-                document.querySelectorAll('.tab').forEach(tabEl => {
-                    const name = tabEl.querySelector('.tab-name').textContent;
-                    if (matchesToUse.some(m => m.tab.name === name)) tabEl.classList.add(hClass);
-                });
-
-                // Scroll to first match
-                const first = matchesToUse[0];
-                if (!first.subcatId) {
-                    const items = document.querySelectorAll(`#content_${first.tab.id} .root-items-section .list-item`);
-                    if (items[first.index]) items[first.index].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                } else {
-                    const items = document.querySelectorAll(`#subcatBody_${first.subcatId} .list-item`);
-                    if (items[first.index]) items[first.index].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-
-                // Build summary
-                const matchesByTab = {};
-                matchesToUse.forEach(m => {
-                    const key = m.tab.name;
-                    if (!matchesByTab[key]) matchesByTab[key] = [];
-                    const loc = m.subcatId ? `${m.subcatName}:#${m.index+1}` : `#${m.index+1}`;
-                    matchesByTab[key].push(loc);
-                });
-                const summaries = Object.entries(matchesByTab).map(([t, locs]) => `"${t}" (${locs.join(', ')})`);
-                const label = isPartial ? 'partial match' : 'match';
-                searchResult.textContent = `${matchesToUse.length} ${label}${matchesToUse.length > 1 ? 'es' : ''} found: ${summaries.join(' | ')}`;
-                searchResult.classList.add('show');
-            }, 100);
-        } else {
-            searchResult.textContent = 'No results found.';
-            searchResult.classList.add('show');
-        }
+    function clearSFCResults() {
+        clearSFCHighlights();
+        sfcFoundMatches = []; sfcCurrentIndex = -1;
+        window._sfcLastCounts = {};
+        document.getElementById('sfcResultsPanel').classList.remove('show');
+        document.getElementById('sfcClearBtn').style.display = 'none';
+        document.getElementById('sfcNavCounter').textContent = '— of —';
+        document.getElementById('sfcPrevBtn').disabled = true;
+        document.getElementById('sfcNextBtn').disabled = true;
+        updateCollapsedSummary();
     }
 
     // ─── Export / Import ──────────────────────────────────────────────────────
     function exportData() {
         document.getElementById('dropdownMenu').classList.remove('show');
-
         const now = new Date();
-        const dateStr = now.getFullYear() + '-' +
-            String(now.getMonth() + 1).padStart(2, '0') + '-' +
-            String(now.getDate()).padStart(2, '0');
-        const timeStr = String(now.getHours()).padStart(2, '0') + '-' +
-            String(now.getMinutes()).padStart(2, '0');
-        const exportedAt = now.toLocaleString();
-
-        let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<!-- Exported: ${exportedAt} -->\n<SFCInventory>\n`;
+        const pad = n => String(n).padStart(2, '0');
+        const dateStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+        const timeStr = `${pad(now.getHours())}-${pad(now.getMinutes())}`;
+        let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<!-- Exported: ${now.toLocaleString()} -->\n<SFCInventory>\n`;
         tabs.forEach(tab => {
             xml += `  <Tab name="${escapeXml(tab.name)}">\n`;
-            tab.items.forEach(item => {
-                xml += `    <Item>${escapeXml(item)}</Item>\n`;
-            });
+            tab.items.forEach(item => { xml += `    <Item>${escapeXml(item)}</Item>\n`; });
             tab.subcategories.forEach(sub => {
                 xml += `    <Subcategory name="${escapeXml(sub.name)}">\n`;
-                sub.items.forEach(item => {
-                    xml += `      <Item>${escapeXml(item)}</Item>\n`;
-                });
+                sub.items.forEach(item => { xml += `      <Item>${escapeXml(item)}</Item>\n`; });
                 xml += `    </Subcategory>\n`;
             });
             xml += `  </Tab>\n`;
         });
         xml += '</SFCInventory>';
-        const blob = new Blob([xml], { type: 'text/xml' });
-        const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url; a.download = `Inventory-${dateStr}_${timeStr}.xml`; a.click();
-        URL.revokeObjectURL(url);
+        a.href = URL.createObjectURL(new Blob([xml], { type: 'text/xml' }));
+        a.download = `Inventory-${dateStr}_${timeStr}.xml`;
+        a.click();
     }
 
     function importData(event) {
         document.getElementById('dropdownMenu').classList.remove('show');
-        const file = event.target.files[0];
-        if (!file) return;
-
+        const file = event.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onerror = () => { alert('Error reading file!'); event.target.value = ''; };
         reader.onload = function(e) {
             try {
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(e.target.result, 'text/xml');
+                const xmlDoc = new DOMParser().parseFromString(e.target.result, 'text/xml');
                 if (xmlDoc.querySelector('parsererror')) { alert('Invalid XML file!'); event.target.value = ''; return; }
-
                 const tabElements = xmlDoc.querySelectorAll('Tab');
                 if (tabElements.length === 0) { alert('No tabs found in XML file!'); event.target.value = ''; return; }
-
                 if (confirm('This will replace all current data. Continue?')) {
                     const newTabs = [];
                     tabElements.forEach(tabEl => {
-                        const items = [];
-                        const subcategories = [];
-
-                        // Root items (direct children only)
+                        const items = [], subcategories = [];
                         tabEl.childNodes.forEach(child => {
-                            if (child.nodeName === 'Item') {
-                                const text = child.textContent.trim();
-                                if (text) items.push(text);
-                            } else if (child.nodeName === 'Subcategory') {
-                                const subName = child.getAttribute('name') || 'Unnamed';
+                            if (child.nodeName === 'Item') { const t = child.textContent.trim(); if (t) items.push(t); }
+                            else if (child.nodeName === 'Subcategory') {
                                 const subItems = [];
-                                child.querySelectorAll('Item').forEach(itemEl => {
-                                    const text = itemEl.textContent.trim();
-                                    if (text) subItems.push(text);
-                                });
-                                subcategories.push({ id: generateId(), name: subName, items: subItems });
+                                child.querySelectorAll('Item').forEach(el => { const t = el.textContent.trim(); if (t) subItems.push(t); });
+                                subcategories.push({ id: generateId(), name: child.getAttribute('name') || 'Unnamed', items: subItems });
                             }
                         });
-
                         newTabs.push({ id: generateId(), name: tabEl.getAttribute('name') || 'Untitled', items, subcategories });
                     });
-
                     if (newTabs.length > 0) {
-                        tabs = newTabs;
-                        currentTab = tabs[0].id;
-                        collapsedSubcats = {};
-                        renderTabs();
+                        tabs = newTabs; currentTab = tabs[0].id; collapsedSubcats = {};
+                        clearSFCResults(); renderTabs();
                         alert('Imported successfully! ' + tabs.length + ' tab(s) loaded.');
-                    } else {
-                        alert('No valid tabs found in file!');
-                    }
+                    } else { alert('No valid tabs found in file!'); }
                 }
-            } catch (err) {
-                alert('Error importing file: ' + err.message);
-            }
+            } catch (err) { alert('Error importing file: ' + err.message); }
             event.target.value = '';
         };
         reader.readAsText(file);
     }
 
     // ─── Utilities ────────────────────────────────────────────────────────────
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
+    function escapeHtml(text) { const d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
     function escapeXml(text) {
-        return text
-            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+        return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
     }
 
-    document.getElementById('tabNameInput').addEventListener('keypress', e => {
-        if (e.key === 'Enter') confirmTabAction();
-    });
+    document.getElementById('tabNameInput').addEventListener('keypress', e => { if (e.key === 'Enter') confirmTabAction(); });
 
     initializeApp();
 </script>
