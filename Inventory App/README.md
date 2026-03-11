@@ -10,11 +10,15 @@ No installation, no server, no dependencies — open the HTML file and go.
 
 - **Tabs** — organize items into named categories
 - **Subcategories** — further organize within each tab; collapsible
-- **SFC Lookup** — paste a list of SFC codes to find; returns exact matches, partial matches, and a clear not-found list
-- **Sticky controls** — the lookup panel and tab bar stay visible while you scroll through long lists
-- **Collapsible lookup panel** — collapses to a compact summary bar when you need more screen space
+- **SFC Lookup sidebar** — always-visible left panel; paste a list of SFC codes to find and see results without losing your place in the inventory
+- **Split-panel layout** — lookup panel on the left, inventory tabs on the right; both scrollable and usable simultaneously
+- **Resizable sidebar** — drag the divider to adjust how much space the lookup panel gets (200–600 px)
+- **Sticky header** — title and menu always visible at the top while scrolling
 - **Highlights persist** — found items stay highlighted as you navigate between tabs
-- **Import / Export** — XML format for backup and transfer between devices
+- **Export XML** — full structured backup for import/restore
+- **Export Plain Text** — human-readable indented snapshot for sharing or printing
+- **Import XML** — restore a previous backup
+- **In-app Help** — full README accessible from the menu without leaving the app
 - **Dark mode** — toggle in the menu; preference saved automatically
 
 ---
@@ -27,6 +31,34 @@ No installation, no server, no dependencies — open the HTML file and go.
 4. Your data saves automatically in browser local storage
 
 To try it immediately with sample data, see **[Sample Data](#sample-data)** below.
+
+---
+
+## Layout Overview
+
+The app uses a two-column layout on desktop:
+
+```
+┌─────────────────────────────────────────────────────┐
+│  SFC Inventory                                   ≡  │  ← sticky header
+├──────────────────┬─┬────────────────────────────────┤
+│  🔍 SFC Lookup   │▌│  [Tab1] [Tab2] [Tab3] …        │  ← sticky tab bar
+│                  │▌│                                 │
+│  [textarea]      │▌│  Items in selected tab …        │
+│  [Find] [Clear]  │▌│                                 │
+│                  │▌│  Subcategories …                │
+│  ─ Results ────  │▌│                                 │
+│  ✓ Exact (3)    │▌│                                 │
+│  ~ Partial (2)  │▌│                                 │
+│  ✕ Not found(1) │▌│                                 │
+└──────────────────┴─┴────────────────────────────────┘
+```
+
+- The **header** is sticky — title and menu (≡) always remain at the top of the viewport.
+- The **SFC Lookup** panel is sticky — stays in view as you scroll through long item lists.
+- The **tab bar** is also sticky — always accessible below the header.
+- Drag the **▌ divider** between the two columns to resize the sidebar (range: 200–600 px).
+- On screens narrower than 700 px the layout stacks vertically: lookup panel above, tabs below.
 
 ---
 
@@ -59,17 +91,16 @@ To try it immediately with sample data, see **[Sample Data](#sample-data)** belo
 
 ### SFC Lookup
 
-The SFC Lookup lets you paste a list of codes you need to find. It searches every item across all tabs and subcategories and tells you exactly where each one is — or that it's missing.
+The SFC Lookup panel lives on the left side of the screen and stays visible at all times. You can search for codes and navigate results while freely browsing tabs — no need to collapse or hide the panel first.
 
 **Running a lookup:**
-1. Click the **SFC Lookup** header to expand the panel (if collapsed)
-2. Paste your codes into the text area, one per line:
+1. Paste your codes into the text area in the left panel, one per line:
    ```
    SFC-007
    SFC-103
    SFC-213
    ```
-3. Click **🔍 Find SFCs**
+2. Click **Find SFCs**
 
 **Results panel — three groups:**
 
@@ -90,25 +121,48 @@ Items already captured by an exact match are automatically suppressed from parti
 - The position counter shows where you are (e.g. "3 of 7")
 - Click any chip to jump directly to that item
 - Navigation wraps — going past the last returns to the first
-- The **active item** gets a solid filled purple background; all other found items show a soft tint so you can see them at a glance without losing your place
+- The **active item** gets a solid filled purple background; all other found items show a soft tint
 - Collapsed subcategories containing matches are automatically expanded
 - **Highlights persist when switching tabs** — they only clear when you run a new search or click ✕ Clear
 
-**Collapsing the panel:**
-- Click the **SFC Lookup** header (or the ▼ arrow) to collapse the section
-- When collapsed after a search, compact summary pills replace the panel:
-  `✓ 5 exact  ~  2 partial  ✕  3 not found`
-- The Find and Clear buttons remain active even when collapsed
+**Resizing the sidebar:**
+- Hover over the thin vertical divider between the sidebar and the tab content — it will highlight
+- Click and drag left or right to resize (minimum 200 px, maximum 600 px)
 
 ---
 
 ### Import and Export
 
-**Export:**
+**Export XML:**
 1. Menu (≡) → Export XML
 2. Downloads `Inventory-YYYY-MM-DD_HH-MM.xml`
+3. Use this for backups and moving data between browsers or devices
 
-**Import:**
+**Export Plain Text:**
+1. Menu (≡) → Export Plain Text
+2. Downloads `Inventory-YYYY-MM-DD_HH-MM.txt`
+3. Produces a human-readable indented list — useful for sharing, printing, or a quick reference
+
+Plain text format example:
+```
+Exported: 3/11/2026, 12:05:30 PM
+SFC Inventory
+
+General
+  SFC-001
+  SFC-002
+  Archived
+    SFC-006
+    SFC-007
+
+Work
+  SFC-042
+  Pending
+    SFC-101
+    SFC-102
+```
+
+**Import XML:**
 1. Menu (≡) → Import XML
 2. Select a previously exported `.xml` file
 3. ⚠️ This replaces all current data — export first if you want to keep it
@@ -134,6 +188,12 @@ The XML format is human-readable and can be edited in any text editor:
   </Tab>
 </SFCInventory>
 ```
+
+---
+
+### In-App Help
+
+Menu (≡) → **Help / README** opens a formatted, scrollable version of this guide directly in the app. Close it with the × button, by clicking outside the panel, or by pressing **Escape**.
 
 ---
 
@@ -191,7 +251,7 @@ SFC-301
 - All data is stored in **browser local storage** — no server involved
 - Data is specific to the browser and device you're using
 - **Clearing browser data will delete your lists** — export regularly as a backup
-- To move data between browsers or devices, use Export / Import
+- To move data between browsers or devices, use Export XML / Import XML
 
 ---
 
@@ -200,7 +260,7 @@ SFC-301
 | Key | Action |
 |-----|--------|
 | Enter | Add item to the current list or subcategory |
-| Escape | Close the rename/add modal |
+| Escape | Close any open modal or the Help panel |
 
 ---
 
@@ -214,6 +274,8 @@ SFC-301
 
 **SFC-42 vs SFC-042** — these are treated as different codes. Formatting must match exactly.
 
+**Sidebar too narrow / too wide** — drag the divider between the SFC panel and the tab content to resize (200–600 px).
+
 ---
 
 ## Browser Compatibility
@@ -222,5 +284,15 @@ Chrome (recommended), Firefox, Safari, Edge. Requires JavaScript.
 
 ---
 
-**Version:** 1.3
+## Changelog
+
+| Version | Changes |
+|---------|---------|
+| 1.5 | Added Export Plain Text; added in-app Help / README modal; Escape closes all modals |
+| 1.4 | Redesigned as split-panel layout (SFC sidebar left, tabs right); drag-to-resize sidebar; sticky header; responsive stacked layout on narrow screens |
+| 1.3 | Collapsible SFC lookup panel; compact summary pills when collapsed; sticky controls and tab bar |
+
+---
+
+**Version:** 1.5  
 **Last Updated:** March 2026

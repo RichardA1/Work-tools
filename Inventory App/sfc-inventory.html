@@ -23,6 +23,8 @@
             --sfc-accent: #6f42c1;
             --sfc-bg: #f3f0ff;
             --sfc-border: #c9b8f0;
+            --sidebar-width: 320px;
+            --header-h: 56px;
         }
 
         body.dark-mode {
@@ -50,16 +52,22 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: var(--bg-primary); color: var(--text-primary);
-            min-height: 100vh; padding: 15px; font-size: 14px;
+            min-height: 100vh; padding: 0 15px 15px; font-size: 14px;
             transition: background 0.3s ease, color 0.3s ease;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1400px; margin: 0 auto; }
 
+        /* ── Header ── */
         header {
-            margin-bottom: 15px; padding-bottom: 10px;
+            position: sticky; top: 0; z-index: 600;
+            background: var(--bg-primary);
+            padding: 12px 0 10px;
+            margin-bottom: 15px;
             border-bottom: 2px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            transition: background 0.3s ease;
         }
 
         .header-left h1 { font-size: 1.5rem; font-weight: 600; color: var(--text-primary); }
@@ -104,16 +112,66 @@
         body.dark-mode .toggle-switch { background: var(--accent-primary); }
         body.dark-mode .toggle-slider { transform: translateX(24px); }
 
-        .top-controls {
-            background: var(--bg-secondary); padding: 12px; border-radius: 4px;
-            margin-bottom: 15px; border: 1px solid var(--border);
-            position: sticky;
-            top: 15px;
-            z-index: 500;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        /* ── Two-column layout ── */
+        .main-layout {
+            display: flex;
+            align-items: flex-start;
+            gap: 0;
         }
 
-        
+        /* ── SFC Sidebar ── */
+        .sfc-sidebar {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            position: sticky;
+            top: var(--header-h);
+            max-height: calc(100vh - var(--header-h));
+            overflow-y: auto;
+            background: var(--bg-secondary);
+            border: 1px solid var(--sfc-border);
+            border-radius: 6px;
+            padding: 12px;
+            box-shadow: 0 2px 10px rgba(111,66,193,0.08);
+            scrollbar-width: thin;
+            scrollbar-color: var(--sfc-border) transparent;
+        }
+        .sfc-sidebar::-webkit-scrollbar { width: 5px; }
+        .sfc-sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sfc-sidebar::-webkit-scrollbar-thumb { background: var(--sfc-border); border-radius: 3px; }
+
+        /* ── Resize handle ── */
+        .sidebar-resize {
+            width: 8px;
+            cursor: col-resize;
+            flex-shrink: 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-resize::after {
+            content: '';
+            display: block;
+            width: 2px;
+            height: 40px;
+            background: var(--border);
+            border-radius: 2px;
+            transition: background 0.2s, height 0.2s;
+        }
+        .sidebar-resize:hover::after,
+        .sidebar-resize.dragging::after {
+            background: var(--sfc-accent);
+            height: 60px;
+        }
+
+        /* ── Content area (tabs + lists) ── */
+        .content-area {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* ── Form elements ── */
+        input[type="text"] {
             flex: 1; padding: 6px 10px; background: var(--bg-tertiary);
             border: 1px solid var(--border); border-radius: 3px;
             color: var(--text-primary); font-size: 13px;
@@ -130,65 +188,26 @@
         .btn-danger { background: var(--danger); }
         .btn-sm { padding: 4px 10px; font-size: 12px; }
 
-        
-        .sfc-finder-section {
-            margin-top: 0;
-            padding-top: 0;
-        }
+        /* ── SFC Finder ── */
+        .sfc-finder-section { margin-top: 0; padding-top: 0; }
 
         .sfc-finder-header {
             display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 8px; gap: 8px; flex-wrap: wrap;
-            cursor: pointer;
-            user-select: none;
+            margin-bottom: 10px; gap: 6px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--sfc-border);
         }
-        .sfc-finder-header:hover .sfc-finder-title { opacity: 0.8; }
-
-        .sfc-collapse-icon {
-            font-size: 10px;
-            color: var(--sfc-accent);
-            transition: transform 0.2s ease;
-            min-width: 12px;
-        }
-        .sfc-collapse-icon.collapsed { transform: rotate(-90deg); }
-
-        .sfc-finder-body { }
-        .sfc-finder-body.collapsed { display: none; }
-
-        /* Compact summary shown when collapsed and results exist */
-        .sfc-collapsed-summary {
-            display: none;
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 2px;
-            margin-bottom: 4px;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .sfc-collapsed-summary.show { display: flex; }
-        .sfc-summary-pill {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 2px 8px; border-radius: 10px;
-            font-size: 11px; font-weight: 600;
-        }
-        .sfc-summary-pill.exact  { background: #eafbee; color: #1a7a35; border: 1px solid var(--highlight); }
-        .sfc-summary-pill.partial { background: #fff4e5; color: #a05000; border: 1px solid #e07b00; }
-        .sfc-summary-pill.missing { background: #fdecea; color: #a01010; border: 1px solid var(--danger); }
-        body.dark-mode .sfc-summary-pill.exact   { background: #0e2e18; color: #5cb85c; }
-        body.dark-mode .sfc-summary-pill.partial { background: #2a1a00; color: #e09040; }
-        body.dark-mode .sfc-summary-pill.missing { background: #2e0e0e; color: #e05050; }
 
         .sfc-finder-title {
-            font-size: 12px; font-weight: 600; color: var(--sfc-accent);
-            text-transform: uppercase; letter-spacing: 0.5px;
+            font-size: 12px; font-weight: 700; color: var(--sfc-accent);
+            text-transform: uppercase; letter-spacing: 0.6px;
         }
 
-        .sfc-finder-actions { display: flex; gap: 6px; align-items: center; }
+        .sfc-finder-actions { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
 
         .btn-sfc {
             background: var(--sfc-accent); color: white; border: none;
-            border-radius: 3px; padding: 6px 14px; font-size: 13px;
+            border-radius: 3px; padding: 5px 11px; font-size: 12px;
             cursor: pointer; font-weight: 500; white-space: nowrap;
         }
         .btn-sfc:hover { opacity: 0.9; }
@@ -196,24 +215,24 @@
         .btn-sfc-outline {
             background: transparent; color: var(--sfc-accent);
             border: 1px solid var(--sfc-accent); border-radius: 3px;
-            padding: 5px 12px; font-size: 13px; cursor: pointer; white-space: nowrap;
+            padding: 4px 10px; font-size: 12px; cursor: pointer; white-space: nowrap;
         }
         .btn-sfc-outline:hover { background: var(--sfc-bg); }
 
         textarea.sfc-input {
-            width: 100%; min-height: 80px; max-height: 160px;
-            padding: 8px 10px; background: var(--bg-tertiary);
+            width: 100%; min-height: 72px; max-height: 140px;
+            padding: 7px 9px; background: var(--bg-tertiary);
             border: 1px solid var(--sfc-border); border-radius: 3px;
-            color: var(--text-primary); font-size: 13px;
+            color: var(--text-primary); font-size: 12px;
             font-family: monospace; resize: vertical; line-height: 1.6;
         }
         textarea.sfc-input:focus { outline: none; border-color: var(--sfc-accent); }
         textarea.sfc-input::placeholder {
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            color: var(--text-muted); font-size: 12px;
+            color: var(--text-muted); font-size: 11px;
         }
 
-        .sfc-input-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .sfc-input-hint { font-size: 10px; color: var(--text-muted); margin-top: 4px; line-height: 1.4; }
 
         /* Results panel */
         .sfc-results-panel {
@@ -223,52 +242,50 @@
         .sfc-results-panel.show { display: block; }
 
         .sfc-results-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 8px 12px; background: var(--sfc-accent); color: white;
-            font-size: 13px; font-weight: 600; gap: 10px; flex-wrap: wrap;
+            padding: 8px 10px; background: var(--sfc-accent); color: white;
+            font-size: 12px; font-weight: 600;
         }
 
-        .sfc-results-title { flex: 1; }
+        .sfc-results-title { display: block; margin-bottom: 6px; line-height: 1.3; }
 
-        .sfc-nav-controls { display: flex; align-items: center; gap: 8px; }
+        .sfc-nav-controls { display: flex; align-items: center; gap: 6px; }
         .sfc-nav-btn {
             background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
-            color: white; border-radius: 3px; padding: 3px 10px;
-            cursor: pointer; font-size: 13px; font-weight: 600; line-height: 1.4;
+            color: white; border-radius: 3px; padding: 2px 9px;
+            cursor: pointer; font-size: 12px; font-weight: 600; line-height: 1.4;
         }
         .sfc-nav-btn:hover { background: rgba(255,255,255,0.35); }
         .sfc-nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-        .sfc-nav-counter { font-size: 12px; opacity: 0.9; min-width: 52px; text-align: center; }
+        .sfc-nav-counter { font-size: 11px; opacity: 0.9; min-width: 48px; text-align: center; }
 
         .sfc-results-body { background: var(--bg-secondary); }
 
-        .sfc-results-group {
-            padding: 10px 14px; border-bottom: 1px solid var(--border);
-        }
+        .sfc-results-group { padding: 8px 10px; border-bottom: 1px solid var(--border); }
         .sfc-results-group:last-child { border-bottom: none; }
 
         .sfc-group-label {
-            font-size: 11px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.5px; margin-bottom: 8px;
-            display: flex; align-items: center; gap: 6px;
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 6px;
+            display: flex; align-items: center; gap: 5px;
         }
         .sfc-group-label.found { color: var(--highlight); }
         .sfc-group-label.partial { color: #e07b00; }
         .sfc-group-label.not-found { color: var(--danger); }
 
         .sfc-group-label .sfc-group-count {
-            font-size: 11px; font-weight: 600; padding: 1px 7px;
+            font-size: 10px; font-weight: 600; padding: 1px 6px;
             border-radius: 10px; color: white;
         }
         .found .sfc-group-count { background: var(--highlight); }
         .partial .sfc-group-count { background: #e07b00; }
         .not-found .sfc-group-count { background: var(--danger); }
 
-        .sfc-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        /* Results chips in sidebar: full-width stacked rows */
+        .sfc-chips { display: flex; flex-direction: column; gap: 4px; }
 
         .sfc-chip {
-            display: inline-flex; align-items: center; gap: 6px;
-            border-radius: 20px; padding: 4px 11px; font-size: 12px;
+            display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap;
+            border-radius: 4px; padding: 5px 9px; font-size: 11px;
             cursor: pointer; transition: all 0.15s ease; border: 1px solid transparent;
         }
 
@@ -279,70 +296,61 @@
         .sfc-chip.found-chip.active-chip {
             background: var(--sfc-accent); border-color: var(--sfc-accent); color: white;
         }
-
         .sfc-chip.partial-chip {
             background: var(--bg-tertiary); border-color: #e07b00; color: var(--text-primary);
-            cursor: pointer;
         }
         .sfc-chip.partial-chip:hover { border-color: #c46a00; }
         .sfc-chip.partial-chip.active-chip {
             background: #e07b00; border-color: #e07b00; color: white;
         }
-
         .sfc-chip.notfound-chip {
             background: var(--bg-tertiary); border-color: var(--danger);
             color: var(--text-muted); cursor: default; opacity: 0.85;
         }
 
-        .sfc-chip-code { font-weight: 700; font-family: monospace; font-size: 12px; }
-        .sfc-chip-loc { font-size: 11px; opacity: 0.7; }
-        .sfc-chip-item { font-size: 11px; font-style: italic; opacity: 0.75; border-left: 1px solid currentColor; padding-left: 6px; }
-        .sfc-chip.active-chip .sfc-chip-loc { opacity: 0.9; }
+        .sfc-chip-code { font-weight: 700; font-family: monospace; font-size: 11px; }
+        .sfc-chip-loc  { font-size: 10px; opacity: 0.7; }
+        .sfc-chip-item {
+            font-size: 10px; font-style: italic; opacity: 0.75;
+            border-left: 1px solid currentColor; padding-left: 5px;
+            word-break: break-all;
+        }
+        .sfc-chip.active-chip .sfc-chip-loc  { opacity: 0.9; }
         .sfc-chip.active-chip .sfc-chip-item { opacity: 0.9; }
 
-        .sfc-empty-result { font-size: 12px; color: var(--text-muted); padding: 2px 0; }
+        .sfc-empty-result { font-size: 11px; color: var(--text-muted); padding: 2px 0; }
 
-        /* SFC item highlights — found (soft) */
+        /* ── SFC highlights ── */
         .list-item.sfc-highlight {
             border-left-color: var(--sfc-accent);
             outline: 2px solid var(--sfc-accent);
             background: var(--sfc-bg);
         }
-        .list-text.sfc-highlight {
-            color: var(--sfc-accent); font-weight: 600;
-        }
-        /* SFC item highlights — partial found (orange) */
+        .list-text.sfc-highlight { color: var(--sfc-accent); font-weight: 600; }
+
         .list-item.sfc-partial {
             border-left-color: #e07b00;
             outline: 2px solid #e07b00;
             background: #fff8f0;
         }
         body.dark-mode .list-item.sfc-partial { background: #2a1f0a; }
-        .list-text.sfc-partial {
-            color: #c46a00; font-weight: 600;
-        }
+        .list-text.sfc-partial { color: #c46a00; font-weight: 600; }
         body.dark-mode .list-text.sfc-partial { color: #f0a040; }
-        /* SFC active item — solid fill, clearly distinct from all other highlights */
+
         .list-item.sfc-active {
             border-left-color: var(--sfc-accent) !important;
             outline: 3px solid var(--sfc-accent) !important;
             background: var(--sfc-accent) !important;
         }
         .list-item.sfc-active .list-number { color: rgba(255,255,255,0.8) !important; }
-        .list-item.sfc-active .list-text { color: white !important; font-weight: 600; }
-        .list-item.sfc-active .remove-btn {
-            border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.8);
-        }
+        .list-item.sfc-active .list-text    { color: white !important; font-weight: 600; }
+        .list-item.sfc-active .remove-btn   { border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.8); }
         .list-item.sfc-active .remove-btn:hover { background: rgba(0,0,0,0.2); border-color: white; color: white; }
 
-        .subcategory-block.sfc-highlight {
-            outline: 2px solid var(--sfc-accent); border-color: var(--sfc-accent);
-        }
-        .subcategory-block.sfc-partial {
-            outline: 2px solid #e07b00; border-color: #e07b00;
-        }
+        .subcategory-block.sfc-highlight { outline: 2px solid var(--sfc-accent); border-color: var(--sfc-accent); }
+        .subcategory-block.sfc-partial   { outline: 2px solid #e07b00; border-color: #e07b00; }
         .tab.sfc-highlight { background: var(--sfc-accent); color: white; border-color: var(--sfc-accent); }
-        .tab.sfc-partial { background: #e07b00; color: white; border-color: #e07b00; }
+        .tab.sfc-partial   { background: #e07b00; color: white; border-color: #e07b00; }
 
         /* ── Tabs ── */
         .tabs {
@@ -350,7 +358,7 @@
             background: var(--bg-tertiary); padding: 8px;
             border-radius: 3px 3px 0 0; border: 1px solid var(--border);
             position: sticky;
-            top: 15px;
+            top: var(--header-h);
             z-index: 400;
         }
 
@@ -361,25 +369,24 @@
         }
         .tab:hover { background: var(--bg-tertiary); }
         .tab.active { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
-        
 
-        .tab-name { flex: 1; }
+        .tab-name    { flex: 1; }
         .tab-actions { display: flex; gap: 4px; }
         .tab-btn {
             background: transparent; border: none; color: inherit;
             cursor: pointer; padding: 2px 6px; border-radius: 2px; font-size: 12px;
         }
-        .tab.active .tab-btn:hover { background: rgba(255,255,255,0.2); }
+        .tab.active .tab-btn:hover       { background: rgba(255,255,255,0.2); }
         .tab:not(.active) .tab-btn:hover { background: rgba(0,0,0,0.05); }
         body.dark-mode .tab:not(.active) .tab-btn:hover { background: rgba(255,255,255,0.1); }
 
         .tab-content {
             display: none; background: var(--bg-secondary); padding: 15px;
-            border-radius: 4px; border: 1px solid var(--border);
+            border-radius: 0 0 4px 4px; border: 1px solid var(--border); border-top: none;
         }
         .tab-content.active { display: block; }
 
-        .root-items-section { margin-bottom: 16px; }
+        .root-items-section  { margin-bottom: 16px; }
         .list-input-container { margin-bottom: 10px; }
         .list-input {
             width: 100%; padding: 8px 10px; background: var(--bg-tertiary);
@@ -396,11 +403,9 @@
             border-left: 2px solid var(--accent-primary);
         }
         .list-item:hover { background: var(--bg-primary); }
-        
 
         .list-number { font-weight: 600; color: var(--text-secondary); min-width: 35px; font-size: 12px; }
-        .list-text { flex: 1; color: var(--text-primary); word-break: break-word; font-size: 13px; }
-        
+        .list-text   { flex: 1; color: var(--text-primary); word-break: break-word; font-size: 13px; }
 
         .remove-btn {
             background: transparent; border: 1px solid var(--border);
@@ -423,7 +428,6 @@
             border: 1px solid var(--subcat-border); border-radius: 5px;
             margin-bottom: 10px; background: var(--subcat-bg); overflow: hidden;
         }
-        
 
         .subcat-header {
             display: flex; align-items: center; gap: 8px; padding: 8px 12px;
@@ -435,7 +439,7 @@
             transition: transform 0.2s ease; min-width: 12px;
         }
         .subcat-collapse-icon.collapsed { transform: rotate(-90deg); }
-        .subcat-name { flex: 1; font-weight: 600; font-size: 13px; color: var(--text-primary); }
+        .subcat-name  { flex: 1; font-weight: 600; font-size: 13px; color: var(--text-primary); }
         .subcat-count {
             font-size: 11px; color: var(--text-muted); background: var(--bg-secondary);
             border: 1px solid var(--subcat-border); border-radius: 10px; padding: 1px 7px;
@@ -446,7 +450,7 @@
             color: var(--text-secondary); cursor: pointer;
             padding: 3px 7px; border-radius: 3px; font-size: 13px; line-height: 1;
         }
-        .subcat-btn:hover { border-color: var(--border); background: var(--bg-secondary); }
+        .subcat-btn:hover        { border-color: var(--border); background: var(--bg-secondary); }
         .subcat-btn.danger:hover { background: var(--danger); color: white; border-color: var(--danger); }
         .subcat-body { padding: 10px 12px; }
         .subcat-body.collapsed { display: none; }
@@ -457,7 +461,81 @@
         }
         .subcat-input:focus { outline: none; border-color: var(--accent-primary); }
 
-        /* Modal */
+
+        /* ── README Modal ── */
+        .readme-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.55); z-index: 2000;
+            align-items: flex-start; justify-content: center;
+            padding: 60px 16px 24px;
+        }
+        .readme-modal.show { display: flex; }
+        .readme-modal-content {
+            background: var(--bg-secondary); border: 1px solid var(--border);
+            border-radius: 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            max-width: 760px; width: 100%;
+            max-height: calc(100vh - 84px);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .readme-modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px; border-bottom: 1px solid var(--border);
+            background: var(--bg-tertiary); flex-shrink: 0;
+        }
+        .readme-modal-title {
+            font-size: 14px; font-weight: 700; color: var(--text-primary);
+        }
+        .readme-modal-close {
+            background: transparent; border: 1px solid var(--border);
+            color: var(--text-secondary); cursor: pointer;
+            width: 28px; height: 28px; border-radius: 3px;
+            font-size: 16px; display: flex; align-items: center; justify-content: center;
+        }
+        .readme-modal-close:hover { background: var(--danger); color: white; border-color: var(--danger); }
+        .readme-modal-body {
+            overflow-y: auto; padding: 20px 24px;
+            font-size: 13px; line-height: 1.7; color: var(--text-primary);
+            scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+        }
+        .readme-modal-body::-webkit-scrollbar { width: 6px; }
+        .readme-modal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        /* README typography */
+        .readme-modal-body h1 { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: var(--text-primary); }
+        .readme-modal-body h2 {
+            font-size: 1rem; font-weight: 700; margin: 22px 0 8px;
+            padding-bottom: 4px; border-bottom: 1px solid var(--border);
+            color: var(--accent-primary);
+        }
+        .readme-modal-body h3 { font-size: 0.9rem; font-weight: 700; margin: 16px 0 6px; color: var(--text-secondary); }
+        .readme-modal-body p  { margin-bottom: 10px; }
+        .readme-modal-body ul, .readme-modal-body ol { margin: 6px 0 10px 20px; }
+        .readme-modal-body li { margin-bottom: 3px; }
+        .readme-modal-body code {
+            background: var(--bg-tertiary); border: 1px solid var(--border);
+            border-radius: 3px; padding: 1px 5px; font-size: 12px; font-family: monospace;
+        }
+        .readme-modal-body pre {
+            background: var(--bg-tertiary); border: 1px solid var(--border);
+            border-radius: 4px; padding: 12px 14px; overflow-x: auto;
+            font-size: 12px; font-family: monospace; line-height: 1.5; margin-bottom: 10px;
+        }
+        .readme-modal-body pre code { background: none; border: none; padding: 0; }
+        .readme-modal-body table {
+            width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 12px;
+        }
+        .readme-modal-body th, .readme-modal-body td {
+            padding: 6px 10px; border: 1px solid var(--border); text-align: left;
+        }
+        .readme-modal-body th { background: var(--bg-tertiary); font-weight: 600; }
+        .readme-modal-body hr { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+        .readme-modal-body strong { font-weight: 700; }
+        .readme-modal-body em { font-style: italic; }
+        .readme-version {
+            font-size: 11px; color: var(--text-muted); text-align: right;
+            margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);
+        }
+        /* ── Modal ── */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;
@@ -469,9 +547,20 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         .modal-content h2 { margin-bottom: 15px; color: var(--text-primary); font-size: 1.25rem; font-weight: 600; }
-        .modal-content input { width: 100%; padding: 8px 10px; margin-bottom: 15px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 3px; color: var(--text-primary); font-size: 13px; }
+        .modal-content input {
+            width: 100%; padding: 8px 10px; margin-bottom: 15px;
+            background: var(--bg-tertiary); border: 1px solid var(--border);
+            border-radius: 3px; color: var(--text-primary); font-size: 13px;
+        }
         .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
 
+        /* ── Responsive: stack on narrow screens ── */
+        @media (max-width: 700px) {
+            .main-layout { flex-direction: column; gap: 12px; }
+            .sfc-sidebar { width: 100%; position: static; max-height: none; }
+            .sidebar-resize { display: none; }
+            .tabs { top: 0; }
+        }
         @media (max-width: 600px) { .dropdown-menu { right: -15px; } }
     </style>
 </head>
@@ -504,33 +593,37 @@
                         <div class="toggle-switch" onclick="toggleDarkMode()"><div class="toggle-slider"></div></div>
                     </div>
                 </div>
+                <div class="dropdown-item" onclick="event.stopPropagation(); exportTxt();">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    Export Plain Text
+                </div>
+                <div class="dropdown-item" onclick="event.stopPropagation(); showReadme();">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    Help / README
+                </div>
             </div>
         </div>
         <input type="file" id="importFile" accept=".xml" onchange="importData(event)" style="display:none;">
     </header>
 
-    <div class="top-controls">
+    <!-- ── Two-column layout ── -->
+    <div class="main-layout" id="mainLayout">
 
-        <!-- SFC Lookup -->
-        <div class="sfc-finder-section">
-            <div class="sfc-finder-header" onclick="toggleSFCFinder()">
-                <span style="display:flex;align-items:center;gap:6px;">
-                    <span class="sfc-collapse-icon" id="sfcCollapseIcon">▼</span>
-                    <span class="sfc-finder-title">SFC Lookup</span>
-                </span>
-                <div class="sfc-finder-actions" onclick="event.stopPropagation()">
-                    <button class="btn-sfc" onclick="runSFCLookup()">&#128269; Find SFCs</button>
-                    <button class="btn-sfc-outline" id="sfcClearBtn" onclick="clearSFCResults()" style="display:none;">✕ Clear</button>
+        <!-- Left: SFC Lookup Sidebar -->
+        <div class="sfc-sidebar" id="sfcSidebar">
+            <div class="sfc-finder-section">
+
+                <div class="sfc-finder-header">
+                    <span class="sfc-finder-title">🔍 SFC Lookup</span>
+                    <div class="sfc-finder-actions">
+                        <button class="btn-sfc" onclick="runSFCLookup()">Find SFCs</button>
+                        <button class="btn-sfc-outline" id="sfcClearBtn" onclick="clearSFCResults()" style="display:none;">✕ Clear</button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Collapsed summary (shown only when collapsed + results exist) -->
-            <div class="sfc-collapsed-summary" id="sfcCollapsedSummary"></div>
-
-            <!-- Expandable body -->
-            <div class="sfc-finder-body" id="sfcFinderBody">
-                <textarea class="sfc-input" id="sfcInput" placeholder="Paste SFCs to look up, one per line:&#10;SFC-001&#10;SFC-042&#10;SFC-999"></textarea>
-                <div class="sfc-input-hint">One SFC per line &mdash; exact, case-insensitive match across all tabs and subcategories</div>
+                <textarea class="sfc-input" id="sfcInput"
+                    placeholder="Paste SFCs to look up, one per line:&#10;SFC-001&#10;SFC-042&#10;SFC-999"></textarea>
+                <div class="sfc-input-hint">One SFC per line — exact &amp; case-insensitive match across all tabs and subcategories</div>
 
                 <div id="sfcResultsPanel" class="sfc-results-panel">
                     <div class="sfc-results-header">
@@ -543,14 +636,34 @@
                     </div>
                     <div class="sfc-results-body" id="sfcResultsBody"></div>
                 </div>
+
             </div>
         </div>
-    </div>
 
-    <div class="tabs" id="tabsContainer"></div>
-    <div id="tabContents"></div>
+        <!-- Drag-to-resize handle -->
+        <div class="sidebar-resize" id="sidebarResize" title="Drag to resize"></div>
+
+        <!-- Right: Tabs + Content -->
+        <div class="content-area">
+            <div class="tabs" id="tabsContainer"></div>
+            <div id="tabContents"></div>
+        </div>
+
+    </div><!-- /.main-layout -->
+</div><!-- /.container -->
+<!-- README Modal -->
+<div id="readmeModal" class="readme-modal" onclick="if(event.target===this)closeReadme()">
+    <div class="readme-modal-content">
+        <div class="readme-modal-header">
+            <span class="readme-modal-title">📖 Help &amp; README</span>
+            <button class="readme-modal-close" onclick="closeReadme()">×</button>
+        </div>
+        <div class="readme-modal-body" id="readmeBody"></div>
+    </div>
 </div>
 
+
+<!-- Modal -->
 <div id="tabModal" class="modal">
     <div class="modal-content">
         <h2 id="modalTitle">Create New Tab</h2>
@@ -591,21 +704,40 @@
         if (localStorage.getItem('darkMode') === 'enabled') document.body.classList.add('dark-mode');
     }
 
+    // ─── Sidebar drag-to-resize ───────────────────────────────────────────────
+    function initSidebarResize() {
+        const handle  = document.getElementById('sidebarResize');
+        const sidebar = document.getElementById('sfcSidebar');
+        let dragging = false, startX = 0, startW = 0;
+
+        handle.addEventListener('mousedown', e => {
+            dragging = true;
+            startX   = e.clientX;
+            startW   = sidebar.getBoundingClientRect().width;
+            handle.classList.add('dragging');
+            document.body.style.userSelect = 'none';
+            document.body.style.cursor     = 'col-resize';
+        });
+        document.addEventListener('mousemove', e => {
+            if (!dragging) return;
+            const newW = Math.max(200, Math.min(600, startW + (e.clientX - startX)));
+            sidebar.style.width = newW + 'px';
+            document.documentElement.style.setProperty('--sidebar-width', newW + 'px');
+        });
+        document.addEventListener('mouseup', () => {
+            if (!dragging) return;
+            dragging = false;
+            handle.classList.remove('dragging');
+            document.body.style.userSelect = '';
+            document.body.style.cursor     = '';
+        });
+    }
+
     // ─── Init ─────────────────────────────────────────────────────────────────
     function initializeApp() {
         initializeDarkMode();
+        initSidebarResize();
         if (tabs.length === 0) addTab('General');
-
-        // Keep the tabs bar sitting just below the sticky controls panel
-        const controls = document.querySelector('.top-controls');
-        const tabsBar  = document.getElementById('tabsContainer');
-        const BODY_PAD = 15; // matches body padding
-        function syncTabsTop() {
-            const h = controls.getBoundingClientRect().height;
-            tabsBar.style.top = (BODY_PAD + h + 4) + 'px';
-        }
-        new ResizeObserver(syncTabsTop).observe(controls);
-        syncTabsTop();
     }
 
     function generateId() {
@@ -650,9 +782,9 @@
     function confirmTabAction() {
         const name = document.getElementById('tabNameInput').value.trim();
         if (!name) return;
-        if (modalAction === 'addTab') addTab(name);
-        else if (modalAction === 'renameTab') renameTab(modalTabId, name);
-        else if (modalAction === 'addSubcat') addSubcategory(modalTabId, name);
+        if (modalAction === 'addTab')          addTab(name);
+        else if (modalAction === 'renameTab')  renameTab(modalTabId, name);
+        else if (modalAction === 'addSubcat')  addSubcategory(modalTabId, name);
         else if (modalAction === 'renameSubcat') renameSubcategory(modalTabId, modalSubcatId, name);
         closeModal();
     }
@@ -684,7 +816,10 @@
     }
     function renameSubcategory(tabId, subcatId, newName) {
         const tab = tabs.find(t => t.id === tabId);
-        if (tab) { const sub = tab.subcategories.find(s => s.id === subcatId); if (sub) { sub.name = newName; renderTabs(); } }
+        if (tab) {
+            const sub = tab.subcategories.find(s => s.id === subcatId);
+            if (sub) { sub.name = newName; renderTabs(); }
+        }
     }
     function deleteSubcategory(tabId, subcatId) {
         if (!confirm('Delete this subcategory and all its items?')) return;
@@ -706,8 +841,10 @@
             const value = event.target.value.trim();
             if (value) {
                 const tab = tabs.find(t => t.id === tabId);
-                if (tab) { tab.items.push(value); event.target.value = ''; renderTabs();
-                    setTimeout(() => { const el = document.getElementById('input_' + tabId); if(el) el.focus(); }, 50); }
+                if (tab) {
+                    tab.items.push(value); event.target.value = ''; renderTabs();
+                    setTimeout(() => { const el = document.getElementById('input_' + tabId); if(el) el.focus(); }, 50);
+                }
             }
         }
     }
@@ -720,23 +857,28 @@
             const value = event.target.value.trim();
             if (value) {
                 const tab = tabs.find(t => t.id === tabId);
-                if (tab) { const sub = tab.subcategories.find(s => s.id === subcatId);
-                    if (sub) { sub.items.push(value); event.target.value = ''; renderTabs();
-                        setTimeout(() => { const el = document.getElementById('subInput_' + subcatId); if(el) el.focus(); }, 50); }
+                if (tab) {
+                    const sub = tab.subcategories.find(s => s.id === subcatId);
+                    if (sub) {
+                        sub.items.push(value); event.target.value = ''; renderTabs();
+                        setTimeout(() => { const el = document.getElementById('subInput_' + subcatId); if(el) el.focus(); }, 50);
+                    }
                 }
             }
         }
     }
     function removeSubcatItem(tabId, subcatId, index) {
         const tab = tabs.find(t => t.id === tabId);
-        if (tab) { const sub = tab.subcategories.find(s => s.id === subcatId);
-            if (sub) { sub.items.splice(index, 1); renderTabs(); } }
+        if (tab) {
+            const sub = tab.subcategories.find(s => s.id === subcatId);
+            if (sub) { sub.items.splice(index, 1); renderTabs(); }
+        }
     }
 
     // ─── Render ───────────────────────────────────────────────────────────────
     function renderTabs() {
         const tabsContainer = document.getElementById('tabsContainer');
-        const tabContents = document.getElementById('tabContents');
+        const tabContents   = document.getElementById('tabContents');
         tabsContainer.innerHTML = ''; tabContents.innerHTML = '';
 
         tabs.forEach(tab => {
@@ -818,38 +960,7 @@
         if (sfcFoundMatches.length > 0) applyAllSFCHighlights();
     }
 
-    // ─── SFC Finder collapse ──────────────────────────────────────────────────
-    let sfcFinderCollapsed = false;
-
-    function toggleSFCFinder() {
-        sfcFinderCollapsed = !sfcFinderCollapsed;
-        document.getElementById('sfcFinderBody').classList.toggle('collapsed', sfcFinderCollapsed);
-        document.getElementById('sfcCollapseIcon').classList.toggle('collapsed', sfcFinderCollapsed);
-        updateCollapsedSummary();
-    }
-
-    function updateCollapsedSummary() {
-        const summaryEl = document.getElementById('sfcCollapsedSummary');
-        // Only show summary when collapsed and a search has been run
-        if (!sfcFinderCollapsed || sfcFoundMatches.length === 0 && !document.getElementById('sfcResultsPanel').classList.contains('show')) {
-            summaryEl.classList.remove('show');
-            summaryEl.innerHTML = '';
-            return;
-        }
-        // Count exact, partial, not-found from the last run (stored on window for summary access)
-        const { lastExact = 0, lastPartialHits = 0, lastNotFound = 0 } = window._sfcLastCounts || {};
-        let html = '';
-        if (lastExact > 0)        html += `<span class="sfc-summary-pill exact">✓ ${lastExact} exact</span>`;
-        if (lastPartialHits > 0)  html += `<span class="sfc-summary-pill partial">~ ${lastPartialHits} partial</span>`;
-        if (lastNotFound > 0)     html += `<span class="sfc-summary-pill missing">✕ ${lastNotFound} not found</span>`;
-        if (!html)                html = '<span style="font-size:12px;color:var(--text-muted)">No results yet</span>';
-        summaryEl.innerHTML = html;
-        summaryEl.classList.add('show');
-    }
-
     // ─── SFC Lookup ───────────────────────────────────────────────────────────
-
-    // Returns the single exact match for a code, or null
     function findExactSFC(code) {
         const needle = code.toLowerCase();
         for (const tab of tabs) {
@@ -867,7 +978,6 @@
         return null;
     }
 
-    // Returns ALL partial/substring matches for a code
     function findAllPartialSFCs(code) {
         const needle = code.toLowerCase();
         const results = [];
@@ -889,15 +999,10 @@
     function runSFCLookup() {
         const inputCodes = document.getElementById('sfcInput').value
             .split('\n').map(l => l.trim()).filter(l => l.length > 0);
-
-        if (inputCodes.length === 0) {
-            alert('Please enter at least one SFC code to look up.');
-            return;
-        }
+        if (inputCodes.length === 0) { alert('Please enter at least one SFC code to look up.'); return; }
 
         clearSFCHighlights();
-        sfcFoundMatches = [];
-        sfcCurrentIndex = -1;
+        sfcFoundMatches = []; sfcCurrentIndex = -1;
 
         const exactFound = [], partialFound = [], notFound = [];
         for (const code of inputCodes) {
@@ -906,16 +1011,11 @@
                 exactFound.push({ code, match: exact });
             } else {
                 const partials = findAllPartialSFCs(code);
-                if (partials.length > 0) {
-                    partials.forEach(match => partialFound.push({ code, match }));
-                } else {
-                    notFound.push(code);
-                }
+                if (partials.length > 0) partials.forEach(match => partialFound.push({ code, match }));
+                else notFound.push(code);
             }
         }
 
-        // Remove any partial hit that points to the same item as an exact match
-        // (i.e. an item that IS an SFC code shouldn't also appear as a partial hit for another code)
         const exactLocations = new Set(
             exactFound.map(f => `${f.match.tab.id}::${f.match.subcatId ?? ''}::${f.match.index}`)
         );
@@ -923,32 +1023,29 @@
             !exactLocations.has(`${f.match.tab.id}::${f.match.subcatId ?? ''}::${f.match.index}`)
         );
 
-        // sfcFoundMatches must be in the same order chips are rendered (exact first, then partial)
-        // so that chip index N always maps to sfcFoundMatches[N]
         sfcFoundMatches = [...exactFound, ...dedupedPartials];
 
         const panel = document.getElementById('sfcResultsPanel');
-        const body = document.getElementById('sfcResultsBody');
+        const body  = document.getElementById('sfcResultsBody');
         panel.classList.add('show');
         document.getElementById('sfcClearBtn').style.display = '';
 
-        const total = inputCodes.length;
+        const total      = inputCodes.length;
         const foundCount = exactFound.length + new Set(dedupedPartials.map(f => f.code)).size;
         document.getElementById('sfcResultsTitle').textContent =
             `${foundCount} of ${total} SFC${total !== 1 ? 's' : ''} found` +
             (dedupedPartials.length > 0 ? ` (${dedupedPartials.length} partial hit${dedupedPartials.length !== 1 ? 's' : ''})` : '');
 
-        // chip index offset — exact chips first, then partial
         let chipIdx = 0;
 
-        // Exact found group
+        // Exact group
         let exactHtml = `<div class="sfc-results-group">
             <div class="sfc-group-label found">Exact Match <span class="sfc-group-count">${exactFound.length}</span></div>
             <div class="sfc-chips">`;
         if (exactFound.length === 0) {
             exactHtml += '<span class="sfc-empty-result">No exact matches.</span>';
         } else {
-            exactFound.forEach((f) => {
+            exactFound.forEach(f => {
                 const loc = f.match.subcatId ? `${f.match.tab.name} › ${f.match.subcatName}` : f.match.tab.name;
                 exactHtml += `<div class="sfc-chip found-chip" id="sfcChip_${chipIdx}" onclick="jumpToSFC(${chipIdx})">
                     <span class="sfc-chip-code">${escapeHtml(f.code)}</span>
@@ -959,14 +1056,14 @@
         }
         exactHtml += '</div></div>';
 
-        // Partial found group
+        // Partial group
         let partialHtml = `<div class="sfc-results-group">
             <div class="sfc-group-label partial">Partial Match <span class="sfc-group-count">${dedupedPartials.length}</span></div>
             <div class="sfc-chips">`;
         if (dedupedPartials.length === 0) {
             partialHtml += '<span class="sfc-empty-result">No partial matches.</span>';
         } else {
-            dedupedPartials.forEach((f) => {
+            dedupedPartials.forEach(f => {
                 const loc = f.match.subcatId ? `${f.match.tab.name} › ${f.match.subcatName}` : f.match.tab.name;
                 const itemText = f.match.subcatId
                     ? tabs.find(t => t.id === f.match.tab.id).subcategories.find(s => s.id === f.match.subcatId).items[f.match.index]
@@ -997,17 +1094,9 @@
         body.innerHTML = exactHtml + partialHtml + notFoundHtml;
 
         const hasFound = sfcFoundMatches.length > 0;
-        document.getElementById('sfcPrevBtn').disabled = !hasFound;
-        document.getElementById('sfcNextBtn').disabled = !hasFound;
+        document.getElementById('sfcPrevBtn').disabled  = !hasFound;
+        document.getElementById('sfcNextBtn').disabled  = !hasFound;
         document.getElementById('sfcNavCounter').textContent = hasFound ? `0 of ${sfcFoundMatches.length}` : '0 of 0';
-
-        // Store counts for the collapsed summary
-        window._sfcLastCounts = {
-            lastExact:       exactFound.length,
-            lastPartialHits: dedupedPartials.length,
-            lastNotFound:    notFound.length
-        };
-        updateCollapsedSummary();
 
         if (hasFound) { applyAllSFCHighlights(); jumpToSFC(0); }
     }
@@ -1020,9 +1109,10 @@
                     const key = match.tab.id + '::' + match.subcatId;
                     if (collapsedSubcats[key]) {
                         collapsedSubcats[key] = false;
-                        const b = document.getElementById('subcatBody_' + match.subcatId);
+                        const b  = document.getElementById('subcatBody_' + match.subcatId);
                         const ic = document.getElementById('subcatIcon_' + match.subcatId);
-                        if (b) b.classList.remove('collapsed'); if (ic) ic.classList.remove('collapsed');
+                        if (b) b.classList.remove('collapsed');
+                        if (ic) ic.classList.remove('collapsed');
                     }
                     const block = document.getElementById('subcatBlock_' + match.subcatId);
                     if (block) block.classList.add(hClass);
@@ -1040,7 +1130,7 @@
                 }
             });
             document.querySelectorAll('.tab').forEach(tabEl => {
-                const name = tabEl.querySelector('.tab-name').textContent;
+                const name  = tabEl.querySelector('.tab-name').textContent;
                 const match = sfcFoundMatches.find(f => f.match.tab.name === name);
                 if (match) tabEl.classList.add(match.match.matchType === 'partial' ? 'sfc-partial' : 'sfc-highlight');
             });
@@ -1058,14 +1148,18 @@
         const chip = document.getElementById('sfcChip_' + index);
         if (chip) { chip.classList.add('active-chip'); chip.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
 
-        // Switch tab if needed — renderTabs will reapply all highlights automatically
         if (currentTab !== match.tab.id) { currentTab = match.tab.id; renderTabs(); }
 
         setTimeout(() => {
             document.querySelectorAll('.list-item.sfc-active').forEach(el => el.classList.remove('sfc-active'));
-            const sel = match.subcatId ? `#subcatBody_${match.subcatId} .list-item` : `#content_${match.tab.id} .root-items-section .list-item`;
+            const sel   = match.subcatId
+                ? `#subcatBody_${match.subcatId} .list-item`
+                : `#content_${match.tab.id} .root-items-section .list-item`;
             const items = document.querySelectorAll(sel);
-            if (items[match.index]) { items[match.index].classList.add('sfc-active'); items[match.index].scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+            if (items[match.index]) {
+                items[match.index].classList.add('sfc-active');
+                items[match.index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }, 120);
     }
 
@@ -1083,13 +1177,11 @@
     function clearSFCResults() {
         clearSFCHighlights();
         sfcFoundMatches = []; sfcCurrentIndex = -1;
-        window._sfcLastCounts = {};
         document.getElementById('sfcResultsPanel').classList.remove('show');
         document.getElementById('sfcClearBtn').style.display = 'none';
         document.getElementById('sfcNavCounter').textContent = '— of —';
         document.getElementById('sfcPrevBtn').disabled = true;
         document.getElementById('sfcNextBtn').disabled = true;
-        updateCollapsedSummary();
     }
 
     // ─── Export / Import ──────────────────────────────────────────────────────
@@ -1160,7 +1252,106 @@
         return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
     }
 
+
+    // ─── Export Plain Text ────────────────────────────────────────────────────
+    function exportTxt() {
+        document.getElementById('dropdownMenu').classList.remove('show');
+        const now = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        const dateStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+        const timeStr = `${pad(now.getHours())}-${pad(now.getMinutes())}`;
+
+        let txt = `Exported: ${now.toLocaleString()}\n`;
+        txt += `SFC Inventory\n`;
+        tabs.forEach(tab => {
+            txt += `\n${tab.name}\n`;
+            tab.items.forEach(item => { txt += `  ${item}\n`; });
+            tab.subcategories.forEach(sub => {
+                txt += `  ${sub.name}\n`;
+                sub.items.forEach(item => { txt += `    ${item}\n`; });
+            });
+        });
+
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain' }));
+        a.download = `Inventory-${dateStr}_${timeStr}.txt`;
+        a.click();
+    }
+
+    // ─── README Modal ─────────────────────────────────────────────────────────
+    const README_CONTENT = `
+<h1>SFC Inventory</h1>
+<p>A lightweight, single-file browser app for organizing items into categorized tabs and locating specific SFC codes across your entire inventory. No installation, no server, no dependencies — open the HTML file and go.</p>
+<hr>
+<h2>Layout</h2>
+<p>The app uses a <strong>two-column layout</strong> on desktop: the <strong>SFC Lookup</strong> sidebar is on the left, and the <strong>tabs &amp; inventory content</strong> fill the right column. Both panels scroll independently. Drag the thin <strong>▌ divider</strong> between them to resize the sidebar (200–600 px). On narrow screens (&lt;700 px) the layout stacks vertically.</p>
+<hr>
+<h2>Managing Tabs</h2>
+<table>
+<tr><th>Action</th><th>How</th></tr>
+<tr><td>Add a tab</td><td>Menu (≡) → Add Tab</td></tr>
+<tr><td>Rename a tab</td><td>Click ✎ on the tab</td></tr>
+<tr><td>Delete a tab</td><td>Click ✕ on the tab (cannot delete the last tab)</td></tr>
+<tr><td>Switch tabs</td><td>Click the tab name</td></tr>
+</table>
+<h2>Adding Items</h2>
+<p>Click a tab, type your item in the text field, and press <strong>Enter</strong>. Items are numbered automatically. Click <strong>×</strong> next to any item to remove it.</p>
+<h2>Subcategories</h2>
+<ul>
+<li>Click <strong>+ Add Subcategory</strong> inside any tab to create one</li>
+<li>Add items the same way — type and press <strong>Enter</strong></li>
+<li>Click the subcategory header to collapse/expand it</li>
+<li>Rename or delete subcategories with the ✎ and × buttons</li>
+</ul>
+<hr>
+<h2>SFC Lookup</h2>
+<p>The SFC Lookup panel is always visible on the left. Paste codes to search (one per line) and click <strong>Find SFCs</strong>. Results appear in three groups:</p>
+<table>
+<tr><th>Group</th><th>Colour</th><th>Meaning</th></tr>
+<tr><td>Exact Match</td><td>Green</td><td>Item is exactly that SFC code</td></tr>
+<tr><td>Partial Match</td><td>Orange</td><td>SFC code appears within a longer item</td></tr>
+<tr><td>Not Found</td><td>Red</td><td>Not located anywhere in the inventory</td></tr>
+</table>
+<p>Use <strong>◀ Prev / Next ▶</strong> to step through results, or click any chip to jump directly. Highlights persist as you switch tabs — they only clear when you run a new search or click <strong>✕ Clear</strong>.</p>
+<hr>
+<h2>Import &amp; Export</h2>
+<ul>
+<li><strong>Export XML</strong> — full backup in structured XML format; use this to move data between browsers or devices</li>
+<li><strong>Export Plain Text</strong> — human-readable indented list, useful for sharing or printing</li>
+<li><strong>Import XML</strong> — loads a previously exported XML file; <em>replaces all current data</em></li>
+</ul>
+<h2>Data Storage</h2>
+<p>All data is stored in <strong>browser local storage</strong> — no server involved. Data is specific to the browser and device. Clearing browser data will delete your lists — <strong>export regularly as a backup</strong>.</p>
+<hr>
+<h2>Keyboard Shortcuts</h2>
+<table>
+<tr><th>Key</th><th>Action</th></tr>
+<tr><td>Enter</td><td>Add item to the current list or subcategory</td></tr>
+<tr><td>Escape</td><td>Close any open modal</td></tr>
+</table>
+<hr>
+<h2>Troubleshooting</h2>
+<ul>
+<li><strong>Data disappeared</strong> — check you're on the same browser/device; import your last backup</li>
+<li><strong>Import not working</strong> — confirm the file is a <code>.xml</code> exported from this app</li>
+<li><strong>SFC not found</strong> — the lookup expects the item to be <em>only</em> the SFC code with no extra text; partial matching will catch items with surrounding text</li>
+<li><strong>SFC-42 vs SFC-042</strong> — treated as different codes; formatting must match exactly</li>
+<li><strong>Sidebar too narrow/wide</strong> — drag the divider to resize (200–600 px)</li>
+</ul>
+<div class="readme-version">Version 1.4 &nbsp;·&nbsp; March 2026</div>
+`;
+
+    function showReadme() {
+        document.getElementById('dropdownMenu').classList.remove('show');
+        document.getElementById('readmeBody').innerHTML = README_CONTENT;
+        document.getElementById('readmeModal').classList.add('show');
+    }
+    function closeReadme() {
+        document.getElementById('readmeModal').classList.remove('show');
+    }
+
     document.getElementById('tabNameInput').addEventListener('keypress', e => { if (e.key === 'Enter') confirmTabAction(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeReadme(); } });
 
     initializeApp();
 </script>
