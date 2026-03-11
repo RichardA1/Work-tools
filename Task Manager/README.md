@@ -1,6 +1,6 @@
 # Task Manager
 
-A streamlined task management application with dark/light mode, time tracking, notes, quick-copy text blocks, priority ranking, and collapsible task cards.
+A streamlined task management application with dark/light mode, time tracking with pause/resume, notes, quick-copy text blocks, priority ranking, and collapsible task cards.
 
 ## File Structure
 
@@ -25,6 +25,7 @@ Both files must be in the same folder. Just open `task-manager.html` in a browse
 - **Color-Coded Status**
   - 🟡 **Yellow** — New tasks (not yet started)
   - 🟠 **Orange** — Started tasks (in progress)
+  - 🟣 **Purple** — Paused tasks (timer paused, not yet finalized)
   - 🟢 **Green** — Completed tasks
   - 🔴 **Red** — Rework tasks (marked for rework)
 - **Add Tasks** — Part number (50 char max) + type selection
@@ -48,10 +49,23 @@ Clicking an active priority button a second time deselects it. The task list sor
 Each task card has a **▼ / ▶ collapse button** at the top-right. Click it to minimize the task to just the part number row, saving vertical space when managing long lists. State is saved in localStorage and persists across reloads.
 
 ### Time Tracking
-- **Start/Stop/Reset** — Three-state time tracking per task
-- **12-Hour Format** — Displays as HH:MM AM/PM
-- **Auto-Complete** — Clicking Stop marks the task complete and clears its priority
-- **Clickable Times** — Click any start or stop time to copy it
+Tasks use a **multi-session timer** that records every start/stop pair individually, letting you pause and resume work without losing history.
+
+**Timer button states:**
+- **Start** (blue) — Begins the first session; task turns orange
+- **⏸ Pause** (orange) — Closes the current session; task turns purple
+- **Stop** (green) — Closes the current session, finalizes the task, and marks it complete. Available alongside Pause/Resume so you can stop in a single click.
+- **▶ Resume** (purple) — Opens a new session; task turns orange again
+
+**Sessions log** — A numbered log of every start → stop pair is displayed inline on the task card when at least one session exists.
+
+**Time display fields:**
+- **First Start** — The timestamp when the task was first started. Shows a `×N` badge when multiple sessions have been recorded.
+- **Last Stop** — The most recent stop timestamp. Shows `● live` while the timer is actively running.
+
+Clicking any displayed time value copies it to the clipboard.
+
+**Completing a task via checkbox** — If the timer is running when you check the task complete, the current session is automatically closed with the current time.
 
 ### Menu System
 Access the hamburger menu (☰) in the top-right corner for:
@@ -61,7 +75,7 @@ Access the hamburger menu (☰) in the top-right corner for:
 - **View README** — Open documentation in a new tab
 
 ### Data Persistence
-- Tasks stored in browser localStorage (including minimize state and priority)
+- Tasks stored in browser localStorage (including minimize state, priority, and full session history)
 - Notes auto-save as you type
 - Theme preference remembered
 - Survives page reloads and browser restarts
@@ -98,17 +112,23 @@ On any incomplete task, click the **1**, **2**, or **3** circle buttons on the T
 Click **▼** at the top-right of any task card to collapse it to a single line. Click **▶** to expand it again.
 
 ### Time Tracking Workflow
-Each task's time button cycles through three states:
 
-1. **Start** — Records the current time as start time; task turns orange
-2. **Stop** — Records stop time; task auto-completes, turns green, priority is cleared
-3. **Reset** — Clears both times and completion status; task returns to yellow
+Each task has a multi-session timer. The typical workflow:
+
+1. Click **Start** — records the start time, task turns orange
+2. Click **⏸ Pause** or **Stop** at any point while running:
+   - **⏸ Pause** — closes the current session and turns the task purple; use **▶ Resume** to start a new session later
+   - **Stop** — closes the current session, marks the task complete, and turns it green
+3. Repeat pause/resume as many times as needed
+4. Click **Stop** from either the running or paused state to finalize
+
+All sessions are saved and shown in the sessions log on the card.
 
 ### Copying Information
 Click directly on any of these to copy to clipboard:
 - Part numbers (via the 📄 button)
-- Start times
-- Stop times
+- First Start time
+- Last Stop time
 
 ### Opening Part Number Links
 If a URL template is configured in `config.js`:
@@ -117,7 +137,7 @@ If a URL template is configured in `config.js`:
 3. The window is named after the part number, so clicking again reuses it
 
 ### Managing Tasks
-- **Mark Complete** — Check the checkbox (or use Stop); priority is cleared automatically
+- **Mark Complete** — Check the checkbox (or use Stop); priority is cleared automatically and any open session is closed
 - **Change Status** — Use the status dropdown on the task card
 - **Mark as Rework** — Check the "Rework" checkbox; border turns red
 - **Delete** — Click 🗑️ with confirmation
@@ -157,7 +177,12 @@ Menu (☰) → **Save CSV** — downloads as `tasks_YYYY-MM-DD.csv`.
 │  ☐ PART-NUMBER  📄 🔗              ▼   │ ← Part number row + minimize
 │    Type: Option 1        [1] [2] [3]    │ ← Type + priority buttons
 │    Status: [dropdown]  □ Rework         │ ← Status + rework
-│    📝  note preview...   [Start] [🗑️]   │ ← Notes left, actions right
+│    First Start ×N   Last Stop           │ ← Time fields (first/last)
+│    ─── Sessions ───────────────────     │ ← Sessions log
+│    1  2:45 PM → 3:10 PM                 │
+│    2  3:30 PM → ● running               │
+│    📝  note preview...  [⏸ Pause][Stop] │ ← Notes left, timer right
+│                                    [🗑️] │
 │                                         │
 ├─────────────────────────────────────────┤
 │ Task Counter                            │
@@ -274,8 +299,10 @@ README.md            # Documentation
   "status": "option1",
   "priority": 1,
   "minimized": false,
-  "startTime": "2:45 PM",
-  "stopTime": "3:30 PM",
+  "sessions": [
+    { "start": "2:45 PM", "stop": "3:10 PM" },
+    { "start": "3:30 PM", "stop": "4:05 PM" }
+  ],
   "completed": true,
   "isRework": false,
   "note": "Needs inspection",
@@ -287,13 +314,25 @@ README.md            # Documentation
 
 **Theme** — localStorage key: `theme` (`"dark"` or `"light"`)
 
+### Timer State Logic
+The timer state is derived from the `sessions` array at render time — no separate state field is stored:
+
+| State | Condition | Border Color |
+|---|---|---|
+| Idle | `sessions` is empty | Yellow |
+| Running | Last session has `stop: null` | Orange |
+| Paused | Sessions exist, last has a stop value | Purple |
+| Completed | `completed: true` | Green |
+
 ### Task Sort Order
 Incomplete tasks sort by priority first (1 → 2 → 3 → unprioritized), then by creation date (newest first). Completed tasks always appear at the bottom.
 
 ### CSV Export Format
+Sessions are exported as dynamic column pairs — one `Session N Start` / `Session N Stop` column pair per session. The number of columns scales to the task with the most sessions.
+
 ```
-Part Number,Type,Status,Start Time,Stop Time,Completed,Rework,Note,Created Date
-"PCB-2024-001","Option 1","Pending","2:45 PM","3:30 PM","Yes","No","Needs inspection","2/25/2026"
+Part Number,Type,Status,Completed,Rework,Note,Created Date,Session 1 Start,Session 1 Stop,Session 2 Start,Session 2 Stop
+"PCB-2024-001","Option 1","Pending","Yes","No","Needs inspection","2/25/2026","2:45 PM","3:10 PM","3:30 PM","4:05 PM"
 ```
 
 ### Browser Compatibility
@@ -318,7 +357,7 @@ Part Number,Type,Status,Start Time,Stop Time,Completed,Rework,Note,Created Date
 - **1 — High:** Red `#ef4444` · **2 — Medium:** Orange `#f97316` · **3 — Low:** Yellow `#eab308`
 
 ### Status Colors
-- 🟡 New — `#facc15` · 🟠 Started — `#fb923c` · 🟢 Complete — `#4ade80` · 🔴 Rework — `#ef4444`
+- 🟡 New — `#facc15` · 🟠 Running — `#fb923c` · 🟣 Paused — `#a78bfa` · 🟢 Complete — `#4ade80` · 🔴 Rework — `#ef4444`
 
 ### Typography
 - **UI Text** — Work Sans · **Part Numbers & Times** — JetBrains Mono
@@ -330,7 +369,8 @@ Part Number,Type,Status,Start Time,Stop Time,Completed,Rework,Note,Created Date
 - Use **priority 1** sparingly to keep rankings meaningful
 - Collapse completed tasks (or let them sink to the bottom) to stay focused on active work
 - Tasks re-sort instantly when priority changes — no manual reordering needed
-- Use `\n` in text block values for email templates, multi-step instructions, or any snippet that needs line breaks
+- Use the **Stop** button when you know the task is done — it finalizes in one click from either the running or paused state
+- Use **Pause → Resume** when you're interrupted and plan to return to the same task
 - Export to CSV regularly — localStorage can be cleared by the browser
 - Keep `config.js` in version control so your customizations are preserved
 
@@ -373,7 +413,7 @@ Part Number,Type,Status,Start Time,Stop Time,Completed,Rework,Note,Created Date
 ---
 
 ## Version Information
-**Version:** 3.1
+**Version:** 3.2
 **Last Updated:** March 2026
 **File Type:** Two-file application (HTML + JS config)
 **Dependencies:** None (Google Fonts loaded remotely)
