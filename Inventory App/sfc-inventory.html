@@ -415,6 +415,56 @@
         }
         .remove-btn:hover { background: var(--danger); color: white; border-color: var(--danger); }
 
+        /* ── Send to Task Manager button ── */
+        .btn-tm {
+            background: transparent; border: 1px solid var(--border);
+            color: var(--text-secondary); cursor: pointer;
+            width: 28px; height: 28px; padding: 0; border-radius: 3px;
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .btn-tm svg { width: 14px; height: 14px; stroke: currentColor; flex-shrink: 0; }
+        .btn-tm:hover {
+            background: var(--accent-primary); color: white; border-color: var(--accent-primary);
+        }
+
+        /* ── TM Send Modal extras ── */
+        .tm-send-code {
+            font-family: monospace; font-size: 13px; font-weight: 700;
+            color: var(--accent-primary); background: var(--bg-tertiary);
+            border: 1px solid var(--border); border-radius: 3px;
+            padding: 6px 10px; display: block; margin: 0 0 12px;
+            text-align: center; letter-spacing: 0.5px;
+        }
+        .tm-type-row { margin-bottom: 0; }
+        .tm-type-row label {
+            display: block; font-size: 11px; font-weight: 600;
+            color: var(--text-secondary); margin-bottom: 5px;
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .tm-type-select {
+            width: 100%; padding: 7px 10px; background: var(--bg-tertiary);
+            border: 1px solid var(--border); border-radius: 3px;
+            color: var(--text-primary); font-size: 13px; cursor: pointer;
+        }
+        .tm-type-select:focus { outline: none; border-color: var(--accent-primary); }
+        .tm-no-types-hint {
+            font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.4;
+        }
+
+        /* ── Toast notification ── */
+        .tm-toast {
+            position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%);
+            background: var(--highlight); color: white; padding: 0.5rem 1.25rem;
+            border-radius: 4px; font-size: 13px; font-weight: 600;
+            z-index: 9999; white-space: nowrap; box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            animation: tmFadeIn 0.25s ease;
+        }
+        @keyframes tmFadeIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
         .subcategories-section { margin-top: 4px; }
         .subcategory-header-row {
             display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
@@ -552,7 +602,7 @@
             background: var(--bg-tertiary); border: 1px solid var(--border);
             border-radius: 3px; color: var(--text-primary); font-size: 13px;
         }
-        .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 15px; }
 
         /* ── Responsive: stack on narrow screens ── */
         @media (max-width: 700px) {
@@ -651,6 +701,28 @@
 
     </div><!-- /.main-layout -->
 </div><!-- /.container -->
+
+<!-- ── Send to Task Manager Modal ── -->
+<div id="tmSendModal" class="modal" onclick="if(event.target===this)closeTMModal()">
+    <div class="modal-content">
+        <h2>Send to Task Manager</h2>
+        <span class="tm-send-code" id="tmSendSfcLabel"></span>
+        <div class="tm-type-row">
+            <label>Task Type</label>
+            <select class="tm-type-select" id="tmTypeSelect">
+                <option value="">Select type...</option>
+            </select>
+            <div class="tm-no-types-hint" id="tmNoTypesHint" style="display:none;">
+                ⚠️ No types found. Open Task Manager first so it can publish its configured types, then try again. A "General" fallback is provided below.
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn" onclick="confirmSendToTM()">Send →</button>
+            <button class="btn btn-danger" onclick="closeTMModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <!-- README Modal -->
 <div id="readmeModal" class="readme-modal" onclick="if(event.target===this)closeReadme()">
     <div class="readme-modal-content">
@@ -662,8 +734,7 @@
     </div>
 </div>
 
-
-<!-- Modal -->
+<!-- Tab rename/add Modal -->
 <div id="tabModal" class="modal">
     <div class="modal-content">
         <h2 id="modalTitle">Create New Tab</h2>
@@ -903,6 +974,7 @@
                     <li class="list-item">
                         <span class="list-number">#${i+1}</span>
                         <span class="list-text">${escapeHtml(item)}</span>
+                        <button class="btn-tm" onclick="showTMSendModal('${tab.id}', null, ${i})" title="Send to Task Manager"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M15 6l6 6-6 6"/><path d="M3 6v12"/></svg></button>
                         <button class="remove-btn" onclick="removeItem('${tab.id}', ${i})" title="Remove">×</button>
                     </li>`).join('') + '</ul>';
 
@@ -915,6 +987,7 @@
                         <li class="list-item">
                             <span class="list-number">#${i+1}</span>
                             <span class="list-text">${escapeHtml(item)}</span>
+                            <button class="btn-tm" onclick="showTMSendModal('${tab.id}', '${sub.id}', ${i})" title="Send to Task Manager"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M15 6l6 6-6 6"/><path d="M3 6v12"/></svg></button>
                             <button class="remove-btn" onclick="removeSubcatItem('${tab.id}','${sub.id}',${i})" title="Remove">×</button>
                         </li>`).join('') + '</ul>';
                 return `
@@ -1184,6 +1257,103 @@
         document.getElementById('sfcNextBtn').disabled = true;
     }
 
+    // ─── Send to Task Manager ─────────────────────────────────────────────────
+    let tmSendState = null;
+
+    function getTMTypes() {
+        try {
+            const raw = localStorage.getItem('tm_types');
+            if (raw) {
+                const types = JSON.parse(raw);
+                if (Array.isArray(types) && types.length > 0) return types;
+            }
+        } catch(e) {}
+        return [];
+    }
+
+    function showTMSendModal(tabId, subcatId, index) {
+        // Look up item text from data — never embed arbitrary strings in onclick attributes
+        const tab = tabs.find(t => t.id === tabId);
+        if (!tab) return;
+        const sfcCode = subcatId
+            ? (tab.subcategories.find(s => s.id === subcatId) || { items: [] }).items[index]
+            : tab.items[index];
+        if (sfcCode === undefined) return;
+
+        tmSendState = { tabId, subcatId, index, sfcCode };
+        document.getElementById('tmSendSfcLabel').textContent = sfcCode;
+
+        const sel = document.getElementById('tmTypeSelect');
+        const hint = document.getElementById('tmNoTypesHint');
+        sel.innerHTML = '';
+
+        const types = getTMTypes();
+        if (types.length > 0) {
+            hint.style.display = 'none';
+            types.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t; opt.textContent = t;
+                sel.appendChild(opt);
+            });
+        } else {
+            hint.style.display = 'block';
+            // Provide a fallback so the user isn't blocked
+            ['General', 'Option 1', 'Option 2', 'Option 3'].forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t; opt.textContent = t;
+                sel.appendChild(opt);
+            });
+        }
+
+        document.getElementById('tmSendModal').classList.add('show');
+    }
+
+    function closeTMModal() {
+        document.getElementById('tmSendModal').classList.remove('show');
+        tmSendState = null;
+    }
+
+    function confirmSendToTM() {
+        if (!tmSendState) return;
+        const type = document.getElementById('tmTypeSelect').value;
+        if (!type) { alert('Please select a type.'); return; }
+
+        const { tabId, subcatId, index, sfcCode } = tmSendState;
+
+        // Add to Task Manager incoming queue in localStorage
+        let queue = [];
+        try { queue = JSON.parse(localStorage.getItem('tm_incoming_queue') || '[]'); } catch(e) {}
+        queue.push({ sfcCode, type, timestamp: Date.now() });
+        localStorage.setItem('tm_incoming_queue', JSON.stringify(queue));
+
+        // Remove the item from inventory
+        const tab = tabs.find(t => t.id === tabId);
+        if (tab) {
+            if (subcatId) {
+                const sub = tab.subcategories.find(s => s.id === subcatId);
+                if (sub) sub.items.splice(index, 1);
+            } else {
+                tab.items.splice(index, 1);
+            }
+        }
+
+        // Clear lookup results that may reference the now-deleted item
+        clearSFCResults();
+
+        closeTMModal();
+        renderTabs();
+        showTMToast(`${sfcCode} sent to Task Manager`);
+    }
+
+    function showTMToast(msg) {
+        const t = document.createElement('div');
+        t.className = 'tm-toast';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; }, 2200);
+        setTimeout(() => t.remove(), 2500);
+    }
+
     // ─── Export / Import ──────────────────────────────────────────────────────
     function exportData() {
         document.getElementById('dropdownMenu').classList.remove('show');
@@ -1252,7 +1422,6 @@
         return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
     }
 
-
     // ─── Export Plain Text ────────────────────────────────────────────────────
     function exportTxt() {
         document.getElementById('dropdownMenu').classList.remove('show');
@@ -1284,61 +1453,73 @@
 <p>A lightweight, single-file browser app for organizing items into categorized tabs and locating specific SFC codes across your entire inventory. No installation, no server, no dependencies — open the HTML file and go.</p>
 <hr>
 <h2>Layout</h2>
-<p>The app uses a <strong>two-column layout</strong> on desktop: the <strong>SFC Lookup</strong> sidebar is on the left, and the <strong>tabs &amp; inventory content</strong> fill the right column. Both panels scroll independently. Drag the thin <strong>▌ divider</strong> between them to resize the sidebar (200–600 px). On narrow screens (&lt;700 px) the layout stacks vertically.</p>
+<p>The app uses a <strong>two-column layout</strong> on desktop: the <strong>SFC Lookup</strong> sidebar is on the left, and the <strong>tabs &amp; inventory content</strong> fill the right column. Both panels scroll independently. Drag the thin <strong>▌ divider</strong> between them to resize the sidebar (200–600 px). On screens narrower than 700 px the layout stacks vertically.</p>
 <hr>
 <h2>Managing Tabs</h2>
 <table>
 <tr><th>Action</th><th>How</th></tr>
 <tr><td>Add a tab</td><td>Menu (≡) → Add Tab</td></tr>
-<tr><td>Rename a tab</td><td>Click ✎ on the tab</td></tr>
-<tr><td>Delete a tab</td><td>Click ✕ on the tab (cannot delete the last tab)</td></tr>
+<tr><td>Rename a tab</td><td>Click ✎ on the tab label</td></tr>
+<tr><td>Delete a tab</td><td>Click ✕ on the tab label (cannot delete the last tab)</td></tr>
 <tr><td>Switch tabs</td><td>Click the tab name</td></tr>
 </table>
 <h2>Adding Items</h2>
-<p>Click a tab, type your item in the text field, and press <strong>Enter</strong>. Items are numbered automatically. Click <strong>×</strong> next to any item to remove it.</p>
+<p>Click a tab to make it active, type your item in the input field at the top, and press <strong>Enter</strong>. Items are numbered automatically (#1, #2, …). Click <strong>×</strong> next to any item to remove it.</p>
 <h2>Subcategories</h2>
 <ul>
 <li>Click <strong>+ Add Subcategory</strong> inside any tab to create one</li>
-<li>Add items the same way — type and press <strong>Enter</strong></li>
-<li>Click the subcategory header to collapse/expand it</li>
-<li>Rename or delete subcategories with the ✎ and × buttons</li>
+<li>Add items the same way — type in the subcategory input and press <strong>Enter</strong></li>
+<li>Click the subcategory header to collapse or expand it</li>
+<li>Rename or delete subcategories with the ✎ and × buttons in the header</li>
 </ul>
 <hr>
 <h2>SFC Lookup</h2>
-<p>The SFC Lookup panel is always visible on the left. Paste codes to search (one per line) and click <strong>Find SFCs</strong>. Results appear in three groups:</p>
+<p>The SFC Lookup panel is always visible on the left. Paste codes to search — one per line — and click <strong>Find SFCs</strong>. Results appear in three groups:</p>
 <table>
 <tr><th>Group</th><th>Colour</th><th>Meaning</th></tr>
-<tr><td>Exact Match</td><td>Green</td><td>Item is exactly that SFC code</td></tr>
-<tr><td>Partial Match</td><td>Orange</td><td>SFC code appears within a longer item</td></tr>
+<tr><td>Exact Match</td><td>Green</td><td>The full item text is exactly the searched code</td></tr>
+<tr><td>Partial Match</td><td>Orange</td><td>The code appears somewhere within a longer item</td></tr>
 <tr><td>Not Found</td><td>Red</td><td>Not located anywhere in the inventory</td></tr>
 </table>
-<p>Use <strong>◀ Prev / Next ▶</strong> to step through results, or click any chip to jump directly. Highlights persist as you switch tabs — they only clear when you run a new search or click <strong>✕ Clear</strong>.</p>
+<p>Items captured by an exact match are automatically excluded from partial results. Use <strong>◀ Prev / Next ▶</strong> to step through all found items in order, or click any chip to jump directly. Highlights persist as you switch tabs — they only clear when you run a new search or click <strong>✕ Clear</strong>.</p>
+<hr>
+<h2>Send to Task Manager</h2>
+<p>Every item row has a small <strong>send icon button</strong> (arrow pointing right) between the item text and the × remove button. Click it to transfer that item to the Task Manager app.</p>
+<ol>
+<li>Click the send icon on any item</li>
+<li>A dialog shows the SFC code and a <strong>Task Type</strong> dropdown</li>
+<li>Select the type and click <strong>Send →</strong></li>
+</ol>
+<p>On confirm: the item is removed from the inventory immediately and queued for Task Manager to pick up. A green toast confirms the send. Task Manager will show a <strong>📥 imported</strong> notification when it receives the item — either when you switch to its tab, or the next time it is opened.</p>
+<p><strong>Tip:</strong> Open Task Manager at least once before using this feature so it can publish its configured types. If it has never been opened, generic fallback types are shown with a warning.</p>
 <hr>
 <h2>Import &amp; Export</h2>
 <ul>
-<li><strong>Export XML</strong> — full backup in structured XML format; use this to move data between browsers or devices</li>
-<li><strong>Export Plain Text</strong> — human-readable indented list, useful for sharing or printing</li>
-<li><strong>Import XML</strong> — loads a previously exported XML file; <em>replaces all current data</em></li>
+<li><strong>Export XML</strong> — full structured backup; use this to move data between browsers or devices</li>
+<li><strong>Export Plain Text</strong> — indented human-readable snapshot for printing or sharing</li>
+<li><strong>Import XML</strong> — restores a previously exported file; <em>replaces all current data</em></li>
 </ul>
 <h2>Data Storage</h2>
-<p>All data is stored in <strong>browser local storage</strong> — no server involved. Data is specific to the browser and device. Clearing browser data will delete your lists — <strong>export regularly as a backup</strong>.</p>
+<p>All data is stored in <strong>browser localStorage</strong> — no server involved. Data is specific to the browser and device you are using. Clearing browser data will delete your inventory — <strong>export XML regularly as a backup</strong>.</p>
 <hr>
 <h2>Keyboard Shortcuts</h2>
 <table>
 <tr><th>Key</th><th>Action</th></tr>
-<tr><td>Enter</td><td>Add item to the current list or subcategory</td></tr>
-<tr><td>Escape</td><td>Close any open modal</td></tr>
+<tr><td>Enter</td><td>Add item in the focused input field</td></tr>
+<tr><td>Escape</td><td>Close any open modal or this Help panel</td></tr>
 </table>
 <hr>
 <h2>Troubleshooting</h2>
 <ul>
-<li><strong>Data disappeared</strong> — check you're on the same browser/device; import your last backup</li>
+<li><strong>Data disappeared</strong> — check you're on the same browser/device; import your last XML backup</li>
 <li><strong>Import not working</strong> — confirm the file is a <code>.xml</code> exported from this app</li>
-<li><strong>SFC not found</strong> — the lookup expects the item to be <em>only</em> the SFC code with no extra text; partial matching will catch items with surrounding text</li>
-<li><strong>SFC-42 vs SFC-042</strong> — treated as different codes; formatting must match exactly</li>
-<li><strong>Sidebar too narrow/wide</strong> — drag the divider to resize (200–600 px)</li>
+<li><strong>SFC not found when it should be</strong> — exact match requires the item to be <em>only</em> the SFC code; items with extra text will show as partial matches</li>
+<li><strong>SFC-42 vs SFC-042 are different</strong> — the lookup is a string comparison; zero-padding must match exactly</li>
+<li><strong>Type dropdown shows generic options</strong> — open Task Manager at least once so it publishes its configured types to shared storage</li>
+<li><strong>Sent item not appearing in Task Manager</strong> — both files must be open in the same browser; click on the Task Manager tab to trigger processing</li>
+<li><strong>Sidebar too narrow or too wide</strong> — drag the ▌ divider to resize (200–600 px)</li>
 </ul>
-<div class="readme-version">Version 1.4 &nbsp;·&nbsp; March 2026</div>
+<div class="readme-version">Version 1.6 &nbsp;·&nbsp; March 2026</div>
 `;
 
     function showReadme() {
@@ -1351,7 +1532,7 @@
     }
 
     document.getElementById('tabNameInput').addEventListener('keypress', e => { if (e.key === 'Enter') confirmTabAction(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeReadme(); } });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeReadme(); closeTMModal(); } });
 
     initializeApp();
 </script>

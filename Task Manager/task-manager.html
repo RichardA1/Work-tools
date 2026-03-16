@@ -384,7 +384,16 @@
         }
         .btn-time-stop:hover { background: #22c55e; border-color: #22c55e; color: #0f172a; }
 
-
+        /* ─── Imported-from-inventory badge ─── */
+        .inventory-badge {
+            display: inline-flex; align-items: center;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; font-weight: 700;
+            background: rgba(96,165,250,0.15); color: var(--primary);
+            border: 1px solid rgba(96,165,250,0.35);
+            border-radius: 10px; padding: 0.05rem 0.35rem;
+            margin-left: 0.3rem; letter-spacing: 0.03em; vertical-align: middle;
+            white-space: nowrap;
+        }
 
         .empty-state { text-align: center; padding: 2rem 1rem; color: var(--text-muted); }
         .empty-state-icon { font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.5; }
@@ -497,6 +506,22 @@
         .config-error-banner .error-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.05rem; }
         .config-error-banner strong { display: block; margin-bottom: 0.2rem; color: #fca5a5; }
         [data-theme="light"] .config-error-banner strong { color: #dc2626; }
+
+        /* ─── TOAST ─── */
+        .tm-toast {
+            position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%);
+            background: var(--success); color: #0f172a;
+            padding: 0.5rem 1.25rem; border-radius: 4px;
+            font-weight: 700; font-size: 0.875rem; z-index: 9999;
+            white-space: nowrap; box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+            animation: tmToastIn 0.25s ease;
+            pointer-events: none;
+        }
+        [data-theme="light"] .tm-toast { color: white; }
+        @keyframes tmToastIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
     </style>
     <script src="config.js"></script>
 </head>
@@ -621,6 +646,9 @@
             renderTextBlocks();
             statusOptions = Array.isArray(cfg.statusOptions) ? cfg.statusOptions : [];
             urlTemplate = typeof cfg.urlTemplate === 'string' ? cfg.urlTemplate : '';
+
+            // Publish types to localStorage so SFC Inventory can read them for the → TM type dropdown
+            try { localStorage.setItem('tm_types', JSON.stringify(taskTypes)); } catch(e) {}
         }
 
         function showConfigError(message) {
@@ -645,6 +673,55 @@
                 opt.value = type; opt.textContent = type;
                 select.appendChild(opt);
             });
+        }
+
+        // ─── INCOMING QUEUE (from SFC Inventory) ─────────────────────────────
+        function processIncomingQueue() {
+            let queue = [];
+            try { queue = JSON.parse(localStorage.getItem('tm_incoming_queue') || '[]'); } catch(e) {}
+            if (!Array.isArray(queue) || queue.length === 0) return;
+
+            // Clear the queue immediately so concurrent tabs don't double-process
+            localStorage.removeItem('tm_incoming_queue');
+
+            let added = 0;
+            queue.forEach((item, i) => {
+                if (!item.sfcCode) return;
+                tasks.push({
+                    id: Date.now() + i,
+                    partNumber: item.sfcCode,
+                    type: item.type || (taskTypes[0] || 'General'),
+                    sessions: [], completed: false, isRework: false,
+                    status: statusOptions.length > 0 ? statusOptions[0].value : '',
+                    note: '',
+                    fromInventory: true,
+                    createdAt: item.timestamp ? new Date(item.timestamp).toISOString() : new Date().toISOString()
+                });
+                added++;
+            });
+
+            if (added > 0) {
+                saveTasks();
+                renderTasks();
+
+                // Switch to Tasks tab so the user sees the new items
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                document.querySelector('[data-tab="tasks"]').classList.add('active');
+                document.getElementById('panel-tasks').classList.add('active');
+                document.getElementById('mainFooter').style.display = 'block';
+
+                showToast(`📥 ${added} task${added > 1 ? 's' : ''} imported from SFC Inventory`);
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = 'tm-toast';
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s ease'; }, 2700);
+            setTimeout(() => t.remove(), 3000);
         }
 
         // ─── TIMER HELPERS ───
@@ -763,6 +840,11 @@
                     ? `<span class="session-badge">×${sessions.length}</span>`
                     : '';
 
+                // Inventory origin badge
+                const inventoryBadge = task.fromInventory
+                    ? `<span class="inventory-badge">from inventory</span>`
+                    : '';
+
                 // Sessions log
                 let sessionsLogHtml = '';
                 if (sessions.length > 0) {
@@ -786,12 +868,10 @@
                     if (timerState === 'idle') {
                         timerBtns = `<button class="btn-small btn-time-start" onclick="tickTimer(${task.id})">Start</button>`;
                     } else if (timerState === 'running') {
-                        // Both Pause and Stop available while running
                         timerBtns = `
                             <button class="btn-small btn-time-pause" onclick="tickTimer(${task.id})">⏸ Pause</button>
                             <button class="btn-small btn-time-stop" onclick="stopTask(${task.id})" title="Finalize & complete">Stop</button>`;
                     } else {
-                        // Paused — Resume or Stop to finalize
                         timerBtns = `
                             <button class="btn-small btn-time-resume" onclick="tickTimer(${task.id})">▶ Resume</button>
                             <button class="btn-small btn-time-stop" onclick="stopTask(${task.id})" title="Finalize & complete">Stop</button>`;
@@ -819,6 +899,7 @@
                         <div class="task-header-row">
                             <div class="part-number-row" style="flex:1;min-width:0;">
                                 <div class="part-number">${escapeHtml(task.partNumber)}</div>
+                                ${inventoryBadge}
                                 <button class="btn-small btn-copy" onclick="copyPartNumber(${task.id})" title="Copy">&#128196;</button>
                                 ${linkButton}
                             </div>
@@ -882,20 +963,16 @@
             const state = getTimerState(task);
 
             if (state === 'idle') {
-                // Start first session
                 task.sessions.push({ start: nowTime(), stop: null });
             } else if (state === 'running') {
-                // Pause — close current session
                 task.sessions[task.sessions.length - 1].stop = nowTime();
             } else if (state === 'paused') {
-                // Resume — open a new session
                 task.sessions.push({ start: nowTime(), stop: null });
             }
             saveTasks(); renderTasks();
         }
 
         function stopTask(id) {
-            // Finalize: close any open session and mark complete
             const task = tasks.find(t => t.id === id);
             if (!task) return;
             if (!task.sessions) task.sessions = [];
@@ -912,7 +989,6 @@
                 task.completed = !task.completed;
                 if (task.completed) {
                     task.priority = null;
-                    // Close any open session
                     if (task.sessions && task.sessions.length > 0) {
                         const last = task.sessions[task.sessions.length - 1];
                         if (last.stop === null) last.stop = nowTime();
@@ -1007,15 +1083,13 @@
         function exportToCSV() {
             if (tasks.length === 0) { alert('No tasks to export!'); return; }
 
-            // Find max sessions across all tasks for dynamic columns
             const maxSessions = tasks.reduce((max, t) => Math.max(max, (t.sessions || []).length), 0);
 
-            // Build header
             let sessionHeaders = '';
             for (let i = 1; i <= maxSessions; i++) {
                 sessionHeaders += `,Session ${i} Start,Session ${i} Stop`;
             }
-            let csv = `Part Number,Type,Status,Completed,Rework,Note,Created Date${sessionHeaders}\n`;
+            let csv = `Part Number,Type,Status,Completed,Rework,From Inventory,Note,Created Date${sessionHeaders}\n`;
 
             tasks.forEach(task => {
                 const createdDate  = new Date(task.createdAt).toLocaleDateString();
@@ -1033,8 +1107,9 @@
 
                 csv += [
                     `"${task.partNumber}"`, `"${task.type}"`, `"${statusLabel}"`,
-                    task.completed ? 'Yes' : 'No',
-                    task.isRework  ? 'Yes' : 'No',
+                    task.completed   ? 'Yes' : 'No',
+                    task.isRework    ? 'Yes' : 'No',
+                    task.fromInventory ? 'Yes' : 'No',
                     `"${noteText}"`,
                     `"${createdDate}"`
                 ].join(',') + sessionCols + '\n';
@@ -1124,7 +1199,17 @@
         });
 
         // ─── INIT ───
-        function init() { loadTheme(); loadConfig(); loadTasks(); loadNotes(); }
+        function init() {
+            loadTheme();
+            loadConfig();
+            loadTasks();
+            loadNotes();
+            processIncomingQueue();
+        }
+
+        // Also check for queued items when the tab regains focus
+        window.addEventListener('focus', processIncomingQueue);
+
         init();
     </script>
 </body>

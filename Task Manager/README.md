@@ -1,428 +1,386 @@
 # Task Manager
 
-A streamlined task management application with dark/light mode, time tracking with pause/resume, notes, quick-copy text blocks, priority ranking, and collapsible task cards.
+A streamlined, single-page task management app with time tracking, priority ranking, collapsible cards, notes, quick-copy text blocks, and direct integration with the SFC Inventory app.
+
+---
 
 ## File Structure
 
 ```
-task-manager.html    # Application (HTML, CSS, JavaScript)
+task-manager.html    # The application — HTML, CSS, and JavaScript
 config.js            # Configuration — edit this to customize the app
 README.md            # This documentation
 ```
 
-Both files must be in the same folder. Just open `task-manager.html` in a browser — no server required.
+Both `task-manager.html` and `config.js` must be in the same folder. Open `task-manager.html` in any modern browser. No server required.
 
 ---
 
-## Features Overview
+## Interface Overview
 
-### Three-Tab Interface
-- **Tasks** — Manage tasks with part numbers, types, time tracking, and status
-- **Notes** — Freeform note-taking with auto-save
-- **Text Blocks** — Quick-copy text snippets, including multiline content
-
-### Task Management
-- **Color-Coded Status**
-  - 🟡 **Yellow** — New tasks (not yet started)
-  - 🟠 **Orange** — Started tasks (in progress)
-  - 🟣 **Purple** — Paused tasks (timer paused, not yet finalized)
-  - 🟢 **Green** — Completed tasks
-  - 🔴 **Red** — Rework tasks (marked for rework)
-- **Add Tasks** — Part number (50 char max) + type selection
-- **Delete Tasks** — Individual task deletion with confirmation
-- **Copy Actions** — Click part numbers or times to copy instantly
-- **Status Dropdown** — Configurable status field for each task
-- **Task Notes** — Add notes to any task via popup modal (📝 button)
-- **Note Preview** — See note snippets inline with action buttons
-- **Rework Indicator** — Checkbox to flag tasks requiring rework
-- **URL Links** — Click link button (🔗) to open part number in configured URL
-
-### Priority Ranking
-Each incomplete task can be assigned a priority using the **1 / 2 / 3** circle buttons on the Type line:
-- **1** — High priority (red)
-- **2** — Medium priority (orange)
-- **3** — Low priority (yellow)
-
-Clicking an active priority button a second time deselects it. The task list sorts incomplete tasks by priority first (1 → 2 → 3 → unprioritized), then by creation date. Priority is automatically cleared when a task is marked complete.
-
-### Collapsible Tasks
-Each task card has a **▼ / ▶ collapse button** at the top-right. Click it to minimize the task to just the part number row, saving vertical space when managing long lists. State is saved in localStorage and persists across reloads.
-
-### Time Tracking
-Tasks use a **multi-session timer** that records every start/stop pair individually, letting you pause and resume work without losing history.
-
-**Timer button states:**
-- **Start** (blue) — Begins the first session; task turns orange
-- **⏸ Pause** (orange) — Closes the current session; task turns purple
-- **Stop** (green) — Closes the current session, finalizes the task, and marks it complete. Available alongside Pause/Resume so you can stop in a single click.
-- **▶ Resume** (purple) — Opens a new session; task turns orange again
-
-**Sessions log** — A numbered log of every start → stop pair is displayed inline on the task card when at least one session exists.
-
-**Time display fields:**
-- **First Start** — The timestamp when the task was first started. Shows a `×N` badge when multiple sessions have been recorded.
-- **Last Stop** — The most recent stop timestamp. Shows `● live` while the timer is actively running.
-
-Clicking any displayed time value copies it to the clipboard.
-
-**Completing a task via checkbox** — If the timer is running when you check the task complete, the current session is automatically closed with the current time.
-
-### Menu System
-Access the hamburger menu (☰) in the top-right corner for:
-- **Save CSV** — Export all tasks to a CSV file
-- **Clear All** — Remove all tasks at once
-- **Dark Mode Toggle** — Switch between dark and light themes
-- **View README** — Open documentation in a new tab
-
-### Data Persistence
-- Tasks stored in browser localStorage (including minimize state, priority, and full session history)
-- Notes auto-save as you type
-- Theme preference remembered
-- Survives page reloads and browser restarts
-
----
-
-## Getting Started
-
-### Installation
-1. Download `task-manager.html` and `config.js` into the same folder
-2. Open `task-manager.html` in any modern browser
-3. Start using immediately — no setup or server required
-
-### First Launch
-The app loads with three example tasks to demonstrate the interface. Delete these and add your own using the form in the footer.
-
----
-
-## Using the Application
-
-### Adding Tasks
-1. Click the **Tasks** tab (if not already active)
-2. Scroll to the footer at the bottom
-3. Enter a part number (up to 50 characters)
-4. Select a type from the dropdown
-5. Click **Add Task**
-
-The new task appears at the top with a yellow left border.
-
-### Setting Priority
-On any incomplete task, click the **1**, **2**, or **3** circle buttons on the Type line. The list re-sorts automatically. Click the active button again to remove the priority.
-
-### Collapsing Tasks
-Click **▼** at the top-right of any task card to collapse it to a single line. Click **▶** to expand it again.
-
-### Time Tracking Workflow
-
-Each task has a multi-session timer. The typical workflow:
-
-1. Click **Start** — records the start time, task turns orange
-2. Click **⏸ Pause** or **Stop** at any point while running:
-   - **⏸ Pause** — closes the current session and turns the task purple; use **▶ Resume** to start a new session later
-   - **Stop** — closes the current session, marks the task complete, and turns it green
-3. Repeat pause/resume as many times as needed
-4. Click **Stop** from either the running or paused state to finalize
-
-All sessions are saved and shown in the sessions log on the card.
-
-### Copying Information
-Click directly on any of these to copy to clipboard:
-- Part numbers (via the 📄 button)
-- First Start time
-- Last Stop time
-
-### Opening Part Number Links
-If a URL template is configured in `config.js`:
-1. Click the 🔗 button next to any part number
-2. Opens the configured URL with the part number substituted in
-3. The window is named after the part number, so clicking again reuses it
-
-### Managing Tasks
-- **Mark Complete** — Check the checkbox (or use Stop); priority is cleared automatically and any open session is closed
-- **Change Status** — Use the status dropdown on the task card
-- **Mark as Rework** — Check the "Rework" checkbox; border turns red
-- **Delete** — Click 🗑️ with confirmation
-- **Clear All** — Menu (☰) → Clear All
-
-### Adding Task Notes
-1. Click the 📝 button on any task (bottom-left of the card)
-2. Type your note in the popup (supports multiple lines)
-3. Click **Save**, press **Escape**, or click outside to close
-4. A note preview appears inline next to the 📝 button
-
-### Using the Notes Tab
-Click the **Notes** tab and type freely. Notes save automatically after a brief pause — watch for the green "Saved" indicator in the bottom-right.
-
-### Using Text Blocks
-1. Click the **Text Blocks** tab
-2. Browse your configured snippets — multiline blocks display with full formatting
-3. Click 📄 to copy any block's full text to the clipboard
-
-### Switching Themes
-Menu (☰) → toggle **Dark Mode**. Preference is saved automatically.
-
-### Exporting Data
-Menu (☰) → **Save CSV** — downloads as `tasks_YYYY-MM-DD.csv`.
-
----
-
-## Interface Layout
+The app has three tabs at the top, a scrollable task list in the middle, and a fixed footer with the task counter and Add Task form (visible only on the Tasks tab).
 
 ```
 ┌─────────────────────────────────────────┐
-│ Task Manager                         ☰  │ ← Header with menu
+│  Task Manager                        ☰  │  ← header + menu
 ├─────────────────────────────────────────┤
-│ [Tasks] [Notes] [Text Blocks]           │ ← Tabs
+│  [Tasks]  [Notes]  [Text Blocks]        │  ← tab nav
 ├─────────────────────────────────────────┤
 │                                         │
-│  ☐ PART-NUMBER  📄 🔗              ▼   │ ← Part number row + minimize
-│    Type: Option 1        [1] [2] [3]    │ ← Type + priority buttons
-│    Status: [dropdown]  □ Rework         │ ← Status + rework
-│    First Start ×N   Last Stop           │ ← Time fields (first/last)
-│    ─── Sessions ───────────────────     │ ← Sessions log
-│    1  2:45 PM → 3:10 PM                 │
-│    2  3:30 PM → ● running               │
-│    📝  note preview...  [⏸ Pause][Stop] │ ← Notes left, timer right
-│                                    [🗑️] │
+│  ☐  PART-NUMBER  📄 🔗  [from inv]  ▼  │  ← part number row
+│     Type: Option 1      [1] [2] [3]     │  ← type + priority
+│     Status: [dropdown]  ☐ Rework        │  ← status + rework
+│     FIRST START ×2    LAST STOP         │  ← time fields
+│     ── Sessions ─────────────────────   │
+│     1  2:45 PM → 3:10 PM               │
+│     2  3:30 PM → ● running             │
+│     📝  note preview…  [⏸ Pause][Stop] │  ← notes + timer
+│                                   [🗑️] │  ← delete
 │                                         │
 ├─────────────────────────────────────────┤
-│ Task Counter                            │
-│ [Part Number Input]  [Type Dropdown]    │ ← Footer (Tasks tab only)
-│ [Add Task Button]                       │
+│  3 active, 1 completed                  │  ← task counter
+│  Part Number: [____________]            │
+│  Type:        [____________]            │
+│  [       ADD TASK        ]              │
 └─────────────────────────────────────────┘
 ```
 
 ---
 
+## Features
+
+### Tasks Tab
+
+#### Task Cards
+
+Each task card shows:
+- **Completion checkbox** — check to mark complete; any running timer session is closed automatically
+- **Part number** — monospace pill, colour-coded by timer state (see below)
+- **📄 Copy button** — copies the part number to the clipboard
+- **🔗 Link button** — opens the URL template configured in `config.js` with the part number substituted in (hidden if no URL template is set)
+- **`from inventory` badge** — shown on tasks transferred from the SFC Inventory app
+- **▼ / ▶ Collapse button** — minimizes the card to just the part number row to save space; state is remembered across reloads
+- **Type** — the task type selected at creation
+- **Priority buttons (1 / 2 / 3)** — set task priority; hidden on completed tasks
+- **Status dropdown** — configurable options from `config.js`
+- **Rework checkbox** — flags the task for rework; turns the left border red
+- **First Start** — timestamp of the first timer session; shows a `×N` badge when multiple sessions exist; click to copy
+- **Last Stop** — timestamp of the most recent stop; shows `● live` while the timer is running; click to copy
+- **Sessions log** — numbered list of every start/stop pair, shown when at least one session exists
+- **📝 Note button** — opens the note editor popup; a truncated preview of the note appears inline when one exists
+- **Timer buttons** — vary by state (see Timer section below)
+- **🗑️ Delete button** — deletes the task after confirmation
+
+#### Task Border Colours
+
+The left border colour indicates the current state of the task at a glance:
+
+| Colour | State |
+|--------|-------|
+| 🟡 Yellow | New — timer not yet started |
+| 🟠 Orange | Running — timer is active |
+| 🟣 Purple | Paused — timer paused, task not yet complete |
+| 🟢 Green | Complete |
+| 🔴 Red | Rework flagged (overrides all other colours) |
+
+#### Task Sort Order
+
+Active tasks sort by priority first (1 → 2 → 3 → unprioritized), then by creation date newest-first. Completed tasks always appear at the bottom.
+
+---
+
+### Priority Ranking
+
+Click the **1**, **2**, or **3** circle buttons on a task card to assign a priority. The task list re-sorts immediately. Click the active priority button again to remove it. Priority is automatically cleared when a task is marked complete.
+
+| Button | Priority | Colour |
+|--------|----------|--------|
+| 1 | High | Red |
+| 2 | Medium | Orange |
+| 3 | Low | Yellow |
+
+---
+
+### Time Tracking
+
+Tasks use a **multi-session timer** that records every individual work period as a start/stop pair. You can pause and resume as many times as needed; the full history is preserved.
+
+**Timer states and buttons:**
+
+| Current state | Buttons shown | Action |
+|--------------|--------------|--------|
+| Idle (not started) | **Start** | Begins session 1; task turns orange |
+| Running | **⏸ Pause** and **Stop** | Pause closes the current session (task turns purple); Stop closes the session and marks complete (task turns green) |
+| Paused | **▶ Resume** and **Stop** | Resume opens a new session (task turns orange); Stop marks complete from paused state |
+
+Clicking **Stop** from either the running or paused state finalizes the task in one action — no separate "mark complete" step needed.
+
+**Completing via checkbox:** If the timer is running when you check the completion checkbox, the current session is closed automatically with the current time.
+
+---
+
+### Notes
+
+Each task has an optional note. Click **📝** on any task card to open the note editor. The note saves when you click **Save**, press **Escape**, or click outside the popup. A truncated preview appears inline on the card when a note exists.
+
+---
+
+### Collapsible Cards
+
+Click **▼** at the top-right of any card to collapse it to just the part number row. Click **▶** to expand. Collapse state is saved in localStorage and persists across page reloads. Collapsed tasks still take up a small amount of space; use them to keep completed or lower-priority tasks out of the way while keeping them accessible.
+
+---
+
+### Notes Tab
+
+A freeform text area for general notes. Content saves automatically to localStorage with a brief debounce — a small "Saved" indicator appears when the save completes.
+
+---
+
+### Text Blocks Tab
+
+Displays quick-copy text snippets configured in `config.js`. Click **📄** on any block to copy its full text to the clipboard. Blocks support multi-line content (use `\n` in the config value).
+
+---
+
+### Menu (☰)
+
+| Item | Action |
+|------|--------|
+| Save CSV | Exports all tasks to `tasks_YYYY-MM-DD.csv` |
+| Clear All | Deletes all tasks after confirmation |
+| Dark Mode | Toggles light/dark theme; preference saved |
+| View README | Opens `README.md` in a new tab |
+
+---
+
+### SFC Inventory Integration
+
+Tasks can be sent directly from the SFC Inventory app into Task Manager using the send icon button on each inventory item.
+
+**What Task Manager does:**
+- On every page load and every time the browser tab regains focus, Task Manager checks for queued items in the shared `tm_incoming_queue` localStorage key
+- Any queued items are imported as new tasks immediately — no manual action required
+- Task Manager switches to the Tasks tab automatically and shows a **📥 N task(s) imported from SFC Inventory** toast notification
+- Imported tasks have `fromInventory: true`, which displays a `from inventory` badge next to the part number and adds a `From Inventory: Yes` column in CSV exports
+
+**Type publishing:**
+Every time Task Manager loads and parses `config.js`, it writes its configured task types to the `tm_types` localStorage key. SFC Inventory reads this key to populate the type dropdown in its Send dialog. This happens automatically — no setup needed beyond opening Task Manager at least once.
+
+**Requirement:** Both HTML files must be open in the same browser (same browser profile). The bridge is entirely localStorage — no network is involved.
+
+---
+
 ## Configuration
 
-All configuration lives in **`config.js`** — a plain JavaScript file in the same folder as `task-manager.html`. Open it in any text editor (Notepad, VS Code, etc.), make your changes, save, and refresh the app.
+All customization lives in `config.js` — a plain JavaScript file in the same folder as `task-manager.html`. Edit it in any text editor, save, and hard-refresh the browser (Ctrl+Shift+R / Cmd+Shift+R).
 
-If `config.js` cannot be found or contains a syntax error, a red error banner appears at the top of the app.
+If `config.js` is missing or contains a syntax error, a red error banner appears at the top of the app.
 
-### config.js Structure
+### config.js Reference
 
 ```js
 var TASK_MANAGER_CONFIG = {
 
+    // ── Task Types ────────────────────────────────────────────────────────
+    // Shown in the Type dropdown when adding a task, and on each task card.
     types: [
         "Option 1",
         "Option 2",
         "Option 3"
     ],
 
+    // ── Status Options ────────────────────────────────────────────────────
+    // Shown in the Status dropdown on each task card.
+    // label = text the user sees; value = stored internally and in CSV export.
     statusOptions: [
         { label: "Option 1", value: "option1" },
         { label: "Option 2", value: "option2" },
         { label: "Option 3", value: "option3" }
     ],
 
+    // ── Text Blocks ───────────────────────────────────────────────────────
+    // Quick-copy snippets shown in the Text Blocks tab.
+    // Use \n for a line break inside any text value.
     textBlocks: [
-        { label: "Sample 1",  text: "Sample 1" },
-        { label: "Sample 2",  text: "Sample 2" },
+        { label: "Sample 1",  text: "Sample text 1" },
+        { label: "Sample 2",  text: "Sample text 2" },
         { label: "Multiline", text: "Line one\nLine two\nLine three" }
     ],
 
+    // ── URL Template ─────────────────────────────────────────────────────
+    // Enables the 🔗 link button on each task card.
+    // {partNumber} is replaced with the actual part number (URL-encoded).
+    // Set to "" to hide the link button entirely.
     urlTemplate: "https://example.com/search?q={partNumber}"
 
 };
 ```
 
-### Customizing Task Types
+### Customization Examples
+
+**Task types:**
 ```js
-types: [
-    "Urgent",
-    "Normal",
-    "Low Priority",
-    "Research"
-],
+types: ["Urgent", "Standard", "Research", "Follow-up"]
 ```
 
-### Customizing Status Options
+**Status options:**
 ```js
 statusOptions: [
     { label: "Pending",     value: "pending"     },
     { label: "In Progress", value: "in_progress" },
+    { label: "On Hold",     value: "on_hold"     },
     { label: "Complete",    value: "complete"    }
-],
+]
 ```
 
-Each option has:
-- **label** — What the user sees in the dropdown
-- **value** — What gets stored internally and exported to CSV
-
-### Customizing Text Blocks
+**Text blocks with multi-line content:**
 ```js
 textBlocks: [
-    { label: "Status Update",   text: "Awaiting review from supervisor" },
-    { label: "Email Sign-off",  text: "Thanks,\nJohn Smith\njohn@example.com" },
-    { label: "Instructions",    text: "Step 1: Do this\nStep 2: Do that\nStep 3: Done" }
-],
+    { label: "Email sign-off", text: "Thanks,\nYour Name\nyour@email.com" },
+    { label: "Status update",  text: "Awaiting review from supervisor." }
+]
 ```
 
-Use `\n` anywhere in the `text` value to insert a line break. The full formatted text (with real newlines) is what gets copied to the clipboard when you click 📄.
-
-### Customizing the URL Template
+**URL template examples:**
 ```js
 // Internal system
-urlTemplate: "http://internal.company.com/part/{partNumber}"
+urlTemplate: "http://internal.company.com/parts/{partNumber}"
 
 // Google search
 urlTemplate: "https://www.google.com/search?q={partNumber}"
 
-// Multiple query parameters — & works normally, no escaping needed
-urlTemplate: "https://example.com/search?q={partNumber}&filter=active"
-
-// Disable the link button entirely
+// Disabled
 urlTemplate: ""
 ```
 
-`{partNumber}` is replaced with the actual part number (URL-encoded automatically).
+---
+
+## Adding Tasks
+
+1. Click the **Tasks** tab if not already active
+2. In the footer, enter a part number (up to 50 characters)
+3. Select a type from the dropdown
+4. Click **Add Task** or press **Enter**
+
+The new task appears at the top of the active list with a yellow border.
 
 ---
 
-## Technical Details
+## Exporting to CSV
 
-### File Structure
+Menu (☰) → **Save CSV** downloads `tasks_YYYY-MM-DD.csv`.
+
+The CSV includes one row per task with these columns:
+
 ```
-task-manager.html    # Application (HTML + CSS + JavaScript)
-config.js            # External configuration file
-README.md            # Documentation
+Part Number, Type, Status, Completed, Rework, From Inventory, Note, Created Date,
+Session 1 Start, Session 1 Stop, Session 2 Start, Session 2 Stop, …
 ```
 
-### Data Storage
-**Tasks** — localStorage key: `tasks`
+Session columns expand dynamically — the number of `Session N Start / Stop` pairs matches the task with the most sessions. The **From Inventory** column is `Yes` for tasks transferred from SFC Inventory, `No` for all others.
+
+---
+
+## Data Storage
+
+All data is stored in **browser localStorage**. Nothing is sent to any server.
+
+| localStorage key | Contents |
+|-----------------|----------|
+| `tasks` | All task data as JSON |
+| `notes` | Notes tab content (plain text) |
+| `theme` | `"dark"` or `"light"` |
+| `tm_types` | Configured task types (read by SFC Inventory) |
+| `tm_incoming_queue` | Incoming tasks from SFC Inventory (read and cleared on receipt) |
+
+Clearing browser data or site storage will delete tasks and notes. **Export to CSV regularly as a backup.**
+
+### Task Data Schema
+
 ```json
 {
-  "id": 1704412800000,
-  "partNumber": "PCB-2024-001",
+  "id": 1710500000000,
+  "partNumber": "SFC-001",
   "type": "Option 1",
   "status": "option1",
   "priority": 1,
   "minimized": false,
+  "fromInventory": true,
   "sessions": [
-    { "start": "2:45 PM", "stop": "3:10 PM" },
-    { "start": "3:30 PM", "stop": "4:05 PM" }
+    { "start": "9:15 AM", "stop": "10:42 AM" },
+    { "start": "1:30 PM", "stop": null }
   ],
-  "completed": true,
+  "completed": false,
   "isRework": false,
-  "note": "Needs inspection",
-  "createdAt": "2025-01-05T12:00:00.000Z"
+  "note": "Waiting on updated drawing.",
+  "createdAt": "2026-03-15T09:15:00.000Z"
 }
 ```
 
-**Notes** — localStorage key: `notes` (plain text string)
+### Timer State Derivation
 
-**Theme** — localStorage key: `theme` (`"dark"` or `"light"`)
-
-### Timer State Logic
 The timer state is derived from the `sessions` array at render time — no separate state field is stored:
 
-| State | Condition | Border Color |
-|---|---|---|
-| Idle | `sessions` is empty | Yellow |
-| Running | Last session has `stop: null` | Orange |
-| Paused | Sessions exist, last has a stop value | Purple |
-| Completed | `completed: true` | Green |
-
-### Task Sort Order
-Incomplete tasks sort by priority first (1 → 2 → 3 → unprioritized), then by creation date (newest first). Completed tasks always appear at the bottom.
-
-### CSV Export Format
-Sessions are exported as dynamic column pairs — one `Session N Start` / `Session N Stop` column pair per session. The number of columns scales to the task with the most sessions.
-
-```
-Part Number,Type,Status,Completed,Rework,Note,Created Date,Session 1 Start,Session 1 Stop,Session 2 Start,Session 2 Stop
-"PCB-2024-001","Option 1","Pending","Yes","No","Needs inspection","2/25/2026","2:45 PM","3:10 PM","3:30 PM","4:05 PM"
-```
-
-### Browser Compatibility
-- Chrome, Firefox, Safari, Edge (modern versions)
-- JavaScript required
-- localStorage API required
-- Clipboard API with fallback
-- No external dependencies (except Google Fonts)
-- Works when opened directly via `file://` — no server required
-
----
-
-## Design Features
-
-### Dark Mode (Default)
-- Background: `#0f172a` · Surface: `#1e293b` · Primary: `#60a5fa` · Accent: `#fb923c`
-
-### Light Mode
-- Background: `#f8fafc` · Surface: `#ffffff` · Primary: `#2563eb` · Accent: `#ea580c`
-
-### Priority Colors
-- **1 — High:** Red `#ef4444` · **2 — Medium:** Orange `#f97316` · **3 — Low:** Yellow `#eab308`
-
-### Status Colors
-- 🟡 New — `#facc15` · 🟠 Running — `#fb923c` · 🟣 Paused — `#a78bfa` · 🟢 Complete — `#4ade80` · 🔴 Rework — `#ef4444`
-
-### Typography
-- **UI Text** — Work Sans · **Part Numbers & Times** — JetBrains Mono
-
----
-
-## Tips & Best Practices
-
-- Use **priority 1** sparingly to keep rankings meaningful
-- Collapse completed tasks (or let them sink to the bottom) to stay focused on active work
-- Tasks re-sort instantly when priority changes — no manual reordering needed
-- Use the **Stop** button when you know the task is done — it finalizes in one click from either the running or paused state
-- Use **Pause → Resume** when you're interrupted and plan to return to the same task
-- Export to CSV regularly — localStorage can be cleared by the browser
-- Keep `config.js` in version control so your customizations are preserved
+| State | Condition |
+|-------|-----------|
+| Idle | `sessions` is empty |
+| Running | Last session has `stop: null` |
+| Paused | Sessions exist and last session has a stop value |
+| Completed | `completed: true` |
 
 ---
 
 ## Keyboard Shortcuts
-- **Enter** — Submit Add Task form (when inputs are focused)
-- **Escape** — Close note modal or menu dropdown
+
+| Key | Action |
+|-----|--------|
+| Enter | Submit the Add Task form (when the part number or type field is focused) |
+| Escape | Close the note popup modal |
 
 ---
 
 ## Troubleshooting
 
-**Config error banner appears on load**
-→ Make sure `config.js` is in the same folder as `task-manager.html` and that the filename is exactly `config.js`.
+**Red config error banner on load**
+`config.js` is missing or has a syntax error. Make sure the file is in the same folder as `task-manager.html` and is valid JavaScript. Open it in VS Code to see any syntax errors highlighted.
 
-**Types / statuses not updating after editing config.js**
-→ Hard-refresh the browser (Ctrl+Shift+R / Cmd+Shift+R) to bypass the script cache.
-
-**Syntax error after editing config.js**
-→ Check for missing commas between entries, unmatched `{` / `}` brackets, or unescaped quotes inside strings. VS Code will highlight syntax errors as you type.
+**Types or status options not updating after editing config.js**
+Hard-refresh the browser: Ctrl+Shift+R on Windows/Linux, Cmd+Shift+R on Mac. This bypasses the script cache.
 
 **Tasks disappeared**
-→ Browser localStorage was cleared. Export to CSV regularly as a backup.
+Browser localStorage was cleared (e.g. by clearing browsing history). Export to CSV regularly to keep a backup outside the browser.
+
+**Transferred items from SFC Inventory not appearing**
+Both files must be open in the same browser. Click on the Task Manager tab — it checks for queued items on every focus event. If that doesn't work, try refreshing Task Manager.
+
+**The `from inventory` type dropdown in SFC Inventory shows generic options**
+Task Manager has not yet been opened in this browser. Open it once — it publishes its configured types on load.
 
 **Copy not working**
-→ Check browser clipboard permissions. The app falls back to `execCommand` if the Clipboard API is unavailable.
-
-**Notes not saving**
-→ Check the browser console for localStorage errors. Some browsers restrict localStorage in private/incognito mode.
+The app uses the Clipboard API with a fallback to `execCommand`. Check that the browser has clipboard permission for local files, or try a different browser.
 
 ---
 
-## Privacy & Security
-- All data stored locally in your browser
-- No network requests except loading Google Fonts
-- No tracking, analytics, or user accounts
-- Works fully offline after first load
+## Browser Compatibility
+
+Chrome, Firefox, Safari, Edge — any modern browser with JavaScript enabled. Works when opened via `file://` with no server. Requires localStorage support (disabled in some private/incognito modes).
+
+The only external resource is Google Fonts (Work Sans and JetBrains Mono), loaded from `fonts.googleapis.com`. The app functions fully without it — the browser will fall back to system fonts.
 
 ---
 
-## Version Information
-**Version:** 3.2
-**Last Updated:** March 2026
-**File Type:** Two-file application (HTML + JS config)
-**Dependencies:** None (Google Fonts loaded remotely)
+## Changelog
+
+| Version | Changes |
+|---------|---------|
+| 3.3 | SFC Inventory integration: incoming queue processing on page load and window focus; `from inventory` badge on imported tasks; `From Inventory` column in CSV; publishes `tm_types` to localStorage on every config load |
+| 3.2 | Multi-session timer with full sessions log; Stop button available from both running and paused states |
+| 3.1 | Priority ranking (1/2/3 buttons); collapsible task cards; Rework checkbox |
+| 3.0 | Three-tab layout (Tasks / Notes / Text Blocks); dark/light mode; config.js external configuration |
 
 ---
 
-## License
-Free to use and modify for personal or commercial purposes.
-
----
-
-*Made with ❤️ for efficient task tracking*
+**Version:** 3.3  
+**Last updated:** March 2026  
+**Dependencies:** None (Google Fonts loaded remotely for typography only)
