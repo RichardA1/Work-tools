@@ -36,14 +36,36 @@ var TASK_MANAGER_CONFIG = {
     ],
 
     // ── URL TEMPLATE ──────────────────────────────────────────────────────────
-    // Enables the 🔗 link button on each task card.
-    // {partNumber} is replaced with the actual part number.
+    // Enables the 🔗 link button on each task card (shown in the part number row).
+    // {partNumber} is replaced with the actual part number (URL-encoded).
     // Set to "" to hide the link button entirely.
     //
     // Examples:
     //   "http://internal.company.com/part/{partNumber}"
     //   "https://www.google.com/search?q={partNumber}"
     //   "https://example.com/search?q={partNumber}&filter=active"
-    urlTemplate: "https://example.com/search?q={partNumber}"
+    urlTemplate: "https://example.com/search?q={partNumber}",
+
+    // ── SECONDARY URL TEMPLATE ────────────────────────────────────────────────
+    // Enables a second link button shown near the Start / Stop timer buttons.
+    // Unlike the icon-only 🔗 button above, this one displays a text label.
+    //
+    //   secondaryUrlTemplate = URL to open; {partNumber} is replaced with the
+    //                          actual part number (URL-encoded).
+    //                          Set to "" to hide the button entirely.
+    //
+    //   secondaryUrlLabel    = Text label shown on the button.
+    //                          Keep it short (1–3 words) so it fits the card.
+    //
+    // Examples:
+    //   secondaryUrlTemplate: "http://erp.company.com/orders?sfc={partNumber}"
+    //   secondaryUrlLabel:    "View ERP"
+    //
+    //   secondaryUrlTemplate: "https://jira.company.com/issues/?jql=text+%7E+%22{partNumber}%22"
+    //   secondaryUrlLabel:    "Jira"
+    //
+    //   secondaryUrlTemplate: ""    ← hides the button
+    secondaryUrlTemplate: "https://example2.com/lookup?id={partNumber}",
+    secondaryUrlLabel: "View Details"
 
 };

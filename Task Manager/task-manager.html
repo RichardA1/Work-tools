@@ -252,7 +252,7 @@
             display: flex; justify-content: space-between;
             align-items: center; gap: 0.5rem; margin-top: 0.375rem;
         }
-        .task-actions-buttons { display: flex; gap: 0.25rem; flex-shrink: 0; }
+        .task-actions-buttons { display: flex; gap: 0.25rem; flex-shrink: 0; align-items: center; }
 
         .task-content { flex: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
         .task-info { flex: 1; min-width: 0; }
@@ -383,6 +383,31 @@
             border-color: var(--success); font-weight: 600;
         }
         .btn-time-stop:hover { background: #22c55e; border-color: #22c55e; color: #0f172a; }
+
+        /* ─── Secondary URL button ─── */
+        .btn-secondary-link {
+            background: transparent;
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+            font-weight: 600;
+            font-size: 0.6875rem;
+            padding: 0.25rem 0.6rem;
+            white-space: nowrap;
+        }
+        .btn-secondary-link:hover {
+            background: #38bdf8;
+            border-color: #38bdf8;
+            color: #0f172a;
+        }
+        [data-theme="light"] .btn-secondary-link {
+            border-color: #0284c7;
+            color: #0284c7;
+        }
+        [data-theme="light"] .btn-secondary-link:hover {
+            background: #0284c7;
+            border-color: #0284c7;
+            color: white;
+        }
 
         /* ─── Imported-from-inventory badge ─── */
         .inventory-badge {
@@ -624,6 +649,8 @@
         let taskTypes = [];
         let textBlocks = [];
         let urlTemplate = '';
+        let secondaryUrlTemplate = '';
+        let secondaryUrlLabel = '';
         let statusOptions = [];
 
         // ─── TABS ───
@@ -646,8 +673,11 @@
             renderTextBlocks();
             statusOptions = Array.isArray(cfg.statusOptions) ? cfg.statusOptions : [];
             urlTemplate = typeof cfg.urlTemplate === 'string' ? cfg.urlTemplate : '';
+            secondaryUrlTemplate = typeof cfg.secondaryUrlTemplate === 'string' ? cfg.secondaryUrlTemplate : '';
+            secondaryUrlLabel    = typeof cfg.secondaryUrlLabel    === 'string' && cfg.secondaryUrlLabel.trim()
+                                   ? cfg.secondaryUrlLabel.trim() : 'Open';
 
-            // Publish types to localStorage so SFC Inventory can read them for the → TM type dropdown
+            // Publish types to localStorage so SFC Inventory can read them
             try { localStorage.setItem('tm_types', JSON.stringify(taskTypes)); } catch(e) {}
         }
 
@@ -681,7 +711,6 @@
             try { queue = JSON.parse(localStorage.getItem('tm_incoming_queue') || '[]'); } catch(e) {}
             if (!Array.isArray(queue) || queue.length === 0) return;
 
-            // Clear the queue immediately so concurrent tabs don't double-process
             localStorage.removeItem('tm_incoming_queue');
 
             let added = 0;
@@ -703,14 +732,11 @@
             if (added > 0) {
                 saveTasks();
                 renderTasks();
-
-                // Switch to Tasks tab so the user sees the new items
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
                 document.querySelector('[data-tab="tasks"]').classList.add('active');
                 document.getElementById('panel-tasks').classList.add('active');
                 document.getElementById('mainFooter').style.display = 'block';
-
                 showToast(`📥 ${added} task${added > 1 ? 's' : ''} imported from SFC Inventory`);
             }
         }
@@ -821,8 +847,8 @@
                 else if (timerState === 'running') stateClass = 'started';
                 else if (timerState === 'paused' && sessions.length > 0) stateClass = 'paused';
 
-                const reworkClass   = task.isRework   ? ' is-rework'  : '';
-                const minimizedClass = task.minimized ? ' minimized'  : '';
+                const reworkClass    = task.isRework   ? ' is-rework'  : '';
+                const minimizedClass = task.minimized  ? ' minimized'  : '';
                 li.className = 'task-item' + (stateClass ? ' ' + stateClass : '') + reworkClass + minimizedClass;
 
                 // Time display — first start / last stop
@@ -878,8 +904,14 @@
                     }
                 }
 
+                // Primary link button (icon, in part-number row)
                 const linkButton = urlTemplate
                     ? `<button class="btn-small btn-link" onclick="openPartNumberLink(${task.id})" title="Open Link">🔗</button>`
+                    : '';
+
+                // Secondary link button (text label, near timer buttons)
+                const secondaryLinkButton = secondaryUrlTemplate
+                    ? `<button class="btn-small btn-secondary-link" onclick="openSecondaryLink(${task.id})" title="${escapeHtml(secondaryUrlLabel)}">${escapeHtml(secondaryUrlLabel)}</button>`
                     : '';
 
                 const prioritySelector = !task.completed ? `
@@ -946,6 +978,7 @@
                                 ${task.note ? `<div class="note-preview">${escapeHtml(task.note)}</div>` : ''}
                             </div>
                             <div class="task-actions-buttons">
+                                ${secondaryLinkButton}
                                 ${timerBtns}
                                 <button class="btn-small btn-delete" onclick="deleteTask(${task.id})" title="Delete">&#128465;</button>
                             </div>
@@ -1079,6 +1112,15 @@
             }
         }
 
+        // ─── SECONDARY LINK ───
+        function openSecondaryLink(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task && secondaryUrlTemplate) {
+                const url = secondaryUrlTemplate.replace('{partNumber}', encodeURIComponent(task.partNumber));
+                window.open(url, task.partNumber + '_secondary', 'popup=yes,width=1200,height=800,left=150,top=150,resizable=yes,scrollbars=yes');
+            }
+        }
+
         // ─── CSV EXPORT ───
         function exportToCSV() {
             if (tasks.length === 0) { alert('No tasks to export!'); return; }
@@ -1207,7 +1249,6 @@
             processIncomingQueue();
         }
 
-        // Also check for queued items when the tab regains focus
         window.addEventListener('focus', processIncomingQueue);
 
         init();

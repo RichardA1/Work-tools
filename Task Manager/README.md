@@ -34,7 +34,7 @@ The app has three tabs at the top, a scrollable task list in the middle, and a f
 │     ── Sessions ─────────────────────   │
 │     1  2:45 PM → 3:10 PM               │
 │     2  3:30 PM → ● running             │
-│     📝  note preview…  [⏸ Pause][Stop] │  ← notes + timer
+│     📝  note preview…  [View ERP][⏸][■]│  ← notes + secondary link + timer
 │                                   [🗑️] │  ← delete
 │                                         │
 ├─────────────────────────────────────────┤
@@ -57,7 +57,7 @@ Each task card shows:
 - **Completion checkbox** — check to mark complete; any running timer session is closed automatically
 - **Part number** — monospace pill, colour-coded by timer state (see below)
 - **📄 Copy button** — copies the part number to the clipboard
-- **🔗 Link button** — opens the URL template configured in `config.js` with the part number substituted in (hidden if no URL template is set)
+- **🔗 Link button** — opens the primary URL template configured in `config.js` with the part number substituted in (hidden if no URL template is set)
 - **`from inventory` badge** — shown on tasks transferred from the SFC Inventory app
 - **▼ / ▶ Collapse button** — minimizes the card to just the part number row to save space; state is remembered across reloads
 - **Type** — the task type selected at creation
@@ -68,6 +68,7 @@ Each task card shows:
 - **Last Stop** — timestamp of the most recent stop; shows `● live` while the timer is running; click to copy
 - **Sessions log** — numbered list of every start/stop pair, shown when at least one session exists
 - **📝 Note button** — opens the note editor popup; a truncated preview of the note appears inline when one exists
+- **Secondary link button** — a text-label button (e.g. "View ERP") that opens the secondary URL template; appears near the timer buttons; hidden if no secondary URL is configured in `config.js`
 - **Timer buttons** — vary by state (see Timer section below)
 - **🗑️ Delete button** — deletes the task after confirmation
 
@@ -116,6 +117,26 @@ Tasks use a **multi-session timer** that records every individual work period as
 Clicking **Stop** from either the running or paused state finalizes the task in one action — no separate "mark complete" step needed.
 
 **Completing via checkbox:** If the timer is running when you check the completion checkbox, the current session is closed automatically with the current time.
+
+---
+
+### Link Buttons
+
+Task cards support two independent URL links, both using `{partNumber}` as a placeholder that is replaced with the actual part number (URL-encoded) when the link is opened.
+
+#### Primary Link (🔗)
+
+Appears in the **part number row** as a small icon button. Configured via `urlTemplate` in `config.js`. Set to `""` to hide it entirely.
+
+#### Secondary Link (text label button)
+
+Appears in the **task actions row**, near the Start/Stop timer buttons. Unlike the primary link, this button displays a short text label (e.g. "View ERP", "Jira", "Open SAP") so it is easy to identify at a glance when both links are in use.
+
+Configured in `config.js` via two settings:
+- `secondaryUrlTemplate` — the URL to open; use `{partNumber}` as the placeholder. Set to `""` to hide the button entirely.
+- `secondaryUrlLabel` — the text shown on the button. Keep it short (1–3 words). Defaults to `"Open"` if omitted or blank.
+
+Both link buttons open their target in a popup window sized 1200 × 800 px, the same as one another.
 
 ---
 
@@ -208,11 +229,19 @@ var TASK_MANAGER_CONFIG = {
         { label: "Multiline", text: "Line one\nLine two\nLine three" }
     ],
 
-    // ── URL Template ─────────────────────────────────────────────────────
-    // Enables the 🔗 link button on each task card.
+    // ── Primary URL Template ──────────────────────────────────────────────
+    // Enables the 🔗 icon button in the part number row.
     // {partNumber} is replaced with the actual part number (URL-encoded).
-    // Set to "" to hide the link button entirely.
-    urlTemplate: "https://example.com/search?q={partNumber}"
+    // Set to "" to hide the button entirely.
+    urlTemplate: "https://example.com/search?q={partNumber}",
+
+    // ── Secondary URL Template ────────────────────────────────────────────
+    // Enables a text-label button near the Start / Stop timer buttons.
+    // {partNumber} is replaced with the actual part number (URL-encoded).
+    // Set secondaryUrlTemplate to "" to hide the button entirely.
+    // secondaryUrlLabel sets the text on the button (keep it short: 1–3 words).
+    secondaryUrlTemplate: "https://example2.com/lookup?id={partNumber}",
+    secondaryUrlLabel: "View Details"
 
 };
 ```
@@ -244,14 +273,22 @@ textBlocks: [
 
 **URL template examples:**
 ```js
-// Internal system
+// Primary link — internal system
 urlTemplate: "http://internal.company.com/parts/{partNumber}"
 
-// Google search
-urlTemplate: "https://www.google.com/search?q={partNumber}"
-
-// Disabled
+// Primary link — disabled
 urlTemplate: ""
+
+// Secondary link — ERP system
+secondaryUrlTemplate: "http://erp.company.com/orders?sfc={partNumber}"
+secondaryUrlLabel: "View ERP"
+
+// Secondary link — Jira search
+secondaryUrlTemplate: "https://jira.company.com/issues/?jql=text+%7E+%22{partNumber}%22"
+secondaryUrlLabel: "Jira"
+
+// Secondary link — disabled
+secondaryUrlTemplate: ""
 ```
 
 ---
@@ -351,6 +388,9 @@ Hard-refresh the browser: Ctrl+Shift+R on Windows/Linux, Cmd+Shift+R on Mac. Thi
 **Tasks disappeared**
 Browser localStorage was cleared (e.g. by clearing browsing history). Export to CSV regularly to keep a backup outside the browser.
 
+**Secondary link button not appearing**
+Verify that `secondaryUrlTemplate` is set to a non-empty string in `config.js` and that you hard-refreshed after saving the file.
+
 **Transferred items from SFC Inventory not appearing**
 Both files must be open in the same browser. Click on the Task Manager tab — it checks for queued items on every focus event. If that doesn't work, try refreshing Task Manager.
 
@@ -374,6 +414,7 @@ The only external resource is Google Fonts (Work Sans and JetBrains Mono), loade
 
 | Version | Changes |
 |---------|---------|
+| 3.4 | Secondary URL button: configurable text-label link button near timer controls, set via `secondaryUrlTemplate` and `secondaryUrlLabel` in config.js |
 | 3.3 | SFC Inventory integration: incoming queue processing on page load and window focus; `from inventory` badge on imported tasks; `From Inventory` column in CSV; publishes `tm_types` to localStorage on every config load |
 | 3.2 | Multi-session timer with full sessions log; Stop button available from both running and paused states |
 | 3.1 | Priority ranking (1/2/3 buttons); collapsible task cards; Rework checkbox |
@@ -381,6 +422,6 @@ The only external resource is Google Fonts (Work Sans and JetBrains Mono), loade
 
 ---
 
-**Version:** 3.3  
-**Last updated:** March 2026  
+**Version:** 3.4  
+**Last updated:** April 2026  
 **Dependencies:** None (Google Fonts loaded remotely for typography only)
