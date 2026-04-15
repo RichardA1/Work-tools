@@ -1,6 +1,6 @@
 # Task Manager
 
-A streamlined, single-page task management app with time tracking, priority ranking, collapsible cards, notes, quick-copy text blocks, and direct integration with the SFC Inventory app.
+A streamlined, single-page task management app with time tracking, priority ranking, collapsible cards, notes, quick-copy text blocks, in-app Settings GUI, and direct integration with the SFC Inventory app.
 
 ---
 
@@ -8,7 +8,7 @@ A streamlined, single-page task management app with time tracking, priority rank
 
 ```
 task-manager.html    # The application — HTML, CSS, and JavaScript
-config.js            # Configuration — edit this to customize the app
+config.js            # Configuration — edit directly or use the in-app Settings GUI
 README.md            # This documentation
 ```
 
@@ -68,65 +68,24 @@ Each task card shows:
 - **Last Stop** — timestamp of the most recent stop; shows `● live` while the timer is running; click to copy
 - **Sessions log** — numbered list of every start/stop pair, shown when at least one session exists
 - **📝 Note button** — opens the note editor popup; a truncated preview of the note appears inline when one exists
-- **Secondary link button** — a text-label button (e.g. "View ERP") that opens the secondary URL template; appears near the timer buttons; hidden if no secondary URL is configured in `config.js`
-- **Timer buttons** — vary by state (see Timer section below)
-- **🗑️ Delete button** — deletes the task after confirmation
+- **Secondary link button** — a text-label button (e.g. "View ERP") near the timer controls; configurable in `config.js`
+- **Start / Pause / Stop timer buttons**
+- **🗑️ Delete button** — removes the task after confirmation
 
-#### Task Border Colours
+#### Timer States and Part Number Colours
 
-The left border colour indicates the current state of the task at a glance:
+| Colour | Meaning |
+|--------|---------|
+| Default (no highlight) | Task not started |
+| Green pill | Timer running |
+| Yellow pill | Timer paused |
+| Faded / strikethrough | Task completed |
 
-| Colour | State |
-|--------|-------|
-| 🟡 Yellow | New — timer not yet started |
-| 🟠 Orange | Running — timer is active |
-| 🟣 Purple | Paused — timer paused, task not yet complete |
-| 🟢 Green | Complete |
-| 🔴 Red | Rework flagged (overrides all other colours) |
+#### Primary Link (🔗 icon button)
 
-#### Task Sort Order
+Appears in the **part number row**. Opens the configured URL with the part number substituted in.
 
-Active tasks sort by priority first (1 → 2 → 3 → unprioritized), then by creation date newest-first. Completed tasks always appear at the bottom.
-
----
-
-### Priority Ranking
-
-Click the **1**, **2**, or **3** circle buttons on a task card to assign a priority. The task list re-sorts immediately. Click the active priority button again to remove it. Priority is automatically cleared when a task is marked complete.
-
-| Button | Priority | Colour |
-|--------|----------|--------|
-| 1 | High | Red |
-| 2 | Medium | Orange |
-| 3 | Low | Yellow |
-
----
-
-### Time Tracking
-
-Tasks use a **multi-session timer** that records every individual work period as a start/stop pair. You can pause and resume as many times as needed; the full history is preserved.
-
-**Timer states and buttons:**
-
-| Current state | Buttons shown | Action |
-|--------------|--------------|--------|
-| Idle (not started) | **Start** | Begins session 1; task turns orange |
-| Running | **⏸ Pause** and **Stop** | Pause closes the current session (task turns purple); Stop closes the session and marks complete (task turns green) |
-| Paused | **▶ Resume** and **Stop** | Resume opens a new session (task turns orange); Stop marks complete from paused state |
-
-Clicking **Stop** from either the running or paused state finalizes the task in one action — no separate "mark complete" step needed.
-
-**Completing via checkbox:** If the timer is running when you check the completion checkbox, the current session is closed automatically with the current time.
-
----
-
-### Link Buttons
-
-Task cards support two independent URL links, both using `{partNumber}` as a placeholder that is replaced with the actual part number (URL-encoded) when the link is opened.
-
-#### Primary Link (🔗)
-
-Appears in the **part number row** as a small icon button. Configured via `urlTemplate` in `config.js`. Set to `""` to hide it entirely.
+Configured via `urlTemplate` in `config.js`. Set to `""` to hide it entirely.
 
 #### Secondary Link (text label button)
 
@@ -170,8 +129,44 @@ Displays quick-copy text snippets configured in `config.js`. Click **📄** on a
 |------|--------|
 | Save CSV | Exports all tasks to `tasks_YYYY-MM-DD.csv` |
 | Clear All | Deletes all tasks after confirmation |
+| ⚙️ Settings | Opens the in-app Settings GUI |
 | Dark Mode | Toggles light/dark theme; preference saved |
 | View README | Opens `README.md` in a new tab |
+
+---
+
+### ⚙️ Settings GUI
+
+All configuration options can be edited directly from within the app — no text editor or file reload required.
+
+Open via **☰ → ⚙️ Settings**.
+
+#### What you can configure
+
+| Section | What you can do |
+|---------|----------------|
+| **Task Types** | Add, edit, delete, and reorder the type options shown in the Add Task form and on each card |
+| **Status Options** | Add, edit, and delete status dropdown entries; each has a **Label** (shown in the UI) and a **Value** (stored internally and exported to CSV) |
+| **Text Blocks** | Add, edit, delete, and reorder quick-copy snippets; each has a label and a body (multi-line supported) |
+| **URL Settings** | Set the primary link template, secondary link template, and secondary button label |
+
+#### How changes are saved
+
+The Settings GUI uses a **two-layer save strategy**:
+
+1. **Apply** — clicking **Apply** saves your settings to browser localStorage (`tm_config_override`) and applies them immediately. No page refresh needed. Changes persist across sessions.
+
+2. **Download config.js** — clicking **⬇ config.js** generates and downloads an updated `config.js` file that matches your current settings. Replace the existing `config.js` in your project folder with this file to make the changes permanent on disk.
+
+> **Best practice:** After finalizing your settings, always download and replace `config.js`. This keeps the file in sync and ensures the app works correctly in any browser (not just the one where you used the Settings GUI).
+
+#### Reset to config.js
+
+The **Reset to config.js** link (bottom-left of the Settings panel) discards all browser-saved overrides and reverts the app to whatever is in `config.js`. Use this if your localStorage overrides get out of sync with the file.
+
+#### Storage key
+
+The browser-saved settings are stored under the localStorage key `tm_config_override`. This key takes precedence over `config.js` at startup when present.
 
 ---
 
@@ -186,7 +181,9 @@ Tasks can be sent directly from the SFC Inventory app into Task Manager using th
 - Imported tasks have `fromInventory: true`, which displays a `from inventory` badge next to the part number and adds a `From Inventory: Yes` column in CSV exports
 
 **Type publishing:**
-Every time Task Manager loads and parses `config.js`, it writes its configured task types to the `tm_types` localStorage key. SFC Inventory reads this key to populate the type dropdown in its Send dialog. This happens automatically — no setup needed beyond opening Task Manager at least once.
+Every time Task Manager loads and parses `config.js`, it writes its configured task types to the `tm_types` localStorage key.
+
+SFC Inventory reads this key to populate the type dropdown in its Send dialog. This happens automatically — no setup needed beyond opening Task Manager at least once.
 
 **Requirement:** Both HTML files must be open in the same browser (same browser profile). The bridge is entirely localStorage — no network is involved.
 
@@ -194,7 +191,13 @@ Every time Task Manager loads and parses `config.js`, it writes its configured t
 
 ## Configuration
 
-All customization lives in `config.js` — a plain JavaScript file in the same folder as `task-manager.html`. Edit it in any text editor, save, and hard-refresh the browser (Ctrl+Shift+R / Cmd+Shift+R).
+All customization lives in `config.js` — a plain JavaScript file in the same folder as `task-manager.html`. You can edit it in two ways:
+
+**Option A — In-app Settings GUI (recommended)**
+Open **☰ → ⚙️ Settings**, make your changes, click **Apply** to take effect immediately, then click **⬇ config.js** to download and replace the file on disk.
+
+**Option B — Text editor**
+Edit `config.js` directly in any text editor, save, and hard-refresh the browser (Ctrl+Shift+R / Cmd+Shift+R).
 
 If `config.js` is missing or contains a syntax error, a red error banner appears at the top of the app.
 
@@ -240,156 +243,42 @@ var TASK_MANAGER_CONFIG = {
     // {partNumber} is replaced with the actual part number (URL-encoded).
     // Set secondaryUrlTemplate to "" to hide the button entirely.
     // secondaryUrlLabel sets the text on the button (keep it short: 1–3 words).
-    secondaryUrlTemplate: "https://example2.com/lookup?id={partNumber}",
-    secondaryUrlLabel: "View Details"
+    secondaryUrlTemplate: "https://example.com/erp?q={partNumber}",
+    secondaryUrlLabel:    "View ERP",
 
 };
 ```
 
-### Customization Examples
-
-**Task types:**
-```js
-types: ["Urgent", "Standard", "Research", "Follow-up"]
-```
-
-**Status options:**
-```js
-statusOptions: [
-    { label: "Pending",     value: "pending"     },
-    { label: "In Progress", value: "in_progress" },
-    { label: "On Hold",     value: "on_hold"     },
-    { label: "Complete",    value: "complete"    }
-]
-```
-
-**Text blocks with multi-line content:**
-```js
-textBlocks: [
-    { label: "Email sign-off", text: "Thanks,\nYour Name\nyour@email.com" },
-    { label: "Status update",  text: "Awaiting review from supervisor." }
-]
-```
-
-**URL template examples:**
-```js
-// Primary link — internal system
-urlTemplate: "http://internal.company.com/parts/{partNumber}"
-
-// Primary link — disabled
-urlTemplate: ""
-
-// Secondary link — ERP system
-secondaryUrlTemplate: "http://erp.company.com/orders?sfc={partNumber}"
-secondaryUrlLabel: "View ERP"
-
-// Secondary link — Jira search
-secondaryUrlTemplate: "https://jira.company.com/issues/?jql=text+%7E+%22{partNumber}%22"
-secondaryUrlLabel: "Jira"
-
-// Secondary link — disabled
-secondaryUrlTemplate: ""
-```
-
 ---
 
-## Adding Tasks
+## localStorage Keys
 
-1. Click the **Tasks** tab if not already active
-2. In the footer, enter a part number (up to 50 characters)
-3. Select a type from the dropdown
-4. Click **Add Task** or press **Enter**
-
-The new task appears at the top of the active list with a yellow border.
-
----
-
-## Exporting to CSV
-
-Menu (☰) → **Save CSV** downloads `tasks_YYYY-MM-DD.csv`.
-
-The CSV includes one row per task with these columns:
-
-```
-Part Number, Type, Status, Completed, Rework, From Inventory, Note, Created Date,
-Session 1 Start, Session 1 Stop, Session 2 Start, Session 2 Stop, …
-```
-
-Session columns expand dynamically — the number of `Session N Start / Stop` pairs matches the task with the most sessions. The **From Inventory** column is `Yes` for tasks transferred from SFC Inventory, `No` for all others.
-
----
-
-## Data Storage
-
-All data is stored in **browser localStorage**. Nothing is sent to any server.
-
-| localStorage key | Contents |
-|-----------------|----------|
-| `tasks` | All task data as JSON |
-| `notes` | Notes tab content (plain text) |
-| `theme` | `"dark"` or `"light"` |
-| `tm_types` | Configured task types (read by SFC Inventory) |
-| `tm_incoming_queue` | Incoming tasks from SFC Inventory (read and cleared on receipt) |
-
-Clearing browser data or site storage will delete tasks and notes. **Export to CSV regularly as a backup.**
-
-### Task Data Schema
-
-```json
-{
-  "id": 1710500000000,
-  "partNumber": "SFC-001",
-  "type": "Option 1",
-  "status": "option1",
-  "priority": 1,
-  "minimized": false,
-  "fromInventory": true,
-  "sessions": [
-    { "start": "9:15 AM", "stop": "10:42 AM" },
-    { "start": "1:30 PM", "stop": null }
-  ],
-  "completed": false,
-  "isRework": false,
-  "note": "Waiting on updated drawing.",
-  "createdAt": "2026-03-15T09:15:00.000Z"
-}
-```
-
-### Timer State Derivation
-
-The timer state is derived from the `sessions` array at render time — no separate state field is stored:
-
-| State | Condition |
-|-------|-----------|
-| Idle | `sessions` is empty |
-| Running | Last session has `stop: null` |
-| Paused | Sessions exist and last session has a stop value |
-| Completed | `completed: true` |
-
----
-
-## Keyboard Shortcuts
-
-| Key | Action |
-|-----|--------|
-| Enter | Submit the Add Task form (when the part number or type field is focused) |
-| Escape | Close the note popup modal |
+| Key | Written by | Purpose |
+|-----|-----------|---------|
+| `tm_tasks` | Task Manager | Saved task list |
+| `tm_notes` | Task Manager | Notes tab content |
+| `tm_config_override` | Settings GUI | Browser-saved config overrides (takes precedence over config.js) |
+| `tm_types` | Task Manager (on load) | Published type list for SFC Inventory |
+| `tm_incoming_queue` | SFC Inventory (on send) | Queued items awaiting Task Manager import |
 
 ---
 
 ## Troubleshooting
 
-**Red config error banner on load**
-`config.js` is missing or has a syntax error. Make sure the file is in the same folder as `task-manager.html` and is valid JavaScript. Open it in VS Code to see any syntax errors highlighted.
+**Config error banner at the top**
+`config.js` is missing from the folder, or it contains a JavaScript syntax error. Check the file location and open the browser console (F12) for the specific error message. Hard-refresh after fixing (Ctrl+Shift+R / Cmd+Shift+R). This bypasses the script cache.
 
-**Types or status options not updating after editing config.js**
-Hard-refresh the browser: Ctrl+Shift+R on Windows/Linux, Cmd+Shift+R on Mac. This bypasses the script cache.
+**Settings applied in the GUI but not showing after refresh**
+The browser-saved settings (`tm_config_override`) should load automatically. If they don't, check that localStorage is available (disabled in some private/incognito modes). Re-apply in Settings and refresh.
+
+**Settings GUI showing old values after editing config.js directly**
+The `tm_config_override` localStorage key takes precedence over `config.js`. Open **⚙️ Settings → Reset to config.js** to clear the override and reload from the file.
 
 **Tasks disappeared**
 Browser localStorage was cleared (e.g. by clearing browsing history). Export to CSV regularly to keep a backup outside the browser.
 
 **Secondary link button not appearing**
-Verify that `secondaryUrlTemplate` is set to a non-empty string in `config.js` and that you hard-refreshed after saving the file.
+Verify that `secondaryUrlTemplate` is set to a non-empty string in `config.js` (or via Settings) and that you have refreshed after saving the file.
 
 **Transferred items from SFC Inventory not appearing**
 Both files must be open in the same browser. Click on the Task Manager tab — it checks for queued items on every focus event. If that doesn't work, try refreshing Task Manager.
@@ -410,10 +299,22 @@ The only external resource is Google Fonts (Work Sans and JetBrains Mono), loade
 
 ---
 
+## Best Practices
+
+- **Keep config.js in sync** — after making changes in the Settings GUI, always use **⬇ config.js** to download and replace the file. This ensures that if you clear your browser data or open the app in a different browser, your settings are not lost.
+- **Export CSV regularly** — task data lives in localStorage. Any browser history clear or site data wipe will erase your tasks. Export a CSV backup periodically.
+- **Hard-refresh after editing config.js** — if you edit `config.js` directly in a text editor, use Ctrl+Shift+R (Windows/Linux) or Cmd+Shift+R (Mac) to ensure the browser loads the new version rather than a cached copy.
+- **Status values should be lowercase, no spaces** — `value` fields in `statusOptions` are stored in CSV exports. Use simple lowercase identifiers (e.g. `in_progress` not `In Progress`) for clean data.
+- **Text Block line breaks** — in `config.js`, use the literal two-character sequence `\n` inside a string to insert a line break. In the Settings GUI text block editor, press Enter normally.
+- **URL templates** — always test your URL templates with a representative part number. If the part number contains special characters, they are URL-encoded automatically.
+
+---
+
 ## Changelog
 
 | Version | Changes |
 |---------|---------|
+| 3.5 | In-app Settings GUI: edit all config.js options from the browser with live apply; download updated config.js; `tm_config_override` localStorage layer for immediate persistence |
 | 3.4 | Secondary URL button: configurable text-label link button near timer controls, set via `secondaryUrlTemplate` and `secondaryUrlLabel` in config.js |
 | 3.3 | SFC Inventory integration: incoming queue processing on page load and window focus; `from inventory` badge on imported tasks; `From Inventory` column in CSV; publishes `tm_types` to localStorage on every config load |
 | 3.2 | Multi-session timer with full sessions log; Stop button available from both running and paused states |
@@ -422,6 +323,6 @@ The only external resource is Google Fonts (Work Sans and JetBrains Mono), loade
 
 ---
 
-**Version:** 3.4  
+**Version:** 3.5  
 **Last updated:** April 2026  
 **Dependencies:** None (Google Fonts loaded remotely for typography only)

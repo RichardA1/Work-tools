@@ -547,6 +547,149 @@
             from { opacity: 0; transform: translateX(-50%) translateY(8px); }
             to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
+
+/* ─── SETTINGS MODAL ─── */
+.settings-modal {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7); z-index: 3000;
+    align-items: flex-start; justify-content: center;
+    overflow-y: auto; padding: 1.5rem 0;
+}
+.settings-modal.show { display: flex; }
+.settings-panel {
+    background: var(--surface); border-radius: 10px;
+    border: 2px solid var(--border);
+    width: 90%; max-width: 600px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    display: flex; flex-direction: column;
+    margin: auto;
+}
+.settings-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 1.5rem; border-bottom: 2px solid var(--border);
+}
+.settings-title { font-size: 1.125rem; font-weight: 700; color: var(--primary); }
+.settings-subtitle {
+    font-size: 0.6875rem; color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace; text-transform: uppercase;
+    letter-spacing: 0.08em; margin-top: 0.125rem;
+}
+.settings-close {
+    background: transparent; border: none; color: var(--text-muted);
+    font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0.25rem;
+}
+.settings-close:hover { color: var(--text); }
+.settings-body { padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 1.75rem; }
+.settings-section { display: flex; flex-direction: column; gap: 0.75rem; }
+.settings-section-title {
+    font-size: 0.6875rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--primary);
+    padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+}
+.settings-list { display: flex; flex-direction: column; gap: 0.375rem; }
+.settings-list-item {
+    display: flex; align-items: center; gap: 0.5rem;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 0.375rem 0.5rem;
+}
+.settings-list-item input {
+    flex: 1; background: transparent; border: none; outline: none;
+    color: var(--text); font-size: 0.875rem; font-family: 'Work Sans', sans-serif;
+    padding: 0.125rem 0.25rem;
+    min-width: 0;
+}
+.settings-list-item input.mono { font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; }
+.settings-list-item .sep {
+    color: var(--text-muted); font-size: 0.75rem; flex-shrink: 0; user-select: none;
+}
+.settings-list-item .badge {
+    font-size: 0.625rem; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    white-space: nowrap; flex-shrink: 0;
+}
+.btn-item-delete {
+    background: transparent; border: none; color: var(--text-muted);
+    cursor: pointer; font-size: 1rem; line-height: 1; padding: 0.125rem 0.25rem;
+    flex-shrink: 0; border-radius: 3px; transition: all 0.15s ease;
+}
+.btn-item-delete:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+.btn-item-move {
+    background: transparent; border: none; color: var(--text-muted);
+    cursor: pointer; font-size: 0.75rem; line-height: 1; padding: 0.125rem 0.2rem;
+    flex-shrink: 0; border-radius: 3px; transition: all 0.15s ease;
+}
+.btn-item-move:hover { color: var(--text); background: var(--border); }
+.settings-add-row {
+    display: flex; gap: 0.5rem; margin-top: 0.25rem; align-items: center; flex-wrap: wrap;
+}
+.settings-add-row input {
+    flex: 1; min-width: 100px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text); font-size: 0.8125rem; padding: 0.375rem 0.625rem;
+    font-family: 'Work Sans', sans-serif;
+}
+.settings-add-row input.mono { font-family: 'JetBrains Mono', monospace; }
+.settings-add-row input:focus { outline: none; border-color: var(--accent); }
+.btn-settings-add {
+    background: var(--primary); color: white; border: none; border-radius: 4px;
+    padding: 0.375rem 0.875rem; font-size: 0.8125rem; font-weight: 600;
+    cursor: pointer; flex-shrink: 0; transition: opacity 0.15s ease;
+}
+.btn-settings-add:hover { opacity: 0.85; }
+.settings-field { display: flex; flex-direction: column; gap: 0.375rem; }
+.settings-field label {
+    font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+    text-transform: none; letter-spacing: 0; margin: 0;
+}
+.settings-field input {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text); font-size: 0.875rem; padding: 0.5rem 0.75rem;
+    font-family: 'JetBrains Mono', monospace; width: 100%;
+}
+.settings-field input:focus { outline: none; border-color: var(--accent); }
+.settings-field .field-hint {
+    font-size: 0.6875rem; color: var(--text-muted); font-style: italic;
+}
+.settings-footer {
+    padding: 1rem 1.5rem; border-top: 2px solid var(--border);
+    display: flex; gap: 0.75rem; justify-content: flex-end; flex-wrap: wrap;
+    align-items: center;
+}
+.settings-footer .footer-left {
+    flex: 1; font-size: 0.6875rem; color: var(--text-muted); font-style: italic;
+}
+.btn-settings-apply {
+    background: var(--primary); color: white; border: none; border-radius: 6px;
+    padding: 0.625rem 1.25rem; font-size: 0.875rem; font-weight: 700;
+    cursor: pointer; transition: opacity 0.15s ease;
+}
+.btn-settings-apply:hover { opacity: 0.85; }
+.btn-settings-download {
+    background: transparent; color: var(--accent); border: 2px solid var(--accent);
+    border-radius: 6px; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600;
+    cursor: pointer; transition: all 0.15s ease;
+}
+.btn-settings-download:hover { background: var(--accent); color: #0f172a; }
+.btn-settings-cancel {
+    background: var(--border); color: var(--text); border: none; border-radius: 6px;
+    padding: 0.5rem 1rem; font-size: 0.875rem; cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+.btn-settings-cancel:hover { opacity: 0.75; }
+.settings-reset-link {
+    font-size: 0.6875rem; color: var(--text-muted); cursor: pointer;
+    text-decoration: underline; white-space: nowrap;
+    background: none; border: none; padding: 0;
+}
+.settings-reset-link:hover { color: #ef4444; }
+.textarea-block {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text); font-size: 0.8125rem; font-family: 'JetBrains Mono', monospace;
+    padding: 0.375rem 0.5rem; width: 100%; resize: vertical; min-height: 48px;
+    line-height: 1.4;
+}
+.textarea-block:focus { outline: none; border-color: var(--accent); }
+
     </style>
     <script src="config.js"></script>
 </head>
@@ -560,9 +703,11 @@
             <header>
                 <h1>Task Manager</h1>
                 <div class="menu-icon" id="menuIcon">☰</div>
+
                 <div class="menu-dropdown" id="menuDropdown">
                     <div class="menu-item" onclick="exportToCSV()">Save CSV</div>
                     <div class="menu-item" onclick="clearAllTasks()">Clear All</div>
+                    <div class="menu-item" onclick="openSettings(); toggleMenu()">⚙️ Settings</div>
                     <div class="menu-item theme-toggle">
                         <span>Dark Mode</span>
                         <label class="theme-switch">
@@ -570,8 +715,9 @@
                             <span class="theme-slider"></span>
                         </label>
                     </div>
-                    <div class="menu-item"><a href="README.md" target="_blank">View README</a></div>
-                </div>
+    <div class="menu-item"><a href="README.md" target="_blank">View README</a></div>
+</div>
+
             </header>
             <div class="tab-nav">
                 <button class="tab-btn active" data-tab="tasks">Tasks</button>
@@ -628,6 +774,87 @@
             </div>
         </div>
     </div>
+
+<!-- Settings Modal -->
+<div id="settingsModal" class="settings-modal" onclick="if(event.target===this)closeSettings()">
+    <div class="settings-panel">
+        <div class="settings-header">
+            <div>
+                <div class="settings-title">⚙️ Settings</div>
+                <div class="settings-subtitle">Editing config.js</div>
+            </div>
+            <button class="settings-close" onclick="closeSettings()">×</button>
+        </div>
+
+        <div class="settings-body">
+
+            <!-- TASK TYPES -->
+            <div class="settings-section">
+                <div class="settings-section-title">Task Types</div>
+                <div class="settings-list" id="settingsTypesList"></div>
+                <div class="settings-add-row">
+                    <input type="text" id="settingsTypeInput" placeholder="New type name…" onkeydown="if(event.key==='Enter')addSettingsType()">
+                    <button class="btn-settings-add" onclick="addSettingsType()">+ Add</button>
+                </div>
+            </div>
+
+            <!-- STATUS OPTIONS -->
+            <div class="settings-section">
+                <div class="settings-section-title">Status Options</div>
+                <div class="settings-list" id="settingsStatusList"></div>
+                <div class="settings-add-row">
+                    <input type="text" id="settingsStatusLabel" placeholder="Label (shown to user)…">
+                    <input type="text" id="settingsStatusValue" placeholder="Value (in CSV/storage)…" class="mono">
+                    <button class="btn-settings-add" onclick="addSettingsStatus()">+ Add</button>
+                </div>
+            </div>
+
+            <!-- TEXT BLOCKS -->
+            <div class="settings-section">
+                <div class="settings-section-title">Text Blocks</div>
+                <div class="settings-list" id="settingsTextBlocksList"></div>
+                <div class="settings-add-row" style="flex-direction:column; align-items:stretch;">
+                    <div style="display:flex;gap:0.5rem;">
+                        <input type="text" id="settingsBlockLabel" placeholder="Block label…" style="flex:1">
+                        <button class="btn-settings-add" onclick="addSettingsTextBlock()">+ Add</button>
+                    </div>
+                    <textarea class="textarea-block" id="settingsBlockText" placeholder="Block text… (use \n for new lines)" rows="2"></textarea>
+                </div>
+            </div>
+
+            <!-- URL SETTINGS -->
+            <div class="settings-section">
+                <div class="settings-section-title">URL Settings</div>
+                <div style="display:flex; flex-direction:column; gap:1rem;">
+                    <div class="settings-field">
+                        <label>Primary URL Template <span style="color:var(--text-muted);font-weight:400">(🔗 icon button)</span></label>
+                        <input type="text" id="settingsPrimaryUrl" placeholder="https://example.com/search?q={partNumber}">
+                        <span class="field-hint">Use {partNumber} as the placeholder. Leave empty to hide the button.</span>
+                    </div>
+                    <div class="settings-field">
+                        <label>Secondary URL Template <span style="color:var(--text-muted);font-weight:400">(text-label button near timer)</span></label>
+                        <input type="text" id="settingsSecondaryUrl" placeholder="https://example.com/erp?q={partNumber}">
+                        <span class="field-hint">Use {partNumber} as the placeholder. Leave empty to hide the button.</span>
+                    </div>
+                    <div class="settings-field">
+                        <label>Secondary Button Label</label>
+                        <input type="text" id="settingsSecondaryLabel" placeholder="View ERP">
+                        <span class="field-hint">Short text shown on the button (1–3 words). Defaults to "Open" if blank.</span>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /settings-body -->
+
+        <div class="settings-footer">
+            <button class="settings-reset-link" onclick="resetSettingsToFile()" title="Discard localStorage overrides and revert to config.js">Reset to config.js</button>
+            <div class="footer-left">Changes apply immediately &amp; are saved in the browser.</div>
+            <button class="btn-settings-cancel" onclick="closeSettings()">Cancel</button>
+            <button class="btn-settings-download" onclick="downloadConfigJs()" title="Download updated config.js file">⬇ config.js</button>
+            <button class="btn-settings-apply" onclick="applySettings()">Apply</button>
+        </div>
+    </div>
+</div>
 
     <!-- Note Modal -->
     <div id="noteModal" class="modal">
@@ -694,6 +921,276 @@
                 showConfigError('config.js could not be loaded or is missing. Make sure config.js is in the same folder as task-manager.html.');
             }
         }
+
+// ─── SETTINGS STATE ─── (working copies while modal is open)
+let _sCfg = null; // snapshot of config being edited
+
+// ─── LOAD CONFIG (updated version — replaces existing loadConfig) ─────────────
+// Add this BEFORE or REPLACE the existing loadConfig() function.
+// The only change is that it checks localStorage for overrides first.
+function loadConfig() {
+    let base = {};
+    if (typeof TASK_MANAGER_CONFIG !== 'undefined') {
+        base = TASK_MANAGER_CONFIG;
+    } else {
+        showConfigError('config.js could not be loaded or is missing. Make sure config.js is in the same folder as task-manager.html.');
+        return;
+    }
+    // Apply localStorage overrides if present
+    try {
+        const stored = localStorage.getItem('tm_config_override');
+        if (stored) {
+            const override = JSON.parse(stored);
+            base = Object.assign({}, base, override);
+        }
+    } catch(e) {}
+    parseConfig(base);
+}
+
+// ─── SETTINGS HELPERS ────────────────────────────────────────────────────────
+function getCurrentConfig() {
+    return {
+        types: [...taskTypes],
+        statusOptions: statusOptions.map(s => ({ label: s.label, value: s.value })),
+        textBlocks: textBlocks.map(b => ({ label: b.label, text: b.text })),
+        urlTemplate,
+        secondaryUrlTemplate,
+        secondaryUrlLabel
+    };
+}
+
+function openSettings() {
+    _sCfg = getCurrentConfig();
+    renderSettingsTypes();
+    renderSettingsStatus();
+    renderSettingsTextBlocks();
+    document.getElementById('settingsPrimaryUrl').value    = _sCfg.urlTemplate || '';
+    document.getElementById('settingsSecondaryUrl').value  = _sCfg.secondaryUrlTemplate || '';
+    document.getElementById('settingsSecondaryLabel').value = _sCfg.secondaryUrlLabel || '';
+    document.getElementById('settingsModal').classList.add('show');
+}
+
+function closeSettings() {
+    document.getElementById('settingsModal').classList.remove('show');
+    _sCfg = null;
+}
+
+// ── Types ──
+function renderSettingsTypes() {
+    const list = document.getElementById('settingsTypesList');
+    list.innerHTML = '';
+    (_sCfg.types || []).forEach((t, i) => {
+        const row = document.createElement('div');
+        row.className = 'settings-list-item';
+        row.innerHTML = `
+            <button class="btn-item-move" onclick="moveSettingsType(${i},-1)" title="Move up">▲</button>
+            <button class="btn-item-move" onclick="moveSettingsType(${i}, 1)" title="Move down">▼</button>
+            <input type="text" value="${escHtml(t)}" oninput="_sCfg.types[${i}]=this.value">
+            <button class="btn-item-delete" onclick="deleteSettingsType(${i})" title="Remove">✕</button>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function addSettingsType() {
+    const inp = document.getElementById('settingsTypeInput');
+    const val = inp.value.trim();
+    if (!val) return;
+    _sCfg.types.push(val);
+    inp.value = '';
+    renderSettingsTypes();
+}
+
+function deleteSettingsType(i) {
+    _sCfg.types.splice(i, 1);
+    renderSettingsTypes();
+}
+
+function moveSettingsType(i, dir) {
+    const j = i + dir;
+    if (j < 0 || j >= _sCfg.types.length) return;
+    [_sCfg.types[i], _sCfg.types[j]] = [_sCfg.types[j], _sCfg.types[i]];
+    renderSettingsTypes();
+}
+
+// ── Status Options ──
+function renderSettingsStatus() {
+    const list = document.getElementById('settingsStatusList');
+    list.innerHTML = '';
+    (_sCfg.statusOptions || []).forEach((s, i) => {
+        const row = document.createElement('div');
+        row.className = 'settings-list-item';
+        row.innerHTML = `
+            <input type="text" value="${escHtml(s.label)}" oninput="_sCfg.statusOptions[${i}].label=this.value" placeholder="Label">
+            <span class="sep">→</span>
+            <input type="text" value="${escHtml(s.value)}" oninput="_sCfg.statusOptions[${i}].value=this.value" placeholder="value" class="mono">
+            <button class="btn-item-delete" onclick="deleteSettingsStatus(${i})" title="Remove">✕</button>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function addSettingsStatus() {
+    const lbl = document.getElementById('settingsStatusLabel').value.trim();
+    const val = document.getElementById('settingsStatusValue').value.trim();
+    if (!lbl || !val) { showToast('Fill in both Label and Value'); return; }
+    _sCfg.statusOptions.push({ label: lbl, value: val });
+    document.getElementById('settingsStatusLabel').value = '';
+    document.getElementById('settingsStatusValue').value = '';
+    renderSettingsStatus();
+}
+
+function deleteSettingsStatus(i) {
+    _sCfg.statusOptions.splice(i, 1);
+    renderSettingsStatus();
+}
+
+// ── Text Blocks ──
+function renderSettingsTextBlocks() {
+    const list = document.getElementById('settingsTextBlocksList');
+    list.innerHTML = '';
+    (_sCfg.textBlocks || []).forEach((b, i) => {
+        const row = document.createElement('div');
+        row.className = 'settings-list-item';
+        row.style.alignItems = 'flex-start';
+        row.innerHTML = `
+            <div style="display:flex;flex-direction:column;gap:0.25rem;flex:1;min-width:0;">
+                <input type="text" value="${escHtml(b.label)}" oninput="_sCfg.textBlocks[${i}].label=this.value" placeholder="Label">
+                <textarea class="textarea-block" oninput="_sCfg.textBlocks[${i}].text=this.value" rows="2">${escHtml(b.text)}</textarea>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.125rem;flex-shrink:0;">
+                <button class="btn-item-move" onclick="moveSettingsBlock(${i},-1)" title="Move up">▲</button>
+                <button class="btn-item-move" onclick="moveSettingsBlock(${i}, 1)" title="Move down">▼</button>
+                <button class="btn-item-delete" onclick="deleteSettingsBlock(${i})" title="Remove">✕</button>
+            </div>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function addSettingsTextBlock() {
+    const lbl  = document.getElementById('settingsBlockLabel').value.trim();
+    const txt  = document.getElementById('settingsBlockText').value;
+    if (!lbl) { showToast('Add a label for the block'); return; }
+    _sCfg.textBlocks.push({ label: lbl, text: txt });
+    document.getElementById('settingsBlockLabel').value = '';
+    document.getElementById('settingsBlockText').value  = '';
+    renderSettingsTextBlocks();
+}
+
+function deleteSettingsBlock(i) {
+    _sCfg.textBlocks.splice(i, 1);
+    renderSettingsTextBlocks();
+}
+
+function moveSettingsBlock(i, dir) {
+    const j = i + dir;
+    if (j < 0 || j >= _sCfg.textBlocks.length) return;
+    [_sCfg.textBlocks[i], _sCfg.textBlocks[j]] = [_sCfg.textBlocks[j], _sCfg.textBlocks[i]];
+    renderSettingsTextBlocks();
+}
+
+// ─── APPLY SETTINGS ───────────────────────────────────────────────────────────
+function applySettings() {
+    // Read URL fields directly (they're inputs, not in _sCfg array)
+    _sCfg.urlTemplate          = document.getElementById('settingsPrimaryUrl').value.trim();
+    _sCfg.secondaryUrlTemplate = document.getElementById('settingsSecondaryUrl').value.trim();
+    _sCfg.secondaryUrlLabel    = document.getElementById('settingsSecondaryLabel').value.trim();
+
+    // Save to localStorage
+    try { localStorage.setItem('tm_config_override', JSON.stringify(_sCfg)); } catch(e) {}
+
+    // Apply immediately to running app
+    parseConfig(_sCfg);
+
+    showToast('Settings applied ✓');
+    closeSettings();
+}
+
+// ─── DOWNLOAD config.js ────────────────────────────────────────────────────────
+function downloadConfigJs() {
+    // Read URL fields
+    _sCfg.urlTemplate          = document.getElementById('settingsPrimaryUrl').value.trim();
+    _sCfg.secondaryUrlTemplate = document.getElementById('settingsSecondaryUrl').value.trim();
+    _sCfg.secondaryUrlLabel    = document.getElementById('settingsSecondaryLabel').value.trim();
+
+    const typesStr    = _sCfg.types.map(t => `        ${JSON.stringify(t)}`).join(',\n');
+    const statusStr   = _sCfg.statusOptions.map(s =>
+        `        { label: ${JSON.stringify(s.label)}, value: ${JSON.stringify(s.value)} }`
+    ).join(',\n');
+    const blocksStr   = _sCfg.textBlocks.map(b =>
+        `        { label: ${JSON.stringify(b.label)}, text: ${JSON.stringify(b.text)} }`
+    ).join(',\n');
+
+    const content = `// ─────────────────────────────────────────────────────────────────────────────
+//  TASK MANAGER CONFIGURATION
+//  Edit this file in any text editor, then refresh the app.
+//  This file must stay in the same folder as task-manager.html
+// ─────────────────────────────────────────────────────────────────────────────
+
+var TASK_MANAGER_CONFIG = {
+
+    // ── TASK TYPES ────────────────────────────────────────────────────────────
+    types: [
+${typesStr}
+    ],
+
+    // ── STATUS OPTIONS ────────────────────────────────────────────────────────
+    statusOptions: [
+${statusStr}
+    ],
+
+    // ── TEXT BLOCKS ───────────────────────────────────────────────────────────
+    //   Use \\n for a newline inside a text value.
+    textBlocks: [
+${blocksStr}
+    ],
+
+    // ── URL TEMPLATE ──────────────────────────────────────────────────────────
+    // {partNumber} is replaced with the actual part number (URL-encoded).
+    // Set to "" to hide the link button entirely.
+    urlTemplate: ${JSON.stringify(_sCfg.urlTemplate)},
+
+    // ── SECONDARY URL TEMPLATE ────────────────────────────────────────────────
+    secondaryUrlTemplate: ${JSON.stringify(_sCfg.secondaryUrlTemplate)},
+    secondaryUrlLabel:    ${JSON.stringify(_sCfg.secondaryUrlLabel || 'Open')},
+
+};
+`;
+
+    const blob = new Blob([content], { type: 'text/javascript' });
+    const a    = document.createElement('a');
+    a.href     = URL.createObjectURL(blob);
+    a.download = 'config.js';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('config.js downloaded — replace your existing file');
+}
+
+// ─── RESET TO FILE ───────────────────────────────────────────────────────────
+function resetSettingsToFile() {
+    if (!confirm('This will discard all browser-saved settings and reload from config.js. Continue?')) return;
+    localStorage.removeItem('tm_config_override');
+    if (typeof TASK_MANAGER_CONFIG !== 'undefined') {
+        parseConfig(TASK_MANAGER_CONFIG);
+    }
+    closeSettings();
+    showToast('Reset to config.js ✓');
+}
+
+// ─── UTILITY ─────────────────────────────────────────────────────────────────
+function escHtml(str) {
+    return String(str || '')
+        .replace(/&/g,'&amp;').replace(/"/g,'&quot;')
+        .replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Close settings on Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('settingsModal').classList.contains('show')) {
+        closeSettings();
+    }
+});
 
         function populateTypeDropdown() {
             const select = document.getElementById('taskType');
