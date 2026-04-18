@@ -7,7 +7,6 @@
 var TASK_MANAGER_CONFIG = {
 
     // ── TASK TYPES ────────────────────────────────────────────────────────────
-    // Options shown in the "Type" dropdown when adding a new task.
     types: [
         "Option 1",
         "Option 2",
@@ -15,9 +14,6 @@ var TASK_MANAGER_CONFIG = {
     ],
 
     // ── STATUS OPTIONS ────────────────────────────────────────────────────────
-    // Dropdown shown on each task card.
-    //   label  = text the user sees
-    //   value  = what gets stored internally and exported to CSV
     statusOptions: [
         { label: "Option 1", value: "option1" },
         { label: "Option 2", value: "option2" },
@@ -25,9 +21,6 @@ var TASK_MANAGER_CONFIG = {
     ],
 
     // ── TEXT BLOCKS ───────────────────────────────────────────────────────────
-    // Quick-copy snippets shown in the Text Blocks tab.
-    //   label = heading shown on the card
-    //   text  = what gets copied to clipboard
     //   Use \n for a newline inside a text value.
     textBlocks: [
         { label: "Sample 1", text: "Sample 1" },
@@ -36,36 +29,26 @@ var TASK_MANAGER_CONFIG = {
     ],
 
     // ── URL TEMPLATE ──────────────────────────────────────────────────────────
-    // Enables the 🔗 link button on each task card (shown in the part number row).
     // {partNumber} is replaced with the actual part number (URL-encoded).
     // Set to "" to hide the link button entirely.
-    //
-    // Examples:
-    //   "http://internal.company.com/part/{partNumber}"
-    //   "https://www.google.com/search?q={partNumber}"
-    //   "https://example.com/search?q={partNumber}&filter=active"
     urlTemplate: "https://example.com/search?q={partNumber}",
 
     // ── SECONDARY URL TEMPLATE ────────────────────────────────────────────────
-    // Enables a second link button shown near the Start / Stop timer buttons.
-    // Unlike the icon-only 🔗 button above, this one displays a text label.
-    //
-    //   secondaryUrlTemplate = URL to open; {partNumber} is replaced with the
-    //                          actual part number (URL-encoded).
-    //                          Set to "" to hide the button entirely.
-    //
-    //   secondaryUrlLabel    = Text label shown on the button.
-    //                          Keep it short (1–3 words) so it fits the card.
-    //
-    // Examples:
-    //   secondaryUrlTemplate: "http://erp.company.com/orders?sfc={partNumber}"
-    //   secondaryUrlLabel:    "View ERP"
-    //
-    //   secondaryUrlTemplate: "https://jira.company.com/issues/?jql=text+%7E+%22{partNumber}%22"
-    //   secondaryUrlLabel:    "Jira"
-    //
-    //   secondaryUrlTemplate: ""    ← hides the button
     secondaryUrlTemplate: "https://example2.com/lookup?id={partNumber}",
-    secondaryUrlLabel: "View Details"
+    secondaryUrlLabel:    "Data Portal",
+
+    // ── COMPLETION RULES ──────────────────────────────────────────────────────
+    // When a task of triggerType is completed, a pending copy is created with outputType.
+    // The copy requires the ⭐ Activate button before the timer can start.
+    completionRules: [
+        { triggerType: "Option 2", outputType: "Option 3" }
+    ],
+
+    // ── LINKS ─────────────────────────────────────────────────────────────────
+    // Saved links shown in the Links tab.
+    //   title = display name; url = full URL; desc = optional description
+    links: [
+        { title: "Wired News", url: "https://www.wired.com/", desc: "We bring you the future as it happens. From the latest in science and technology to the big stories in business and culture, we've got you covered." }
+    ],
 
 };

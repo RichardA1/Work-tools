@@ -280,6 +280,9 @@
             border: 1px solid var(--border); border-radius: 3px;
             color: var(--text); font-size: 0.6875rem; cursor: pointer;
             font-family: 'Work Sans', sans-serif; min-width: 120px;
+            appearance: auto;
+            -webkit-appearance: auto;
+            background-image: none;
         }
         .task-status-select:focus { outline: none; border-color: var(--accent); }
 
@@ -350,8 +353,13 @@
         }
         .btn-small:hover { background: var(--accent); color: white; border-color: var(--accent); }
 
-        .btn-delete { font-size: 0.4rem; padding: 0.25rem 0.375rem; }
-        .btn-delete:hover { background: #dc2626; border-color: #dc2626; }
+        .btn-delete {
+            background: transparent; border: none;
+            color: var(--text-muted); font-size: 0.875rem; font-weight: 700;
+            padding: 0.1rem 0.35rem; cursor: pointer; border-radius: 4px;
+            transition: color 0.15s ease, background 0.15s ease; line-height: 1;
+        }
+        .btn-delete:hover { color: #ef4444; background: rgba(239,68,68,0.1); border-color: transparent; transform: none; box-shadow: none; }
         .btn-copy { font-size: 0.6rem; padding: 0.25rem 0.375rem; }
         .btn-copy:hover { background: var(--primary); border-color: var(--primary); }
         .part-number-row .btn-copy { padding: 0.125rem 0.25rem; min-width: auto; line-height: 1; flex-shrink: 0; }
@@ -468,6 +476,47 @@
             cursor: pointer; transition: all 0.2s ease; flex-shrink: 0;
         }
         .btn-block-copy:hover { background: var(--primary); border-color: var(--primary); color: #0f172a; }
+
+        /* ─── LINKS TAB ─── */
+        .links-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .link-item {
+            background: var(--surface); border-left: 4px solid #38bdf8;
+            border-radius: 6px; padding: 0.625rem 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+        [data-theme="light"] .link-item { box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .link-item-header { display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.2rem; }
+        .link-item-title {
+            font-size: 0.875rem; font-weight: 600; color: #38bdf8;
+            cursor: pointer; text-decoration: none; flex: 1; word-break: break-word;
+            transition: color 0.2s ease;
+        }
+        .link-item-title:hover { color: var(--primary); text-decoration: underline; }
+        [data-theme="light"] .link-item-title { color: #0284c7; }
+        .link-item-desc { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 0.2rem; }
+        .link-item-url {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.625rem;
+            color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+
+        /* ─── PENDING ACTIVATION ─── */
+        .task-item.pending-activation { border-left-color: #facc15; }
+        .btn-activate-star {
+            background: transparent; border: 1px solid #facc15;
+            color: #facc15; font-size: 0.75rem;
+            padding: 0.25rem 0.5rem; border-radius: 4px;
+            cursor: pointer; transition: all 0.2s ease; font-weight: 600;
+        }
+        .btn-activate-star:hover { background: #facc15; color: #0f172a; }
+        .pending-badge {
+            display: inline-flex; align-items: center;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; font-weight: 700;
+            background: rgba(250,204,21,0.15); color: #facc15;
+            border: 1px solid rgba(250,204,21,0.4);
+            border-radius: 10px; padding: 0.05rem 0.35rem;
+            margin-left: 0.3rem; letter-spacing: 0.03em; vertical-align: middle; white-space: nowrap;
+        }
 
         @media (max-width: 640px) {
             .container { padding: 0.75rem 0.5rem 0 0.5rem; }
@@ -723,6 +772,7 @@
                 <button class="tab-btn active" data-tab="tasks">Tasks</button>
                 <button class="tab-btn" data-tab="notes">Notes</button>
                 <button class="tab-btn" data-tab="textblocks">Text Blocks</button>
+                <button class="tab-btn" data-tab="links">Links</button>
             </div>
         </div>
 
@@ -749,6 +799,19 @@
             <div class="empty-state" id="textBlocksEmpty" style="display:none;">
                 <div class="empty-state-icon">📝</div>
                 <p>No text blocks defined. Add some in config.xml</p>
+            </div>
+        </div>
+
+        <!-- LINKS TAB -->
+        <div class="tab-panel" id="panel-links">
+            <div class="section-header">
+                <h2>Saved Links</h2>
+                <button class="btn-small" onclick="openSettings(); switchSettingsTab('links')" style="font-size:0.75rem;padding:0.25rem 0.625rem;">⚙️ Manage</button>
+            </div>
+            <div id="linksList" class="links-list"></div>
+            <div class="empty-state" id="linksEmpty" style="display:none;">
+                <div class="empty-state-icon">🔗</div>
+                <p>No links saved yet. Use <strong>⚙️ Manage</strong> above or <strong>☰ → Settings</strong> to add links.</p>
             </div>
         </div>
 
@@ -844,6 +907,41 @@
                 </div>
             </div>
 
+            <!-- LINKS -->
+            <div class="settings-section" id="settings-section-links">
+                <div class="settings-section-title">Saved Links</div>
+                <div class="settings-list" id="settingsLinksList"></div>
+                <div class="settings-add-row" style="flex-direction:column; align-items:stretch; gap:0.375rem;">
+                    <div style="display:flex;gap:0.5rem;">
+                        <input type="text" id="settingsLinkTitle" placeholder="Title…" style="flex:1">
+                        <input type="text" id="settingsLinkUrl" placeholder="https://…" style="flex:2" onkeydown="if(event.key==='Enter')addSettingsLink()">
+                    </div>
+                    <div style="display:flex;gap:0.5rem;">
+                        <input type="text" id="settingsLinkDesc" placeholder="Brief description (optional)…" style="flex:1">
+                        <button class="btn-settings-add" onclick="addSettingsLink()">+ Add</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPLETION RULES -->
+            <div class="settings-section">
+                <div class="settings-section-title">Completion Rules</div>
+                <div style="font-size:0.6875rem;color:var(--text-muted);margin-bottom:0.5rem;line-height:1.5;">
+                    When a task with the <strong style="color:var(--text)">Trigger Type</strong> is completed, a copy is automatically created with the <strong style="color:var(--text)">Output Type</strong>. The copy requires ⭐ Activate before the timer can start.
+                </div>
+                <div class="settings-list" id="settingsRulesList"></div>
+                <div class="settings-add-row">
+                    <select id="settingsRuleTrigger" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:0.8125rem;padding:0.375rem 0.5rem;font-family:'Work Sans',sans-serif;cursor:pointer;">
+                        <option value="">Trigger Type…</option>
+                    </select>
+                    <span class="sep" style="color:var(--text-muted);flex-shrink:0;padding:0 0.25rem;">→</span>
+                    <select id="settingsRuleOutput" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:0.8125rem;padding:0.375rem 0.5rem;font-family:'Work Sans',sans-serif;cursor:pointer;">
+                        <option value="">Output Type…</option>
+                    </select>
+                    <button class="btn-settings-add" onclick="addSettingsRule()">+ Add</button>
+                </div>
+            </div>
+
         </div><!-- /settings-body -->
 
         <div class="settings-footer">
@@ -879,6 +977,14 @@
         let secondaryUrlTemplate = '';
         let secondaryUrlLabel = '';
         let statusOptions = [];
+        let completionRules = [];
+        let links = [];
+
+        // ─── SETTINGS TAB SWITCHER ───
+        function switchSettingsTab(section) {
+            const el = document.getElementById('settings-section-' + section);
+            if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+        }
 
         // ─── TABS ───
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -903,6 +1009,9 @@
             secondaryUrlTemplate = typeof cfg.secondaryUrlTemplate === 'string' ? cfg.secondaryUrlTemplate : '';
             secondaryUrlLabel    = typeof cfg.secondaryUrlLabel    === 'string' && cfg.secondaryUrlLabel.trim()
                                    ? cfg.secondaryUrlLabel.trim() : 'Open';
+            completionRules = Array.isArray(cfg.completionRules) ? cfg.completionRules : [];
+            links = Array.isArray(cfg.links) ? cfg.links : [];
+            renderLinks();
 
             // Publish types to localStorage so SFC Inventory can read them
             try { localStorage.setItem('tm_types', JSON.stringify(taskTypes)); } catch(e) {}
@@ -955,7 +1064,9 @@ function getCurrentConfig() {
         textBlocks: textBlocks.map(b => ({ label: b.label, text: b.text })),
         urlTemplate,
         secondaryUrlTemplate,
-        secondaryUrlLabel
+        secondaryUrlLabel,
+        completionRules: completionRules.map(r => ({ triggerType: r.triggerType, outputType: r.outputType })),
+        links: links.map(l => ({ title: l.title, url: l.url, desc: l.desc || '' }))
     };
 }
 
@@ -964,6 +1075,8 @@ function openSettings() {
     renderSettingsTypes();
     renderSettingsStatus();
     renderSettingsTextBlocks();
+    renderSettingsLinks();
+    renderSettingsRules();
     document.getElementById('settingsPrimaryUrl').value    = _sCfg.urlTemplate || '';
     document.getElementById('settingsSecondaryUrl').value  = _sCfg.secondaryUrlTemplate || '';
     document.getElementById('settingsSecondaryLabel').value = _sCfg.secondaryUrlLabel || '';
@@ -1090,6 +1203,108 @@ function moveSettingsBlock(i, dir) {
     renderSettingsTextBlocks();
 }
 
+// ── Links ──
+function renderSettingsLinks() {
+    if (!_sCfg.links) _sCfg.links = [];
+    const list = document.getElementById('settingsLinksList');
+    list.innerHTML = '';
+    _sCfg.links.forEach((lnk, i) => {
+        const row = document.createElement('div');
+        row.className = 'settings-list-item';
+        row.style.alignItems = 'flex-start';
+        row.innerHTML = `
+            <div style="display:flex;flex-direction:column;gap:0.25rem;flex:1;min-width:0;">
+                <input type="text" value="${escHtml(lnk.title)}" oninput="_sCfg.links[${i}].title=this.value" placeholder="Title">
+                <input type="text" value="${escHtml(lnk.url)}" oninput="_sCfg.links[${i}].url=this.value" placeholder="https://…" class="mono" style="font-size:0.75rem;">
+                <input type="text" value="${escHtml(lnk.desc||'')}" oninput="_sCfg.links[${i}].desc=this.value" placeholder="Description (optional)" style="font-size:0.75rem;">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.125rem;flex-shrink:0;">
+                <button class="btn-item-move" onclick="moveSettingsLink(${i},-1)" title="Move up">▲</button>
+                <button class="btn-item-move" onclick="moveSettingsLink(${i}, 1)" title="Move down">▼</button>
+                <button class="btn-item-delete" onclick="deleteSettingsLink(${i})" title="Remove">✕</button>
+            </div>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function addSettingsLink() {
+    const title = document.getElementById('settingsLinkTitle').value.trim();
+    const url   = document.getElementById('settingsLinkUrl').value.trim();
+    const desc  = document.getElementById('settingsLinkDesc').value.trim();
+    if (!url) { showToast('A URL is required'); return; }
+    const fullUrl = /^https?:\/\//i.test(url) ? url : 'https://' + url;
+    if (!_sCfg.links) _sCfg.links = [];
+    _sCfg.links.push({ title: title || fullUrl, url: fullUrl, desc });
+    document.getElementById('settingsLinkTitle').value = '';
+    document.getElementById('settingsLinkUrl').value   = '';
+    document.getElementById('settingsLinkDesc').value  = '';
+    renderSettingsLinks();
+}
+
+function deleteSettingsLink(i) {
+    _sCfg.links.splice(i, 1);
+    renderSettingsLinks();
+}
+
+function moveSettingsLink(i, dir) {
+    const j = i + dir;
+    if (!_sCfg.links || j < 0 || j >= _sCfg.links.length) return;
+    [_sCfg.links[i], _sCfg.links[j]] = [_sCfg.links[j], _sCfg.links[i]];
+    renderSettingsLinks();
+}
+
+// ── Completion Rules ──
+function renderSettingsRules() {
+    if (!_sCfg.completionRules) _sCfg.completionRules = [];
+    const types = _sCfg.types || [];
+    const opts  = types.map(t => `<option value="${escHtml(t)}">${escHtml(t)}</option>`).join('');
+
+    const trigSel = document.getElementById('settingsRuleTrigger');
+    const outSel  = document.getElementById('settingsRuleOutput');
+    trigSel.innerHTML = '<option value="">Trigger Type…</option>' + opts;
+    outSel.innerHTML  = '<option value="">Output Type…</option>' + opts;
+
+    const list = document.getElementById('settingsRulesList');
+    list.innerHTML = '';
+    _sCfg.completionRules.forEach((r, i) => {
+        const makeOpts = (selected) => types.map(t =>
+            `<option value="${escHtml(t)}" ${t === selected ? 'selected' : ''}>${escHtml(t)}</option>`
+        ).join('');
+        const row = document.createElement('div');
+        row.className = 'settings-list-item';
+        row.innerHTML = `
+            <select oninput="_sCfg.completionRules[${i}].triggerType=this.value"
+                style="flex:1;background:var(--bg);border:none;outline:none;color:var(--text);font-size:0.8125rem;padding:0.125rem 0.25rem;font-family:'Work Sans',sans-serif;cursor:pointer;">
+                <option value="">Select…</option>${makeOpts(r.triggerType)}
+            </select>
+            <span class="sep">→</span>
+            <select oninput="_sCfg.completionRules[${i}].outputType=this.value"
+                style="flex:1;background:var(--bg);border:none;outline:none;color:var(--text);font-size:0.8125rem;padding:0.125rem 0.25rem;font-family:'Work Sans',sans-serif;cursor:pointer;">
+                <option value="">Select…</option>${makeOpts(r.outputType)}
+            </select>
+            <button class="btn-item-delete" onclick="deleteSettingsRule(${i})" title="Remove">✕</button>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function addSettingsRule() {
+    const trig = document.getElementById('settingsRuleTrigger').value;
+    const out  = document.getElementById('settingsRuleOutput').value;
+    if (!trig || !out) { showToast('Select both Trigger and Output types'); return; }
+    if (!_sCfg.completionRules) _sCfg.completionRules = [];
+    _sCfg.completionRules.push({ triggerType: trig, outputType: out });
+    document.getElementById('settingsRuleTrigger').value = '';
+    document.getElementById('settingsRuleOutput').value  = '';
+    renderSettingsRules();
+}
+
+function deleteSettingsRule(i) {
+    _sCfg.completionRules.splice(i, 1);
+    renderSettingsRules();
+}
+
 // ─── APPLY SETTINGS ───────────────────────────────────────────────────────────
 function applySettings() {
     // Read URL fields directly (they're inputs, not in _sCfg array)
@@ -1120,6 +1335,12 @@ function downloadConfigJs() {
     ).join(',\n');
     const blocksStr   = _sCfg.textBlocks.map(b =>
         `        { label: ${JSON.stringify(b.label)}, text: ${JSON.stringify(b.text)} }`
+    ).join(',\n');
+    const rulesStr    = (_sCfg.completionRules || []).map(r =>
+        `        { triggerType: ${JSON.stringify(r.triggerType)}, outputType: ${JSON.stringify(r.outputType)} }`
+    ).join(',\n');
+    const linksStr    = (_sCfg.links || []).map(l =>
+        `        { title: ${JSON.stringify(l.title)}, url: ${JSON.stringify(l.url)}, desc: ${JSON.stringify(l.desc||'')} }`
     ).join(',\n');
 
     const content = `// ─────────────────────────────────────────────────────────────────────────────
@@ -1154,6 +1375,20 @@ ${blocksStr}
     // ── SECONDARY URL TEMPLATE ────────────────────────────────────────────────
     secondaryUrlTemplate: ${JSON.stringify(_sCfg.secondaryUrlTemplate)},
     secondaryUrlLabel:    ${JSON.stringify(_sCfg.secondaryUrlLabel || 'Open')},
+
+    // ── COMPLETION RULES ──────────────────────────────────────────────────────
+    // When a task of triggerType is completed, a pending copy is created with outputType.
+    // The copy requires the ⭐ Activate button before the timer can start.
+    completionRules: [
+${rulesStr}
+    ],
+
+    // ── LINKS ─────────────────────────────────────────────────────────────────
+    // Saved links shown in the Links tab.
+    //   title = display name; url = full URL; desc = optional description
+    links: [
+${linksStr}
+    ],
 
 };
 `;
@@ -1340,7 +1575,8 @@ document.addEventListener('keydown', function(e) {
                 const lastStop   = getLastStop(task);
 
                 let stateClass = '';
-                if (task.completed)        stateClass = 'completed';
+                if (task.pendingActivation) stateClass = 'pending-activation';
+                else if (task.completed)        stateClass = 'completed';
                 else if (timerState === 'running') stateClass = 'started';
                 else if (timerState === 'paused' && sessions.length > 0) stateClass = 'paused';
 
@@ -1368,6 +1604,11 @@ document.addEventListener('keydown', function(e) {
                     ? `<span class="inventory-badge">from inventory</span>`
                     : '';
 
+                // Pending activation badge
+                const pendingBadge = task.pendingActivation
+                    ? `<span class="pending-badge">⭐ pending</span>`
+                    : '';
+
                 // Sessions log
                 let sessionsLogHtml = '';
                 if (sessions.length > 0) {
@@ -1387,7 +1628,9 @@ document.addEventListener('keydown', function(e) {
 
                 // Timer buttons — built as a group based on state
                 let timerBtns = '';
-                if (!task.completed) {
+                if (task.pendingActivation) {
+                    timerBtns = `<button class="btn-activate-star" onclick="activatePendingTask(${task.id})" title="Activate this task to begin">⭐ Activate</button>`;
+                } else if (!task.completed) {
                     if (timerState === 'idle') {
                         timerBtns = `<button class="btn-small btn-time-start" onclick="tickTimer(${task.id})">Start</button>`;
                     } else if (timerState === 'running') {
@@ -1411,7 +1654,7 @@ document.addEventListener('keydown', function(e) {
                     ? `<button class="btn-small btn-secondary-link" onclick="openSecondaryLink(${task.id})" title="${escapeHtml(secondaryUrlLabel)}">${escapeHtml(secondaryUrlLabel)}</button>`
                     : '';
 
-                const prioritySelector = !task.completed ? `
+                const prioritySelector = (!task.completed && !task.pendingActivation) ? `
                     <div class="priority-selector">
                         <button class="priority-btn ${task.priority === 1 ? 'active-1' : ''}" onclick="setPriority(${task.id}, 1)" title="Priority 1">1</button>
                         <button class="priority-btn ${task.priority === 2 ? 'active-2' : ''}" onclick="setPriority(${task.id}, 2)" title="Priority 2">2</button>
@@ -1423,12 +1666,13 @@ document.addEventListener('keydown', function(e) {
                 li.innerHTML = `
                     <div class="task-header">
                         <div class="checkbox-wrapper">
-                            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})">
+                            <input type="checkbox" ${task.completed ? 'checked' : ''} ${task.pendingActivation ? 'disabled title="Activate this task before completing it"' : `onchange="toggleTask(${task.id})"`}>
                         </div>
                         <div class="task-header-row">
                             <div class="part-number-row" style="flex:1;min-width:0;">
                                 <div class="part-number">${escapeHtml(task.partNumber)}</div>
                                 ${inventoryBadge}
+                                ${pendingBadge}
                                 <button class="btn-small btn-copy" onclick="copyPartNumber(${task.id})" title="Copy">&#128196;</button>
                                 ${linkButton}
                             </div>
@@ -1477,7 +1721,7 @@ document.addEventListener('keydown', function(e) {
                             <div class="task-actions-buttons">
                                 ${secondaryLinkButton}
                                 ${timerBtns}
-                                <button class="btn-small btn-delete" onclick="deleteTask(${task.id})" title="Delete">&#128465;</button>
+                                <button class="btn-delete" onclick="deleteTask(${task.id})" title="Delete">✕</button>
                             </div>
                         </div>
                     </div>`;
@@ -1508,21 +1752,56 @@ document.addEventListener('keydown', function(e) {
             if (!task.sessions) task.sessions = [];
             const last = task.sessions[task.sessions.length - 1];
             if (last && last.stop === null) last.stop = nowTime();
+            const prevPriority = task.priority || null;
             task.completed = true;
             task.priority = null;
+            applyCompletionRule(task, prevPriority);
             saveTasks(); renderTasks();
+        }
+
+        function applyCompletionRule(task, prevPriority) {
+            const rule = completionRules.find(r => r.triggerType === task.type);
+            if (!rule) return;
+            tasks.push({
+                id: Date.now() + Math.floor(Math.random() * 9000) + 1000,
+                partNumber: task.partNumber,
+                type: rule.outputType,
+                sessions: [],
+                completed: false,
+                isRework: task.isRework || false,
+                status: statusOptions.length > 0 ? statusOptions[0].value : '',
+                note: task.note || '',
+                priority: prevPriority,
+                fromInventory: false,
+                pendingActivation: true,
+                createdAt: new Date().toISOString()
+            });
+            showToast(`⭐ New task created — ${rule.outputType} (${task.partNumber})`);
+        }
+
+        function activatePendingTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.pendingActivation = false;
+                saveTasks(); renderTasks();
+            }
         }
 
         function toggleTask(id) {
             const task = tasks.find(t => t.id === id);
             if (task) {
-                task.completed = !task.completed;
-                if (task.completed) {
+                if (!task.completed) {
+                    // Completing — save priority before clearing it for the clone
+                    const prevPriority = task.priority || null;
+                    task.completed = true;
                     task.priority = null;
                     if (task.sessions && task.sessions.length > 0) {
                         const last = task.sessions[task.sessions.length - 1];
                         if (last.stop === null) last.stop = nowTime();
                     }
+                    applyCompletionRule(task, prevPriority);
+                } else {
+                    task.completed = false;
                 }
                 saveTasks(); renderTasks();
             }
@@ -1601,22 +1880,22 @@ document.addEventListener('keydown', function(e) {
             if (task) copyText(task.partNumber);
         }
 
-        function openPartNumberLink(id) {
-            const task = tasks.find(t => t.id === id);
-            if (task && urlTemplate) {
-                const url = urlTemplate.replace('{partNumber}', encodeURIComponent(task.partNumber));
-                window.open(url, task.partNumber, 'popup=yes,width=1200,height=800,left=100,top=100,resizable=yes,scrollbars=yes');
-            }
-        }
+function openPartNumberLink(id) {
+    const task = tasks.find(t => t.id === id);
+    if (task && urlTemplate) {
+        const url = urlTemplate.replace('{partNumber}', encodeURIComponent(task.partNumber));
+        window.open(url, 'TM_primary_' + task.partNumber);
+    }
+}
 
         // ─── SECONDARY LINK ───
-        function openSecondaryLink(id) {
-            const task = tasks.find(t => t.id === id);
-            if (task && secondaryUrlTemplate) {
-                const url = secondaryUrlTemplate.replace('{partNumber}', encodeURIComponent(task.partNumber));
-                window.open(url, task.partNumber + '_secondary', 'popup=yes,width=1200,height=800,left=150,top=150,resizable=yes,scrollbars=yes');
-            }
-        }
+function openSecondaryLink(id) {
+    const task = tasks.find(t => t.id === id);
+    if (task && secondaryUrlTemplate) {
+        const url = secondaryUrlTemplate.replace('{partNumber}', encodeURIComponent(task.partNumber));
+        window.open(url, 'TM_secondary_' + task.partNumber);
+    }
+}
 
         // ─── CSV EXPORT ───
         function exportToCSV() {
@@ -1698,6 +1977,34 @@ document.addEventListener('keydown', function(e) {
                 button.addEventListener('click', () => copyText(block.text));
                 div.appendChild(content); div.appendChild(button); list.appendChild(div);
             });
+        }
+
+        // ─── LINKS ───
+        function renderLinks() {
+            const list  = document.getElementById('linksList');
+            const empty = document.getElementById('linksEmpty');
+            if (!list) return;
+            list.innerHTML = '';
+            if (!links || links.length === 0) { empty.style.display = 'block'; return; }
+            empty.style.display = 'none';
+            links.forEach((lnk, i) => {
+                const urlDisplay = lnk.url.length > 65 ? lnk.url.slice(0, 62) + '…' : lnk.url;
+                const div = document.createElement('div');
+                div.className = 'link-item';
+                div.innerHTML = `
+                    <div class="link-item-header">
+                        <span class="link-item-title" onclick="openLink(${i})" title="${escapeHtml(lnk.url)}">${escapeHtml(lnk.title || lnk.url)}</span>
+                    </div>
+                    ${lnk.desc ? `<div class="link-item-desc">${escapeHtml(lnk.desc)}</div>` : ''}
+                    <div class="link-item-url">${escapeHtml(urlDisplay)}</div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function openLink(i) {
+            const lnk = links[i];
+            if (lnk) window.open(lnk.url, '_blank', 'noopener');
         }
 
         // ─── SHARED ───
