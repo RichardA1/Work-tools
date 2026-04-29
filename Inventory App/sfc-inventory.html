@@ -465,6 +465,37 @@
             to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
+        /* ── Redirect Barcodes ── */
+        .redirect-list { list-style: none; margin: 0 0 10px; padding: 0; }
+        .redirect-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 0; border-bottom: 1px solid var(--border);
+        }
+        .redirect-item:last-child { border-bottom: none; }
+        .redirect-code {
+            flex: 1; font-family: monospace; font-size: 12px; font-weight: 700;
+            color: var(--accent-primary); background: var(--bg-tertiary);
+            padding: 3px 8px; border-radius: 3px; border: 1px solid var(--border);
+            letter-spacing: 0.3px; word-break: break-all;
+        }
+        .redirect-target-label {
+            font-size: 11px; color: var(--text-muted);
+            margin: 0 0 12px; line-height: 1.5;
+        }
+        .redirect-add-row { display: flex; gap: 8px; margin-top: 4px; }
+        .redirect-add-row input { flex: 1; font-family: monospace; font-size: 13px; }
+        .redirect-empty {
+            font-size: 12px; color: var(--text-muted); padding: 6px 0 10px;
+            font-style: italic;
+        }
+        .redirect-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 9px; line-height: 1; background: var(--accent-primary);
+            color: white; border-radius: 8px; padding: 1px 5px;
+            margin-left: 3px; font-weight: 700; vertical-align: middle;
+        }
+        .subcat-btn.redirect-active { color: var(--accent-primary); }
+
         .subcategories-section { margin-top: 4px; }
         .subcategory-header-row {
             display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
@@ -734,6 +765,22 @@
     </div>
 </div>
 
+<!-- ── Redirect Barcodes Modal ── -->
+<div id="redirectModal" class="modal" onclick="if(event.target===this)closeRedirectModal()">
+    <div class="modal-content" style="max-width:420px;">
+        <h2>⚡ Redirect Barcodes</h2>
+        <p class="redirect-target-label" id="redirectTargetLabel"></p>
+        <ul class="redirect-list" id="redirectList"></ul>
+        <div class="redirect-add-row">
+            <input type="text" id="redirectInput" placeholder="Scan or type barcode…" onkeypress="if(event.key==='Enter')addRedirectBarcode()">
+            <button class="btn" onclick="addRedirectBarcode()">Add</button>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-danger" onclick="closeRedirectModal()">Done</button>
+        </div>
+    </div>
+</div>
+
 <!-- Tab rename/add Modal -->
 <div id="tabModal" class="modal">
     <div class="modal-content">
@@ -753,6 +800,10 @@
     let modalTabId = null;
     let modalSubcatId = null;
     let collapsedSubcats = {};
+
+    // Redirect barcode modal state
+    let redirectModalTabId    = null;
+    let redirectModalSubcatId = null;
 
     // SFC lookup state
     let sfcFoundMatches = [];
@@ -863,7 +914,7 @@
     // ─── Tab CRUD ─────────────────────────────────────────────────────────────
     function addTab(name) {
         const id = generateId();
-        tabs.push({ id, name, items: [], subcategories: [] });
+        tabs.push({ id, name, items: [], subcategories: [], redirectBarcodes: [] });
         renderTabs(); switchTab(id);
     }
     function renameTab(tabId, newName) {
@@ -883,7 +934,7 @@
     // ─── Subcategory CRUD ─────────────────────────────────────────────────────
     function addSubcategory(tabId, name) {
         const tab = tabs.find(t => t.id === tabId);
-        if (tab) { tab.subcategories.push({ id: generateId(), name, items: [] }); renderTabs(); }
+        if (tab) { tab.subcategories.push({ id: generateId(), name, items: [], redirectBarcodes: [] }); renderTabs(); }
     }
     function renameSubcategory(tabId, subcatId, newName) {
         const tab = tabs.find(t => t.id === tabId);
@@ -911,6 +962,12 @@
         if (event.key === 'Enter') {
             const value = event.target.value.trim();
             if (value) {
+                const redirect = checkRedirectBarcode(value);
+                if (redirect) {
+                    event.target.value = '';
+                    executeRedirect(redirect.tabId, redirect.subcatId);
+                    return;
+                }
                 const tab = tabs.find(t => t.id === tabId);
                 if (tab) {
                     tab.items.push(value); event.target.value = ''; renderTabs();
@@ -927,6 +984,12 @@
         if (event.key === 'Enter') {
             const value = event.target.value.trim();
             if (value) {
+                const redirect = checkRedirectBarcode(value);
+                if (redirect) {
+                    event.target.value = '';
+                    executeRedirect(redirect.tabId, redirect.subcatId);
+                    return;
+                }
                 const tab = tabs.find(t => t.id === tabId);
                 if (tab) {
                     const sub = tab.subcategories.find(s => s.id === subcatId);
@@ -946,6 +1009,131 @@
         }
     }
 
+    // ─── Redirect Barcodes ────────────────────────────────────────────────────
+    function checkRedirectBarcode(value) {
+        const needle = value.toLowerCase();
+        for (const tab of tabs) {
+            const tabCodes = tab.redirectBarcodes || [];
+            if (tabCodes.some(c => c.toLowerCase() === needle))
+                return { tabId: tab.id, subcatId: null };
+            for (const sub of tab.subcategories) {
+                const subCodes = sub.redirectBarcodes || [];
+                if (subCodes.some(c => c.toLowerCase() === needle))
+                    return { tabId: tab.id, subcatId: sub.id };
+            }
+        }
+        return null;
+    }
+
+    function executeRedirect(tabId, subcatId) {
+        currentTab = tabId;
+        if (subcatId) {
+            const key = tabId + '::' + subcatId;
+            collapsedSubcats[key] = false;
+        }
+        renderTabs();
+        setTimeout(() => {
+            const inputEl = subcatId
+                ? document.getElementById('subInput_' + subcatId)
+                : document.getElementById('input_' + tabId);
+            if (inputEl) inputEl.focus();
+            const tab = tabs.find(t => t.id === tabId);
+            const sub = subcatId && tab ? tab.subcategories.find(s => s.id === subcatId) : null;
+            const dest = sub ? `${tab.name} › ${sub.name}` : (tab ? tab.name : 'destination');
+            showTMToast(`⚡ Redirected to ${dest}`);
+        }, 60);
+    }
+
+    function showRedirectModal(tabId, subcatId) {
+        redirectModalTabId    = tabId;
+        redirectModalSubcatId = subcatId;
+        const tab = tabs.find(t => t.id === tabId);
+        const sub = subcatId ? tab.subcategories.find(s => s.id === subcatId) : null;
+        const targetName = sub ? `${tab.name} › ${sub.name}` : tab.name;
+        document.getElementById('redirectTargetLabel').textContent =
+            `Scanning any code below will redirect to: ${targetName}`;
+        renderRedirectList();
+        document.getElementById('redirectInput').value = '';
+        document.getElementById('redirectModal').classList.add('show');
+        setTimeout(() => document.getElementById('redirectInput').focus(), 80);
+    }
+
+    function closeRedirectModal() {
+        document.getElementById('redirectModal').classList.remove('show');
+        redirectModalTabId = null; redirectModalSubcatId = null;
+    }
+
+    function renderRedirectList() {
+        const tab = tabs.find(t => t.id === redirectModalTabId);
+        if (!tab) return;
+        const target = redirectModalSubcatId
+            ? tab.subcategories.find(s => s.id === redirectModalSubcatId)
+            : tab;
+        const codes = (target && target.redirectBarcodes) ? target.redirectBarcodes : [];
+        const list = document.getElementById('redirectList');
+        if (codes.length === 0) {
+            list.innerHTML = '<li class="redirect-empty">No redirect barcodes set.</li>';
+        } else {
+            list.innerHTML = codes.map((code, i) => `
+                <li class="redirect-item">
+                    <span class="redirect-code">${escapeHtml(code)}</span>
+                    <button class="subcat-btn danger" onclick="removeRedirectBarcode(${i})" title="Remove">✕</button>
+                </li>`).join('');
+        }
+    }
+
+    function addRedirectBarcode() {
+        const input = document.getElementById('redirectInput');
+        const value = input.value.trim();
+        if (!value) return;
+        const tab = tabs.find(t => t.id === redirectModalTabId);
+        if (!tab) return;
+        const target = redirectModalSubcatId
+            ? tab.subcategories.find(s => s.id === redirectModalSubcatId)
+            : tab;
+        if (!target) return;
+        if (!target.redirectBarcodes) target.redirectBarcodes = [];
+        if (target.redirectBarcodes.some(c => c.toLowerCase() === value.toLowerCase())) {
+            input.value = ''; return;
+        }
+        const existing = checkRedirectBarcode(value);
+        if (existing && !(existing.tabId === redirectModalTabId && existing.subcatId === redirectModalSubcatId)) {
+            if (!confirm(`"${value}" is already a redirect barcode pointing elsewhere. Assign it here instead?`)) {
+                input.value = ''; return;
+            }
+            removeRedirectBarcodeGlobal(value);
+        }
+        target.redirectBarcodes.push(value);
+        input.value = '';
+        renderRedirectList();
+        renderTabs();
+    }
+
+    function removeRedirectBarcode(index) {
+        const tab = tabs.find(t => t.id === redirectModalTabId);
+        if (!tab) return;
+        const target = redirectModalSubcatId
+            ? tab.subcategories.find(s => s.id === redirectModalSubcatId)
+            : tab;
+        if (target && target.redirectBarcodes) {
+            target.redirectBarcodes.splice(index, 1);
+            renderRedirectList();
+            renderTabs();
+        }
+    }
+
+    function removeRedirectBarcodeGlobal(code) {
+        const needle = code.toLowerCase();
+        for (const tab of tabs) {
+            if (tab.redirectBarcodes)
+                tab.redirectBarcodes = tab.redirectBarcodes.filter(c => c.toLowerCase() !== needle);
+            for (const sub of tab.subcategories) {
+                if (sub.redirectBarcodes)
+                    sub.redirectBarcodes = sub.redirectBarcodes.filter(c => c.toLowerCase() !== needle);
+            }
+        }
+    }
+
     // ─── Render ───────────────────────────────────────────────────────────────
     function renderTabs() {
         const tabsContainer = document.getElementById('tabsContainer');
@@ -959,6 +1147,7 @@
                 <span class="tab-name">${escapeHtml(tab.name)}</span>
                 <div class="tab-actions">
                     <button class="tab-btn" onclick="showRenameTabModal('${tab.id}')" title="Rename">✎</button>
+                    <button class="tab-btn" onclick="event.stopPropagation();showRedirectModal('${tab.id}',null)" title="Redirect barcodes">⚡${tab.redirectBarcodes && tab.redirectBarcodes.length ? `<span class="redirect-badge">${tab.redirectBarcodes.length}</span>` : ''}</button>
                     <button class="tab-btn" onclick="deleteTab('${tab.id}')" title="Delete">✕</button>
                 </div>`;
             tabEl.querySelector('.tab-name').onclick = () => switchTab(tab.id);
@@ -998,6 +1187,7 @@
                             <span class="subcat-count">${sub.items.length} item${sub.items.length !== 1 ? 's' : ''}</span>
                             <div class="subcat-actions" onclick="event.stopPropagation()">
                                 <button class="subcat-btn" onclick="showRenameSubcatModal('${tab.id}','${sub.id}')" title="Rename">✎</button>
+                                <button class="subcat-btn${sub.redirectBarcodes && sub.redirectBarcodes.length ? ' redirect-active' : ''}" onclick="showRedirectModal('${tab.id}','${sub.id}')" title="Redirect barcodes">⚡${sub.redirectBarcodes && sub.redirectBarcodes.length ? `<span class="redirect-badge">${sub.redirectBarcodes.length}</span>` : ''}</button>
                                 <button class="subcat-btn danger" onclick="deleteSubcategory('${tab.id}','${sub.id}')" title="Delete">✕</button>
                             </div>
                         </div>
@@ -1365,9 +1555,11 @@
         tabs.forEach(tab => {
             xml += `  <Tab name="${escapeXml(tab.name)}">\n`;
             tab.items.forEach(item => { xml += `    <Item>${escapeXml(item)}</Item>\n`; });
+            (tab.redirectBarcodes || []).forEach(code => { xml += `    <RedirectBarcode>${escapeXml(code)}</RedirectBarcode>\n`; });
             tab.subcategories.forEach(sub => {
                 xml += `    <Subcategory name="${escapeXml(sub.name)}">\n`;
                 sub.items.forEach(item => { xml += `      <Item>${escapeXml(item)}</Item>\n`; });
+                (sub.redirectBarcodes || []).forEach(code => { xml += `      <RedirectBarcode>${escapeXml(code)}</RedirectBarcode>\n`; });
                 xml += `    </Subcategory>\n`;
             });
             xml += `  </Tab>\n`;
@@ -1393,16 +1585,20 @@
                 if (confirm('This will replace all current data. Continue?')) {
                     const newTabs = [];
                     tabElements.forEach(tabEl => {
-                        const items = [], subcategories = [];
+                        const items = [], subcategories = [], tabRedirects = [];
                         tabEl.childNodes.forEach(child => {
                             if (child.nodeName === 'Item') { const t = child.textContent.trim(); if (t) items.push(t); }
+                            else if (child.nodeName === 'RedirectBarcode') { const t = child.textContent.trim(); if (t) tabRedirects.push(t); }
                             else if (child.nodeName === 'Subcategory') {
-                                const subItems = [];
-                                child.querySelectorAll('Item').forEach(el => { const t = el.textContent.trim(); if (t) subItems.push(t); });
-                                subcategories.push({ id: generateId(), name: child.getAttribute('name') || 'Unnamed', items: subItems });
+                                const subItems = [], subRedirects = [];
+                                child.childNodes.forEach(sc => {
+                                    if (sc.nodeName === 'Item') { const t = sc.textContent.trim(); if (t) subItems.push(t); }
+                                    else if (sc.nodeName === 'RedirectBarcode') { const t = sc.textContent.trim(); if (t) subRedirects.push(t); }
+                                });
+                                subcategories.push({ id: generateId(), name: child.getAttribute('name') || 'Unnamed', items: subItems, redirectBarcodes: subRedirects });
                             }
                         });
-                        newTabs.push({ id: generateId(), name: tabEl.getAttribute('name') || 'Untitled', items, subcategories });
+                        newTabs.push({ id: generateId(), name: tabEl.getAttribute('name') || 'Untitled', items, subcategories, redirectBarcodes: tabRedirects });
                     });
                     if (newTabs.length > 0) {
                         tabs = newTabs; currentTab = tabs[0].id; collapsedSubcats = {};
@@ -1460,6 +1656,7 @@
 <tr><th>Action</th><th>How</th></tr>
 <tr><td>Add a tab</td><td>Menu (≡) → Add Tab</td></tr>
 <tr><td>Rename a tab</td><td>Click ✎ on the tab label</td></tr>
+<tr><td>Manage redirect barcodes</td><td>Click ⚡ on the tab label</td></tr>
 <tr><td>Delete a tab</td><td>Click ✕ on the tab label (cannot delete the last tab)</td></tr>
 <tr><td>Switch tabs</td><td>Click the tab name</td></tr>
 </table>
@@ -1471,6 +1668,7 @@
 <li>Add items the same way — type in the subcategory input and press <strong>Enter</strong></li>
 <li>Click the subcategory header to collapse or expand it</li>
 <li>Rename or delete subcategories with the ✎ and × buttons in the header</li>
+<li>Manage redirect barcodes with the ⚡ button in the header</li>
 </ul>
 <hr>
 <h2>SFC Lookup</h2>
@@ -1518,8 +1716,30 @@
 <li><strong>Type dropdown shows generic options</strong> — open Task Manager at least once so it publishes its configured types to shared storage</li>
 <li><strong>Sent item not appearing in Task Manager</strong> — both files must be open in the same browser; click on the Task Manager tab to trigger processing</li>
 <li><strong>Sidebar too narrow or too wide</strong> — drag the ▌ divider to resize (200–600 px)</li>
+<li><strong>Redirect barcode not triggering</strong> — matching is case-insensitive exact string; check for extra spaces in the stored code or scanned value</li>
+<li><strong>Redirect barcode adds the item instead of redirecting</strong> — the barcode was not found in any redirect list; verify it is saved on the correct tab or subcategory by clicking ⚡</li>
 </ul>
-<div class="readme-version">Version 1.6 &nbsp;·&nbsp; March 2026</div>
+<hr>
+<h2>Redirect Barcodes</h2>
+<p>Any tab or subcategory can have one or more <strong>redirect barcodes</strong> assigned to it. When a redirect barcode is scanned into any input field, the app immediately switches focus to that tab or subcategory — without adding the barcode as an item.</p>
+<p>Designed for physical scanner workflows where a printed label on each bin or shelf routes the scanner to the matching inventory location.</p>
+<h3>Configuring redirect barcodes</h3>
+<ul>
+<li>Click <strong>⚡</strong> on a tab label (between ✎ and ✕) or in a subcategory header</li>
+<li>Scan or type the barcode string, then click <strong>Add</strong> (or press Enter)</li>
+<li>Remove any entry with the <strong>✕</strong> next to it — click <strong>Done</strong> when finished</li>
+</ul>
+<p>A badge (e.g. <code>⚡2</code>) appears on the tab or subcategory header when redirect barcodes are active.</p>
+<h3>How redirects behave</h3>
+<ul>
+<li>Matching is <strong>case-insensitive</strong> exact string comparison</li>
+<li>The barcode is <strong>consumed silently</strong> — never added as an item</li>
+<li>Target subcategories are automatically expanded if collapsed</li>
+<li>A toast confirms: <em>"⚡ Redirected to Tab › Subcategory"</em></li>
+<li>Each barcode can only point to one target; assigning it elsewhere removes it from the previous owner (with confirmation)</li>
+<li>Redirect rules are preserved in XML export / import</li>
+</ul>
+<div class="readme-version">Version 1.7 &nbsp;·&nbsp; April 2026</div>
 `;
 
     function showReadme() {
@@ -1532,7 +1752,7 @@
     }
 
     document.getElementById('tabNameInput').addEventListener('keypress', e => { if (e.key === 'Enter') confirmTabAction(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeReadme(); closeTMModal(); } });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeReadme(); closeTMModal(); closeRedirectModal(); } });
 
     initializeApp();
 </script>

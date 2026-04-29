@@ -20,6 +20,7 @@ Open `sfc-inventory.html` directly in any modern browser. No server required.
 
 - **Tabs** — organize items into named categories
 - **Subcategories** — group items further within each tab; collapsible
+- **Redirect Barcodes** — assign barcode(s) to any tab or subcategory; scanning one silently switches focus to that location
 - **SFC Lookup sidebar** — always-visible left panel; paste codes to search across all tabs and subcategories simultaneously
 - **Send to Task Manager** — transfer any item directly to the Task Manager app in one click; removes it from inventory automatically
 - **Resizable sidebar** — drag the divider between the two columns to adjust the lookup panel width (200–600 px)
@@ -65,6 +66,7 @@ The **▌ divider** between the two columns can be dragged left or right to resi
 |--------|-----|
 | Add a tab | Menu (≡) → Add Tab |
 | Rename a tab | Click ✎ on the tab label |
+| Manage redirect barcodes | Click ⚡ on the tab label |
 | Delete a tab | Click ✕ on the tab label (cannot delete the last remaining tab) |
 | Switch tabs | Click the tab name |
 
@@ -80,8 +82,41 @@ The **▌ divider** between the two columns can be dragged left or right to resi
 - Click **+ Add Subcategory** inside any tab to create a subcategory
 - Add items to a subcategory the same way — type in its input field and press **Enter**
 - Click the subcategory header to collapse or expand it
-- Rename with **✎**, delete with **×** (both in the subcategory header)
+- Rename with **✎**, manage redirects with **⚡**, delete with **×** (all in the subcategory header)
 - Deleting a subcategory removes all items inside it
+
+---
+
+### Redirect Barcodes
+
+Redirect barcodes let you use a physical scanner to navigate between tabs and subcategories without touching the mouse or keyboard. Assign one or more barcodes to any tab or subcategory; when that barcode is scanned into any input field, the app silently switches focus to the designated location.
+
+**Typical use case:** place a printed barcode label on each physical bin or shelf. Scanning the bin label first routes the scanner to the matching inventory location; subsequent scans add items there normally.
+
+#### Configuring redirect barcodes
+
+1. Click the **⚡** button on a tab label (between ✎ Rename and ✕ Delete) **or** in a subcategory header
+2. In the popup, scan or type the barcode string, then click **Add** (or press **Enter**)
+3. Repeat for additional barcodes if needed
+4. Remove any entry with the **✕** next to it
+5. Click **Done** to close
+
+A badge (e.g. `⚡ 2`) appears on the tab or subcategory header when redirect barcodes are active.
+
+#### How redirects behave
+
+| Behaviour | Detail |
+|-----------|--------|
+| Trigger | Any Enter keypress in any input field across the app |
+| Match | Case-insensitive exact string comparison |
+| Barcode consumed | Yes — never added as an inventory item |
+| Target subcategory collapsed | Automatically expanded |
+| Confirmation | Toast: *"⚡ Redirected to Tab › Subcategory"* |
+| Duplicate assignment | Each barcode can point to only one target; assigning it to a second location removes it from the first (with a confirmation prompt) |
+
+#### Redirect barcodes in exports
+
+Redirect rules are stored in localStorage alongside all other data and are fully preserved in XML export/import — your routing setup survives a backup/restore cycle.
 
 ---
 
@@ -121,68 +156,23 @@ Every item row has a small **send icon** button (an arrow pointing right) betwee
 **Workflow:**
 1. Click the send icon on any item
 2. A dialog appears showing the SFC code and a **Task Type** dropdown
-3. Select the appropriate type and click **Send →**
+3. Select the type and click **Send →**
 
-On confirm:
-- The item is removed from the inventory immediately
-- It is queued in shared browser storage for the Task Manager to pick up
-- A green confirmation toast appears at the bottom of the screen
+On confirm: the item is removed from the inventory immediately and queued for Task Manager to pick up. A green toast confirms the send. Task Manager will show a **📥 imported** notification when it receives the item — either when you switch to its tab, or the next time it is opened.
 
-**What happens in Task Manager:**
-- If the Task Manager tab is already open, it picks up the queued item the next time you click on that tab (window focus event)
-- If Task Manager is not open, it imports the item automatically the next time it is opened
-- A **📥 imported from SFC Inventory** toast confirms receipt
-- Imported tasks display a `from inventory` label next to the part number
-
-**Type dropdown:**
-The dropdown is populated from the Task Manager's configured types via shared browser storage. Open Task Manager at least once in the same browser — it publishes its types automatically on load. If it has never been opened, generic fallback options appear with a warning.
-
-**Requirement:** Both `sfc-inventory.html` and `task-manager.html` must be open in the same browser (same browser profile). The bridge uses `localStorage`, which is scoped to the local file origin — no network is involved.
+**Tip:** Open Task Manager at least once before using this feature so it can publish its configured types.
 
 ---
 
-### Import and Export
+### Import & Export
 
-**Export XML**
-Menu (≡) → Export XML → downloads `Inventory-YYYY-MM-DD_HH-MM.xml`
+| Action | Menu item |
+|--------|-----------|
+| Export XML backup | Menu (≡) → Export XML |
+| Export plain text snapshot | Menu (≡) → Export Plain Text |
+| Import XML backup | Menu (≡) → Import XML |
 
-Use this for backups and for moving data between browsers or devices. The format is human-readable and can be edited in any text editor:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<SFCInventory>
-  <Tab name="General">
-    <Item>SFC-001</Item>
-    <Item>SFC-002</Item>
-    <Subcategory name="Archived">
-      <Item>SFC-006</Item>
-      <Item>SFC-007</Item>
-    </Subcategory>
-  </Tab>
-</SFCInventory>
-```
-
-**Export Plain Text**
-Menu (≡) → Export Plain Text → downloads `Inventory-YYYY-MM-DD_HH-MM.txt`
-
-Produces an indented plain-text list useful for printing or pasting into an email:
-
-```
-Exported: 3/15/2026, 10:30:00 AM
-SFC Inventory
-
-General
-  SFC-001
-  SFC-002
-  Archived
-    SFC-006
-    SFC-007
-```
-
-**Import XML**
-Menu (≡) → Import XML → select a `.xml` file previously exported from this app
-
-⚠️ Importing replaces all current data. Export a backup first if needed.
+> **Warning:** Importing replaces all current data. Export a backup first if needed.
 
 ---
 
@@ -211,32 +201,6 @@ The repository includes `Inventory-testData.xml` — a ready-to-use dataset with
 | Maintenance | SFC-200 – SFC-202 | Scheduled: SFC-210 – SFC-213 · Overdue: SFC-220 – SFC-222 |
 | Logistics | SFC-300 – SFC-302 | Inbound: SFC-310 – SFC-312 · Outbound: SFC-320 |
 
-**Sample lookup — paste into the SFC Lookup panel:**
-
-```
-SFC-007
-SFC-103
-SFC-213
-SFC-10
-SFC-987
-SFC-997
-SFC-044
-SFC-301
-```
-
-**Expected results:**
-
-| Code | Result | Location |
-|------|--------|----------|
-| SFC-007 | ✓ Exact | General › Archived |
-| SFC-103 | ✓ Exact | Work › Pending |
-| SFC-213 | ✓ Exact | Maintenance › Scheduled |
-| SFC-044 | ✓ Exact | Work |
-| SFC-301 | ✓ Exact | Logistics |
-| SFC-10 | ~ Partial | 6 hits across Work subcategories (SFC-103 suppressed — already exact-matched) |
-| SFC-987 | ✕ Not found | — |
-| SFC-997 | ✕ Not found | — |
-
 ---
 
 ## Data Storage
@@ -252,13 +216,15 @@ The Send to Task Manager feature uses two additional localStorage keys as a comm
 | `tm_types` | Task Manager (on load) | Type list for the Send dialog dropdown |
 | `tm_incoming_queue` | SFC Inventory (on send) | Queued items awaiting Task Manager import |
 
+Redirect barcodes are stored as part of the tab and subcategory objects in the main `sfc_inventory` localStorage key — no separate key is needed.
+
 ---
 
 ## Keyboard Shortcuts
 
 | Key | Action |
 |-----|--------|
-| Enter | Add item in the focused input field |
+| Enter | Add item in the focused input field (or trigger redirect if barcode matches) |
 | Escape | Close any open modal or the Help panel |
 
 ---
@@ -276,6 +242,12 @@ The Exact Match lookup requires the item text to be *only* the SFC code with no 
 
 **SFC-42 and SFC-042 are treated as different codes**
 The lookup is a string comparison. Zero-padding must match exactly between your data and your search queries.
+
+**A redirect barcode is not triggering**
+Redirect matching is case-insensitive but must otherwise be an exact string match. Check for leading/trailing spaces in the stored code or in the scanned value.
+
+**A redirect barcode adds the item instead of redirecting**
+The barcode was not found in any redirect list — verify it is saved on the correct tab or subcategory by clicking ⚡ on that target.
 
 **The type dropdown shows generic fallback options**
 Open `task-manager.html` at least once in the same browser. Task Manager publishes its configured types to localStorage automatically on load — once it has done this, the dropdown will stay current.
@@ -298,6 +270,7 @@ Chrome (recommended), Firefox, Safari, Edge — any modern browser with JavaScri
 
 | Version | Changes |
 |---------|---------|
+| 1.7 | Added Redirect Barcodes: assign barcode(s) to any tab or subcategory via inline ⚡ button; scanning redirects focus silently without adding the code as an item; badge shows active rule count; redirect rules preserved in XML export/import |
 | 1.6 | Added Send to Task Manager: icon button on every item row, type-selection dialog, localStorage queue bridge with Task Manager, confirmation toast; in-app Help updated |
 | 1.5 | Added Export Plain Text; added in-app Help / README modal; Escape closes all modals |
 | 1.4 | Split-panel layout; drag-to-resize sidebar (200–600 px); sticky header and tab bar; responsive stacked layout on narrow screens |
@@ -305,5 +278,5 @@ Chrome (recommended), Firefox, Safari, Edge — any modern browser with JavaScri
 
 ---
 
-**Version:** 1.6  
-**Last updated:** March 2026
+**Version:** 1.7  
+**Last updated:** April 2026
